@@ -242,6 +242,8 @@ public enum MenuOpcode
 	 */
 	PRIO_RUNELITE(666),
 
+	LUA_MENU(700),
+
 	/**
 	 * Menu action triggered by examining an object.
 	 */

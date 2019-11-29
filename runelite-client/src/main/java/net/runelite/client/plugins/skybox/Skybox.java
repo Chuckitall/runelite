@@ -297,6 +297,7 @@ class Skybox
 					}
 				}
 			}
+			br.close();
 		}
 		catch (NumberFormatException ex)
 		{

@@ -72,7 +72,7 @@ public class ConfigManager
 {
 	private static final String SETTINGS_FILE_NAME = "runeliteplus.properties";
 	private static final String STANDARD_SETTINGS_FILE_NAME = "settings.properties";
-	private static final File SETTINGS_FILE = new File(RuneLite.RUNELITE_DIR, SETTINGS_FILE_NAME);
+	private static final File SETTINGS_FILE = new File(RuneLite.LOCAL_DIR, SETTINGS_FILE_NAME);
 	private static final File STANDARD_SETTINGS_FILE = new File(RuneLite.RUNELITE_DIR, STANDARD_SETTINGS_FILE_NAME);
 
 	@Inject

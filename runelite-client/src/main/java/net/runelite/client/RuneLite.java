@@ -40,6 +40,7 @@ import java.lang.management.RuntimeMXBean;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.util.Locale;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -86,7 +87,7 @@ import org.slf4j.LoggerFactory;
 @Slf4j
 public class RuneLite
 {
-	public static final File RUNELITE_DIR = new File(System.getProperty("user.home"), ".runelite");
+	public static final File RUNELITE_DIR = new File(System.getProperty("user.home"), ".runeliteplus");
 	public static final File CACHE_DIR = new File(RUNELITE_DIR, "cache");
 	public static final File PROFILES_DIR = new File(RUNELITE_DIR, "profiles");
 	public static final File PLUGIN_DIR = new File(RUNELITE_DIR, "plugins");
@@ -94,6 +95,11 @@ public class RuneLite
 	public static final File LOGS_DIR = new File(RUNELITE_DIR, "logs");
 	public static final Locale SYSTEM_LOCALE = Locale.getDefault();
 	public static boolean allowPrivateServer = false;
+
+	public static final File LOCAL_ROOT = new File(RUNELITE_DIR, "local");
+	public static File LOCAL_DIR = null;
+	public static String password = "";
+	public static String local_profile = null;
 
 	@Getter
 	private static Injector injector;
@@ -171,6 +177,12 @@ public class RuneLite
 	@Nullable
 	private Client client;
 
+	private static Client _client;
+	public static Optional<Client> getClient()
+	{
+		return Optional.ofNullable(_client);
+	}
+
 	@Inject
 	private Provider<ModelOutlineRenderer> modelOutlineRenderer;
 
@@ -188,6 +200,18 @@ public class RuneLite
 		final ArgumentAcceptingOptionSpec<String> proxyInfo = parser
 			.accepts("proxy")
 			.withRequiredArg().ofType(String.class);
+
+		final ArgumentAcceptingOptionSpec<String> localOption = parser
+			.accepts("local", "Local Folder to use")
+			.withRequiredArg()
+			.ofType(String.class)
+			.defaultsTo("000");
+
+		final ArgumentAcceptingOptionSpec<String> accountPasswordOption = parser
+			.accepts("pass", "Password to unlock profiles")
+			.withRequiredArg()
+			.ofType(String.class)
+			.defaultsTo("");
 
 		final ArgumentAcceptingOptionSpec<ClientUpdateCheckMode> updateMode = parser
 			.accepts("rs", "Select client type")
@@ -294,6 +318,12 @@ public class RuneLite
 
 		PROFILES_DIR.mkdirs();
 
+
+		password = options.valueOf(accountPasswordOption);
+		local_profile = options.valueOf(localOption);
+		LOCAL_DIR = new File(LOCAL_ROOT, local_profile);
+		LOCAL_DIR.mkdirs();
+
 		final long start = System.currentTimeMillis();
 
 		injector = Guice.createInjector(new RuneLiteModule(
@@ -317,6 +347,11 @@ public class RuneLite
 		{
 			// Inject members into client
 			injector.injectMembers(client);
+		}
+
+		if (RuneLite._client == null)
+		{
+			RuneLite._client = client;
 		}
 
 		// Load user configuration

@@ -38,6 +38,22 @@ public class Point
 		this.y = y;
 	}
 
+	public static Point fromNative(java.awt.Point nPoint)
+	{
+		return new Point(nPoint.x, nPoint.y);
+	}
+
+	public static java.awt.Point toNative(Point point)
+	{
+		return new java.awt.Point(point.getX(), point.getY());
+	}
+
+	@Deprecated
+	public java.awt.Point asNativePoint()
+	{
+		return Point.toNative(this);
+	}
+
 	@Override
 	public String toString()
 	{

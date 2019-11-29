@@ -275,6 +275,19 @@ public interface OpenOSRSConfig extends Config
 		return new Color(144, 212, 237, 255);
 	}
 
+	@Alpha
+	@ConfigItem(
+		position = 17,
+		keyName = "fredColor",
+		name = "Fred color",
+		description = "Configure the color of Fred's plugins",
+		titleSection = "pluginsColorTitle"
+	)
+	default Color fredColor()
+	{
+		return new Color(104, 242, 237, 255);
+	}
+
 	@ConfigTitleSection(
 		keyName = "externalPluginsTitle",
 		name = "External",

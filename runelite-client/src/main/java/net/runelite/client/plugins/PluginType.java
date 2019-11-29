@@ -8,5 +8,6 @@ public enum PluginType
 	UTILITY,
 	GENERAL_USE,
 	EXTERNAL,
+	FRED,
 	IMPORTANT
 }

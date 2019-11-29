@@ -46,22 +46,20 @@ import java.awt.event.KeyEvent;
 import java.util.Random;
 import java.util.logging.Logger;
 import net.runelite.api.Client;
-import net.runelite.api.Constants;
 import net.runelite.client.ui.ClientUI;
 
 public class Flexo extends Robot
 {
-	public ThreadGroup flexoThreads = new ThreadGroup("flexo");
-	public static boolean isActive;
+	//	public static boolean isActive;
 	public static double scale;
 	public static Client client;
 	public static ClientUI clientUI;
-	public static final int fixedWidth = Constants.GAME_FIXED_WIDTH;
-	public static final int fixedHeight = Constants.GAME_FIXED_HEIGHT;
+	//	static final int fixedWidth = Constants.GAME_FIXED_WIDTH;
+//	static final int fixedHeight = Constants.GAME_FIXED_HEIGHT;
 	public static boolean isStretched;
-	public static int minDelay = 45;
+	public static final int minDelay = 45;
 	public static MouseMotionFactory currentMouseMotionFactory;
-	public boolean pausedIndefinitely = false;
+	private boolean pausedIndefinitely = false;
 	private Robot peer;
 
 	public Flexo() throws AWTException
@@ -95,14 +93,14 @@ public class Flexo extends Robot
 		{
 			try
 			{
-				Thread.sleep(10);
+				Thread.sleep(1);
 			}
-			catch (Exception e)
+			catch (InterruptedException e)
 			{
 				e.printStackTrace();
 			}
 		}
-		isActive = false;
+		//isActive = false;
 	}
 
 	@Override
@@ -155,7 +153,7 @@ public class Flexo extends Robot
 		peer.mousePress(InputEvent.getMaskForButton(buttonID));
 		this.delay(getMinDelay());
 		peer.mouseRelease(InputEvent.getMaskForButton(buttonID));
-		this.delay(getMinDelay());
+//		this.delay(getMinDelay());
 	}
 
 	//TODO: Symbols are nut supported at this time
@@ -187,7 +185,7 @@ public class Flexo extends Robot
 		this.delay(getMinDelay());
 	}
 
-	private int getMinDelay()
+	public int getMinDelay()
 	{
 		Random random = new Random();
 		int random1 = random.nextInt(minDelay);
@@ -263,6 +261,14 @@ public class Flexo extends Robot
 			long startTime = System.currentTimeMillis();
 			while ((startTime + timeMS) > System.currentTimeMillis())
 			{
+				try
+				{
+					Thread.sleep(1);
+				}
+				catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
 			}
 			peer.keyRelease(keycode);
 			this.delay(getMinDelay());
@@ -304,12 +310,17 @@ public class Flexo extends Robot
 		pauseMS(ms);
 	}
 
-	public int determineHorizontalOffset()
+	public void delay()
+	{
+		this.pauseMS(getMinDelay());
+	}
+
+	private int determineHorizontalOffset()
 	{
 		return clientUI.getCanvasOffset().getX();
 	}
 
-	public int determineVerticalOffset()
+	private int determineVerticalOffset()
 	{
 		return clientUI.getCanvasOffset().getY();
 	}

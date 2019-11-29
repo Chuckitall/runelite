@@ -42,7 +42,7 @@ public class GetClosestNpc extends TwoArgFunction
 		if (localPlayerLoc.isPresent()) //this assures us that client and player are also present
 		{
 			_NPC result =  Optional.ofNullable(new NPCQuery().idEquals(ids).isWithinDistance(localPlayerLoc.get(), dist).result(client.get()).nearestTo(player.get())).map(_NPC::from).orElse(null);
-//			log.debug("{}", result);
+			log.debug("{}", result);
 			return CoerceJavaToLua.coerce(result);
 		}
 		return LuaValue.NIL;

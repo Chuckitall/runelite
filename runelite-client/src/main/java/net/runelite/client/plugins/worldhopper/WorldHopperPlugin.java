@@ -37,6 +37,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -112,6 +113,8 @@ public class WorldHopperPlugin extends Plugin
 
 	@Inject
 	private Client client;
+
+	private static WorldHopperPlugin worldHopperPlugin;
 
 	@Inject
 	private ConfigManager configManager;
@@ -507,6 +510,33 @@ public class WorldHopperPlugin extends Plugin
 		}
 	}
 
+	private boolean can_Hop()
+	{
+		return hopperExecutorService != null;
+	}
+
+	public static boolean canHop()
+	{
+		return worldHopperPlugin != null && worldHopperPlugin.can_Hop();
+	}
+
+	public static void request_hop(boolean previous)
+	{
+		if (canHop())
+		{
+			worldHopperPlugin.hop(previous);
+		}
+	}
+
+	public static void request_hop(int worldId)
+	{
+		if (canHop())
+		{
+			worldHopperPlugin.hop(worldId);
+		}
+	}
+
+
 	private void hop(boolean previous)
 	{
 		WorldResult worldResult = worldService.getWorlds();
@@ -620,9 +650,9 @@ public class WorldHopperPlugin extends Plugin
 
 	private void hop(int worldId)
 	{
-		WorldResult worldResult = worldService.getWorlds();
+		Optional<WorldResult> worldResult = Optional.ofNullable(worldService.getWorlds());
 		// Don't try to hop if the world doesn't exist
-		World world = worldResult.findWorld(worldId);
+		World world = worldResult.map(f -> f.findWorld(worldId)).orElse(null);
 		if (world == null)
 		{
 			return;

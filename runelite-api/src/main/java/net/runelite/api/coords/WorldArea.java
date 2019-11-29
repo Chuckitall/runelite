@@ -94,7 +94,7 @@ public class WorldArea
 	 * @param other the passed area
 	 * @return the distance along both x and y axis
 	 */
-	private Point getAxisDistances(WorldArea other)
+	public Point getAxisDistances(WorldArea other)
 	{
 		Point p1 = this.getComparisonPoint(other);
 		Point p2 = other.getComparisonPoint(this);

@@ -163,6 +163,14 @@ public class WidgetID
 	public static final int OPTIONS_GROUP_ID = 261;
 	public static final int GWD_KC_GROUP_ID = 406;
 
+	public static  final int WINTERTODT_GROUP_ID = 396;
+
+	static class Wintertodt
+	{
+		static final int POINTS = 7;
+		static final int PERCENTAGE = 21;
+	}
+
 	static class WorldMap
 	{
 		static final int MAPVIEW = 6;
@@ -304,6 +312,40 @@ public class WidgetID
 	static class Smithing
 	{
 		static final int INVENTORY_ITEM_CONTAINER = 0;
+
+		static final int QTY_1 = 3;
+		static final int QTY_5 = 4;
+		static final int QTY_10 = 5;
+		static final int QTY_X = 6;
+		static final int QTY_ALL = 7;
+
+		static final int DAGGER = 9;
+		static final int SWORD = 10;
+		static final int SCIMITAR = 11;
+		static final int LONG_SWORD = 12;
+		static final int TWO_H_SWORD = 13;
+		static final int AXE = 14;
+		static final int MACE = 15;
+		static final int WARHAMMER = 16;
+		static final int BATTLE_AXE = 17;
+		static final int CLAWS = 18;
+		static final int CHAIN_BODY = 19;
+		static final int PLATE_LEGS = 20;
+		static final int PLATE_SKIRT = 21;
+		static final int PLATE_BODY = 22;
+		static final int NAILS = 23;
+		static final int MED_HELM = 24;
+		static final int FULL_HELM = 25;
+		static final int SQ_SHIELD = 26;
+		static final int KITE_SHIELD = 27;
+		static final int EXCLUSIVE1 = 28;
+		static final int DART_TIPS = 29;
+		static final int ARROW_HEADS = 30;
+		static final int KNIVES = 31;
+		static final int EXCLUSIVE2 = 32;
+		static final int JAVELIN_HEADS = 33;
+		static final int BOLTS = 34;
+		static final int LIMBS = 35;
 	}
 
 	static class GuidePrices

@@ -60,6 +60,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.client.RuneLite;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.DynamicGridLayout;
 import net.runelite.client.ui.FontManager;
@@ -367,6 +368,13 @@ class ProfilesPanel extends PluginPanel
 		add(loginPanel, BorderLayout.CENTER);
 
 		// addAccounts(config.profilesData());
+		if (RuneLite.password != null && !RuneLite.password.equalsIgnoreCase(""))
+		{
+			txtDecryptPassword.setEchoChar('*');
+			txtDecryptPassword.setText(RuneLite.password);
+			decryptAccounts();
+		}
+
 	}
 
 	private void decryptAccounts()

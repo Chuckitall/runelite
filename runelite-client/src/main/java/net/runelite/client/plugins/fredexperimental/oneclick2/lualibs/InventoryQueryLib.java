@@ -1,27 +1,18 @@
 package net.runelite.client.plugins.fredexperimental.oneclick2.lualibs;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.RuneLite;
 import net.runelite.client.plugins.fred.api.wrappers._Item;
 import net.runelite.client.plugins.fredexperimental.oneclick2.Oneclick2;
-import net.runelite.client.plugins.fredexperimental.oneclick2.lualibs.MenuEntryLib.added;
-import net.runelite.client.plugins.fredexperimental.oneclick2.lualibs.MenuEntryLib.clicked;
 import org.apache.commons.lang3.ArrayUtils;
-import org.luaj.vm2.LuaInteger;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.LibFunction;
-import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
-import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.CoerceLuaToJava;
 
@@ -31,7 +22,6 @@ public class InventoryQueryLib extends TwoArgFunction
 	private Oneclick2 plugin;
 	public InventoryQueryLib(Oneclick2 plugin)
 	{
-		log.debug("Plugin {}", plugin);
 		this.plugin = plugin;
 	}
 
@@ -44,7 +34,7 @@ public class InventoryQueryLib extends TwoArgFunction
 	public LuaValue call(LuaValue modname, LuaValue env)
 	{
 		LuaTable library = tableOf();
-//		(id, id2, id3, ...) returns -> _Item containing any of the afformentioned item ids."
+//		(id, id2, id3, ...) returns -> _Item containing any of the aforementioned item ids."
 		library.set("findAll", new findItems());
 		library.set("findFirst", new firstItem());
 		library.set("setSelected", new setSelected());
@@ -88,7 +78,6 @@ public class InventoryQueryLib extends TwoArgFunction
 
 		public Varargs invoke(Varargs args)
 		{
-			//log.debug("findItems called with {}", args.narg());
 			int[] ids = new int[args.narg()];
 			for (int i = 1; i <= args.narg(); i++)
 			{
@@ -132,7 +121,6 @@ public class InventoryQueryLib extends TwoArgFunction
 
 		public Varargs invoke(Varargs args)
 		{
-			//log.debug("firstItem called with {}", args.narg());
 			int[] ids = new int[args.narg()];
 			for (int i = 1; i <= args.narg(); i++)
 			{
@@ -155,7 +143,6 @@ public class InventoryQueryLib extends TwoArgFunction
 			_Item param = (_Item) CoerceLuaToJava.coerce(a, _Item.class);
 			if (param != null)
 			{
-				log.debug("param: {}", param);
 				Client c = plugin.getClient();
 				if (c != null)
 				{

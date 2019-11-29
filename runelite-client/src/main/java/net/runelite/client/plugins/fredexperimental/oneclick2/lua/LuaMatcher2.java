@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.fredexperimental.oneclick2.lua;
 
 import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import net.runelite.client.plugins.fredexperimental.oneclick2.Oneclick2;
 import net.runelite.client.plugins.fredexperimental.oneclick2.lualibs.GameObjQueryLib;
 import net.runelite.client.plugins.fredexperimental.oneclick2.lualibs.InventoryQueryLib;
 import net.runelite.client.plugins.fredexperimental.oneclick2.lualibs.MenuEntryLib;
+import org.apache.commons.lang3.ArrayUtils;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
@@ -143,7 +145,6 @@ public class LuaMatcher2 extends LuaScript<Oneclick2>
 			}
 		}
 	}
-
 
 	public LuaMatcher2(Oneclick2 plugin, int uuid, String path, String name)
 	{

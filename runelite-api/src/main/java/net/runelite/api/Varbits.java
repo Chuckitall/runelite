@@ -286,6 +286,11 @@ public enum Varbits
 	TITHE_FARM_POINTS(4893),
 
 	/**
+	 * Artifact Stealing
+	 */
+	ARTIFACT_STATE(4903),
+
+	/**
 	 * Blast Mine
 	 */
 	BLAST_MINE_COAL(4924),

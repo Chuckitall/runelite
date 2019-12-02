@@ -31,6 +31,7 @@ import static java.awt.event.KeyEvent.VK_4;
 import static java.awt.event.KeyEvent.VK_5;
 import static java.awt.event.KeyEvent.VK_SPACE;
 import static net.runelite.api.NpcID.ALI_MORRISANE;
+import static net.runelite.api.NpcID.CAPTAIN_KHALED_6972;
 import static net.runelite.api.widgets.WidgetID.*;
 import static net.runelite.api.widgets.WidgetInfo.*;
 
@@ -160,6 +161,17 @@ public class TalkerPlugin extends Plugin
 				return FLEXO_CHAT_KEY.ONE;
 			else if (dChild.length > 4 && dChild[4] != null && dChild[4].getText().equalsIgnoreCase("Buy other runes."))
 				return FLEXO_CHAT_KEY.FOUR;
+		}
+		else if(interactingWith.getId() == CAPTAIN_KHALED_6972)
+		{
+			if (dChild.length > 1 && dChild[1] != null && dChild[1].getText().equalsIgnoreCase("I have what it takes."))
+			{
+				return FLEXO_CHAT_KEY.ONE;
+			}
+			else if (dChild.length > 2 && dChild[2] != null && dChild[2].getText().equalsIgnoreCase("Looking for any help?"))
+			{
+				return FLEXO_CHAT_KEY.TWO;
+			}
 		}
 		return FLEXO_CHAT_KEY.NULL;
 	}

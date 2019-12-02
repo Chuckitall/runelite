@@ -3,8 +3,6 @@ package net.runelite.client.plugins.fred.artifact;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Provides;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,23 +15,16 @@ import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.GameState;
 import net.runelite.api.NPC;
-import net.runelite.api.TileObject;
 import net.runelite.api.Varbits;
-import net.runelite.api.World;
 import net.runelite.api.coords.Angle;
 import net.runelite.api.coords.Direction;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.GameObjectChanged;
-import net.runelite.api.events.GameObjectDespawned;
-import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.events.VarbitChanged;
-import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.api.queries.NPCQuery;
-import net.runelite.api.queries.TileObjectQuery;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.api.events.NpcDespawned;
@@ -41,8 +32,6 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
-import net.runelite.client.plugins.fred.api.other.Tuples;
-import net.runelite.client.plugins.fred.api.other.Tuples.T2;
 import net.runelite.client.ui.overlay.OverlayManager;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -68,24 +57,30 @@ import static net.runelite.api.coords.Direction.WEST;
 public class ArtifactPlugin extends Plugin
 {
 	@Getter
-	private ArtifactState state = getArtifactById(-1);
+	private ArtifactTarget state = null;
+
+	@Getter
+	private WorldPoint markerPoint = null;
+
+	@Getter
+	private Optional<GameObject> targetObject = Optional.empty();
+
+	@Getter
+	private Optional<NPC> targetNPC = Optional.empty();
 
 	@Getter(AccessLevel.PACKAGE)
 	private List<NPC> guards = new ArrayList<>();
 
-	@Getter(AccessLevel.PACKAGE)
-	private final List<GameObject> interestingObjects = new ArrayList<>();
+	private int favor = 0;
+	private boolean inArea = false;
+
+	private static final int ladderUpId = 27634;
+
+	private static final int[] REGIONS = {6971, 7227, 6970, 7226};
+	private static final List<Integer> GUARD_IDS = ImmutableList.of(6978, 7975, 6980, 6974, 6973, 6975, 6976, 6979, 6977);
 
 	@Getter
 	private boolean markHouse = false;
-
-	private static final int[] REGIONS = {6971, 7227, 6970, 7226};
-
-	private List<Integer> GUARD_IDS;
-
-	private int favor = 0;
-
-	boolean inArea = false;
 
 	private boolean inArea()
 	{
@@ -124,57 +119,6 @@ public class ArtifactPlugin extends Plugin
 	@Getter
 	private List<WorldPoint> guardVision = new ArrayList<>();
 
-	private List<GameObject> findGameObjects(List<T2<WorldPoint, Integer>> data)
-	{
-		List<GameObject> toRet = new ArrayList<>();
-		for (T2<WorldPoint, Integer> datum : data)
-		{
-			Optional<GameObject> temp = Optional.ofNullable(new GameObjectQuery().idEquals(datum.get_2()).atWorldLocation(datum.get_1()).result(client).nearestTo(client.getLocalPlayer()));
-			temp.ifPresent(toRet::add);
-		}
-		return toRet;
-	}
-
-	static class ArtifactState
-	{
-		@Getter
-		private final int value;
-
-		@Getter
-		private final String message;
-
-		@Getter
-		private final List<T2<Integer, WorldPoint>> targetsData;
-
-		public boolean objMatches(int id, WorldPoint loc)
-		{
-			//List<T2<_Tile, Integer>> idMatched = targetsData.stream().filter(f -> f.get_2() == obj.getId()).collect(Collectors.toList());
-			//idMatched.stream().filter(f->f.get_1().equals(_Tile.fromGameObject(obj.getWorldLocation()))).collect(Collectors.toList());
-			for (T2<Integer, WorldPoint> targetsDatum : targetsData)
-			{
-				if (targetsDatum.get_1() == id && targetsDatum.get_2().getX() == loc.getX() && targetsDatum.get_2().getY() == loc.getY())
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-
-		ArtifactState(int value, String message)
-		{
-			this.value = value;
-			this.message = message;
-			this.targetsData = ImmutableList.copyOf(Collections.emptyList());
-		}
-
-		ArtifactState(int value, String message, List<T2<Integer, WorldPoint>> targetsData)
-		{
-			this.value = value;
-			this.message = message;
-			this.targetsData = ImmutableList.copyOf(targetsData);
-		}
-	}
-
 	@Provides
 	ArtifactConfig getConfig(ConfigManager configManager)
 	{
@@ -185,9 +129,12 @@ public class ArtifactPlugin extends Plugin
 	protected void startUp()
 	{
 		//init config
-		state = getArtifactById(-1);
+		state = null;
+		markerPoint = null;
+		targetNPC = Optional.empty();
+		targetObject = Optional.empty();
+
 		updateConfig();
-		GUARD_IDS = ImmutableList.of(6978, 7975, 6980, 6974, 6973, 6975, 6976, 6979, 6977);
 		inArea = inArea();
 		if (inArea)
 		{
@@ -203,7 +150,10 @@ public class ArtifactPlugin extends Plugin
 	{
 		overlayManager.remove(windowOverlay);
 		overlayManager.remove(sceneOverlay);
-		state = getArtifactById(-1);
+		state = null;
+		markerPoint = null;
+		targetNPC = Optional.empty();
+		targetObject = Optional.empty();
 	}
 
 	private void calculateLineOfSight(List<WorldPoint> points, Direction d, WorldPoint p, int n)
@@ -297,24 +247,81 @@ public class ArtifactPlugin extends Plugin
 		List<WorldPoint> toRet = new ArrayList<>();
 		Direction d = new Angle(a.getOrientation()).getNearestDirection();
 		WorldPoint origin = a.getWorldLocation();
+
 		calculateLineOfSight(toRet, d, origin, n);
+//		WorldArea area = new WorldArea(origin, 1, 1);
+		toRet.add(origin);
+//		if (d == NORTH || d == SOUTH)
+//		{
+//			if(area.canTravelInDirection(client, 1, 0))
+//			{
+//				toRet.add(origin.dx(1));
+//			}
+//			if(area.canTravelInDirection(client, -1, 0))
+//			{
+//				toRet.add(origin.dx(-1));
+//			}
+//		}
+//		else
+//		{
+//				if(area.canTravelInDirection(client, 0, 1))
+//				{
+//					toRet.add(origin.dy(1));
+//				}
+//				if(area.canTravelInDirection(client, 0, -1))
+//				{
+//					toRet.add(origin.dy(-1));
+//				}
+//		}
 		return toRet.stream().distinct().collect(Collectors.toList());
 	}
 
 	@Subscribe
 	private void onTick(GameTick event)
 	{
-		List<WorldPoint> los = guards.stream().flatMap(f -> calculateLineOfSight(f, 3).stream()).distinct().collect(Collectors.toList());
-		guardVision.clear();
-		guardVision.addAll(los);
-		if (client.hasHintArrow() && client.getHintArrowPoint().getPlane() != client.getPlane())
+		if (!inArea)
 		{
-			client.clearHintArrow();
+			if(markerPoint != null)
+			{
+				client.clearHintArrow();
+				markerPoint = null;
+			}
+			return;
 		}
-		if (!client.hasHintArrow() && interestingObjects.stream().anyMatch(f -> f.getPlane() == client.getPlane()))
+		if (state.getId() == 8)
 		{
-			interestingObjects.stream().filter(f -> f.getPlane() == client.getPlane()).min(Comparator.comparing(g -> g.getWorldLocation().distanceTo(Objects.requireNonNull(client.getLocalPlayer()).getWorldLocation()))).map(TileObject::getWorldLocation).ifPresent(client::setHintArrow);
+			List<WorldPoint> los = guards.stream().flatMap(f -> calculateLineOfSight(f, 3).stream()).distinct().collect(Collectors.toList());
+			guardVision.clear();
+			guardVision.addAll(los);
 		}
+		else
+		{
+			guardVision.clear();
+		}
+		if (client.hasHintArrow())
+		{
+			WorldPoint clientMarker = client.getHintArrowPoint();
+			if (clientMarker.getPlane() != markerPoint.getPlane())
+			{
+				client.clearHintArrow();
+				markerPoint = state.getMarkerPoint(client);
+				if(markerPoint != null)
+				{
+					client.setHintArrow(markerPoint);
+				}
+			}
+		}
+		else
+		{
+			markerPoint = state.getMarkerPoint(client);
+			if (markerPoint != null)
+			{
+				client.setHintArrow(markerPoint);
+			}
+		}
+
+		targetObject = state.getTargetObject(client);
+		targetNPC = state.getTargetNPC(client);
 	}
 
 	@Subscribe
@@ -333,7 +340,9 @@ public class ArtifactPlugin extends Plugin
 		{
 			return;
 		}
-		interestingObjects.clear();
+		markerPoint = null;
+		targetNPC = Optional.empty();
+		targetObject = Optional.empty();
 	}
 
 	@Subscribe
@@ -343,68 +352,6 @@ public class ArtifactPlugin extends Plugin
 		{
 			updateConfig();
 		}
-	}
-
-	private ArtifactState getArtifactById(int id)
-	{
-		ArtifactState toRet;
-		switch (id)
-		{
-			case 7:
-				toRet = new ArtifactState(7, "Failed");
-				break;
-			case 8:
-				toRet = new ArtifactState(8, "Return to capt.", ImmutableList.of(
-					Tuples.of(27635, new WorldPoint(1749, 3730, 1)),//south-west
-					Tuples.of(27635, new WorldPoint(1776, 3730, 1)),//south-east
-					Tuples.of(27635, new WorldPoint(1768, 3733, 1)),//south
-					Tuples.of(27635, new WorldPoint(1750, 3756, 1)), //north-west
-					Tuples.of(27635, new WorldPoint(1751, 3751, 1)) //west
-				));
-				break;
-			case 0:
-				toRet = new ArtifactState(0, "No task.");
-				break;
-			case 1:
-				toRet = new ArtifactState(1, "Northern house", ImmutableList.of(
-					Tuples.of(27771, new WorldPoint(1767, 3750, 0))
-				));
-				break;
-			case 3:
-				toRet = new ArtifactState(3, "Southern house", ImmutableList.of(
-					Tuples.of(27634, new WorldPoint(1768, 3733, 0)),
-					Tuples.of(27773, new WorldPoint(1764, 3735, 1))
-				));
-				break;
-			case 4:
-				toRet = new ArtifactState(4, "South-western house", ImmutableList.of(
-					Tuples.of(27634, new WorldPoint(1749, 3730, 0)),
-					Tuples.of(27774, new WorldPoint(1749, 3735, 1))
-				));
-				break;
-			case 6:
-				toRet = new ArtifactState(6, "North-western house", ImmutableList.of(
-					Tuples.of(27634, new WorldPoint(1750, 3756, 0)),
-					Tuples.of(27776, new WorldPoint(1750, 3763, 1))
-				));
-				break;
-			case 2:
-				toRet = new ArtifactState(2, "South-eastern house", ImmutableList.of(
-					Tuples.of(27634, new WorldPoint(1776, 3730, 0)),
-					Tuples.of(27772, new WorldPoint(1773, 3730, 1))
-				));
-				break;
-			case 5:
-				toRet = new ArtifactState(5, "Western house", ImmutableList.of(
-					Tuples.of(27634, new WorldPoint(1751, 3751, 0)),
-					Tuples.of(27775, new WorldPoint(1747, 3749, 1))
-				));
-				break;
-			default:
-				toRet = new ArtifactState(-1, "INVALID");
-				break;
-		}
-		return toRet;
 	}
 
 	@Subscribe
@@ -419,14 +366,11 @@ public class ArtifactPlugin extends Plugin
 	private void updateArtifactVarbit()
 	{
 		this.favor = client.getVar(Varbits.KOUREND_FAVOR_PISCARILIUS);
-		int varbVal = client.getVar(Varbits.ARTIFACT_STATE);
-		if (this.state.getValue() != varbVal)
+		int varVal = client.getVar(Varbits.ARTIFACT_STATE);
+		if (this.state == null || this.state.getId() != varVal)
 		{
-			this.state = getArtifactById(varbVal);
-			this.interestingObjects.clear();
+			this.state = ArtifactTarget.getByState(varVal);
 			client.clearHintArrow();
-			TileObjectQuery<GameObject, GameObjectQuery> q = new GameObjectQuery().idEquals(state.getTargetsData().stream().map(T2::get_1).collect(Collectors.toList())).filter(this::checkGameObject);
-			this.interestingObjects.addAll(q.result(client).list);
 		}
 	}
 
@@ -447,44 +391,6 @@ public class ArtifactPlugin extends Plugin
 	private void onNpcDespawned(NpcDespawned event)
 	{
 		guards.remove(event.getNpc());
-	}
-
-	private boolean checkGameObject(GameObject obj)
-	{
-		WorldPoint loc = Optional.of(obj).map(f -> Tuples.of(f.getSceneMinLocation(), f.getPlane())).map(f -> WorldPoint.fromScene(client, f.get_1().getX(), f.get_1().getY(), f.get_2())).get();
-		return state.objMatches(obj.getId(), loc);
-	}
-
-	@Subscribe
-	private void onGameObjectSpawned(GameObjectSpawned event)
-	{
-		if(!shouldRunPlugin())
-		{
-			return;
-		}
-		if (checkGameObject(event.getGameObject()))
-		{
-			this.interestingObjects.add(event.getGameObject());
-		}
-	}
-
-	@Subscribe
-	private void onGameObjectDespawned(GameObjectDespawned event)
-	{
-		this.interestingObjects.remove(event.getGameObject());
-	}
-
-	@Subscribe
-	private void onGameObjectChanged(GameObjectChanged event)
-	{
-		GameObject previous = event.getPrevious();
-		GameObject gameObject = event.getGameObject();
-
-		interestingObjects.remove(previous);
-		if (checkGameObject(gameObject))
-		{
-			interestingObjects.add(gameObject);
-		}
 	}
 
 	private void updateConfig()

@@ -46,8 +46,8 @@ public class WindowOverlay extends Overlay
 		TableComponent tableComponent = new TableComponent();
 		tableComponent.setColumnAlignments(TableAlignment.LEFT, TableAlignment.RIGHT);
 
-		tableComponent.addRow("State", plugin.getState().getValue() + "");
-		tableComponent.addRow("State", plugin.getState().getMessage());
+		tableComponent.addRow("State", plugin.getState().getId() + "");
+		tableComponent.addRow("State", plugin.getState().getText());
 		tableComponent.addRow("varbit", plugin.getClient().getVar(Varbits.ARTIFACT_STATE) + "");
 
 		panelComponent.getChildren().add(tableComponent);

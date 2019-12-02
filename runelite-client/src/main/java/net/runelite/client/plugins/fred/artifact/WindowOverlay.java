@@ -39,21 +39,18 @@ public class WindowOverlay extends Overlay
 			return null;
 		}
 		panelComponent.getChildren().clear();
-		if (plugin.shouldRunPlugin())
-		{
-			panelComponent.getChildren().add(TitleComponent.builder()
-				.text("Steal Artifact")
-				.color(Color.MAGENTA)
-				.build());
-			TableComponent tableComponent = new TableComponent();
-			tableComponent.setColumnAlignments(TableAlignment.LEFT, TableAlignment.RIGHT);
+		panelComponent.getChildren().add(TitleComponent.builder()
+			.text("Steal Artifact")
+			.color(Color.MAGENTA)
+			.build());
+		TableComponent tableComponent = new TableComponent();
+		tableComponent.setColumnAlignments(TableAlignment.LEFT, TableAlignment.RIGHT);
 
-			tableComponent.addRow("State", plugin.getState().getValue() + "");
-			tableComponent.addRow("State", plugin.getState().getMessage());
-			tableComponent.addRow("varbit", plugin.getClient().getVar(Varbits.ARTIFACT_STATE) + "");
+		tableComponent.addRow("State", plugin.getState().getValue() + "");
+		tableComponent.addRow("State", plugin.getState().getMessage());
+		tableComponent.addRow("varbit", plugin.getClient().getVar(Varbits.ARTIFACT_STATE) + "");
 
-			panelComponent.getChildren().add(tableComponent);
-		}
+		panelComponent.getChildren().add(tableComponent);
 		return panelComponent.render(graphics);
 	}
 }

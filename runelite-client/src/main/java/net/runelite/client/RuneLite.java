@@ -94,6 +94,7 @@ public class RuneLite
 	public static final File PLUGIN_DIR = new File(RUNELITE_DIR, "plugins");
 	public static final File SCREENSHOT_DIR = new File(RUNELITE_DIR, "screenshots");
 	public static final File LOGS_DIR = new File(RUNELITE_DIR, "logs");
+	public static final File PLUGINS_DIR = new File(RUNELITE_DIR, "plugins");
 	public static final Locale SYSTEM_LOCALE = Locale.getDefault();
 	public static boolean allowPrivateServer = false;
 
@@ -104,19 +105,14 @@ public class RuneLite
 
 	@Getter
 	private static Injector injector;
-
-	@Inject
-	private PluginManager pluginManager;
-
-	@Inject
-	private ConfigManager configManager;
-
-	@Inject
-	private SessionManager sessionManager;
-
 	@Inject
 	public DiscordService discordService;
-
+	@Inject
+	private PluginManager pluginManager;
+	@Inject
+	private ConfigManager configManager;
+	@Inject
+	private SessionManager sessionManager;
 	@Inject
 	private ClientSessionManager clientSessionManager;
 
@@ -282,7 +278,7 @@ public class RuneLite
 
 		final ClientLoader clientLoader = new ClientLoader(options.valueOf(updateMode));
 		Completable.fromAction(clientLoader::get)
-			.subscribeOn(Schedulers.single())
+			.subscribeOn(Schedulers.computation())
 			.subscribe();
 
 		Completable.fromAction(ClassPreloader::preload)
@@ -338,6 +334,12 @@ public class RuneLite
 		final RuntimeMXBean rb = ManagementFactory.getRuntimeMXBean();
 		final long uptime = rb.getUptime();
 		log.info("Client initialization took {}ms. Uptime: {}ms", end - start, uptime);
+	}
+
+	@VisibleForTesting
+	public static void setInjector(Injector injector)
+	{
+		RuneLite.injector = injector;
 	}
 
 	private void start() throws Exception
@@ -439,11 +441,5 @@ public class RuneLite
 		configManager.sendConfig();
 		clientSessionManager.shutdown();
 		discordService.close();
-	}
-
-	@VisibleForTesting
-	public static void setInjector(Injector injector)
-	{
-		RuneLite.injector = injector;
 	}
 }

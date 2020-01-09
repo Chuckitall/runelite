@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, https://openosrs.com
+ * Copyright (c) 2017, Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,22 +22,18 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.lizardmenshaman;
+package net.runelite.client.plugins.config;
 
-import java.time.Instant;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import java.awt.Dimension;
+import javax.swing.JPanel;
+import net.runelite.client.ui.PluginPanel;
 
-@Getter(AccessLevel.PACKAGE)
-@Setter(AccessLevel.PACKAGE)
-@RequiredArgsConstructor
-@AllArgsConstructor
-class LizardmenShamanSpawn
+class FixedWidthPanel extends JPanel
 {
-	private final Instant start = Instant.now();
-	private double countdownTimer;
-	private Instant end;
+	@Override
+	public Dimension getPreferredSize()
+	{
+		return new Dimension(PluginPanel.PANEL_WIDTH, super.getPreferredSize().height);
+	}
+
 }

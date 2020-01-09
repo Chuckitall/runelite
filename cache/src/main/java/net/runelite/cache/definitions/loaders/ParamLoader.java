@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Adam <Adam@sigterm.info>
+ * Copyright (c) 2020, Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,14 +22,43 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.chat;
+package net.runelite.cache.definitions.loaders;
 
-import net.runelite.client.events.ChatboxInput;
-import net.runelite.client.events.PrivateMessageInput;
+import net.runelite.cache.definitions.ParamDefinition;
+import net.runelite.cache.io.InputStream;
+import net.runelite.cache.util.ScriptVarType;
 
-public interface ChatboxInputListener
+public class ParamLoader
 {
-	boolean onChatboxInput(ChatboxInput chatboxInput);
+	public ParamDefinition load(byte[] data)
+	{
+		ParamDefinition def = new ParamDefinition();
+		InputStream b = new InputStream(data);
 
-	boolean onPrivateMessageInput(PrivateMessageInput privateMessageInput);
+		for (; ; )
+		{
+			int opcode = b.readUnsignedByte();
+
+			switch (opcode)
+			{
+				case 0:
+					return def;
+				case 1:
+				{
+					int idx = b.readByte();
+					def.setType(ScriptVarType.forCharKey((char) idx));
+					break;
+				}
+				case 2:
+					def.setDefaultInt(b.readInt());
+					break;
+				case 4:
+					def.setMembers(false);
+					break;
+				case 5:
+					def.setDefaultString(b.readString());
+					break;
+			}
+		}
+	}
 }

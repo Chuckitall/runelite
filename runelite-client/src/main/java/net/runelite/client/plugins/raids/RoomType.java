@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2018, https://openosrs.com
+ * Copyright (c) 2018, Kamiel
+ * Copyright (c) 2019, Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,34 +23,58 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.lizardmenshaman;
+package net.runelite.client.plugins.raids;
 
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@ConfigGroup("shaman")
-public interface LizardmenShamanConfig extends Config
+@AllArgsConstructor
+@Getter
+public enum RoomType
 {
-	@ConfigItem(
-		position = 1,
-		keyName = "showTimer",
-		name = "Show timer",
-		description = "Display timer till for lizardman shaman spawns."
-	)
-	default boolean showTimer()
-	{
-		return true;
-	}
+    START("Start", '#'),
+    END("End", '¤'),
+    SCAVENGERS("Scavengers", 'S'),
+    FARMING("Farming", 'F'),
+    EMPTY("Empty", ' '),
+    COMBAT("Combat", 'C'),
+    PUZZLE("Puzzle", 'P');
 
-	@ConfigItem(
-		position = 2,
-		keyName = "notifyOnSpawn",
-		name = "Notify on spawn",
-		description = "Notify user when lizardman summons spawns."
-	)
-	default boolean notifyOnSpawn()
-	{
-		return true;
-	}
+    private final String name;
+    private final char code;
+
+    RaidRoom getUnsolvedRoom()
+    {
+        switch (this)
+        {
+            case START:
+                return RaidRoom.START;
+            case END:
+                return RaidRoom.END;
+            case SCAVENGERS:
+                return RaidRoom.SCAVENGERS;
+            case FARMING:
+                return RaidRoom.FARMING;
+            case COMBAT:
+                return RaidRoom.UNKNOWN_COMBAT;
+            case PUZZLE:
+                return RaidRoom.UNKNOWN_PUZZLE;
+            case EMPTY:
+            default:
+                return RaidRoom.EMPTY;
+        }
+    }
+
+    static RoomType fromCode(char code)
+    {
+        for (RoomType type : values())
+        {
+            if (type.getCode() == code)
+            {
+                return type;
+            }
+        }
+
+        return EMPTY;
+    }
 }

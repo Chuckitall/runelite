@@ -1,6 +1,8 @@
 package net.runelite.client.plugins.fred.api.lua.library;
 
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.plugins.fred.api.lua.library.craftingInterface.FindCraftingOption;
+import net.runelite.client.plugins.fred.api.lua.library.craftingInterface.IsCraftingWidgetOpen;
 import net.runelite.client.plugins.fred.api.lua.library.dialog.FindDialog;
 import net.runelite.client.plugins.fred.api.lua.library.dialog.IsDialogOpen;
 import net.runelite.client.plugins.fred.api.lua.library.npc.GetAllNpc;
@@ -32,6 +34,10 @@ public class LuaGameInteropLib extends TwoArgFunction
 		//dialog
 		library.set("isDialogOpen", new IsDialogOpen());
 		library.set("findDialog", new FindDialog());
+
+		//crafting
+		library.set("isCraftingWidgetOpen", new IsCraftingWidgetOpen());
+		library.set("findCraftingOption", new FindCraftingOption());
 
 		env.set("game", library);
 		env.get("package").get("loaded").set("game", library);

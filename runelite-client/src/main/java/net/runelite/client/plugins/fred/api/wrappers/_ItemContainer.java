@@ -106,7 +106,7 @@ public class _ItemContainer
 		int dX = Math.abs(aX - bX);
 		int dY = Math.abs(aY - bY);
 		int delta = dX + dY;
-		log.debug("[{}=({}, {}) | {}=({}, {})] => {}", slotA, aX, aY, slotB, bX, bY, delta);
+		//log.debug("[{}=({}, {}) | {}=({}, {})] => {}", slotA, aX, aY, slotB, bX, bY, delta);
 		return delta;
 	}
 

@@ -34,7 +34,7 @@ public class LuaMatcher<E extends ScriptPlugin> implements Matcher<E>
 	@Getter(AccessLevel.PUBLIC)
 	private final String name;
 
-	@Getter(AccessLevel.PROTECTED)
+	@Getter(AccessLevel.PUBLIC)
 	private E plugin;
 
 	protected Globals luaGlobals;

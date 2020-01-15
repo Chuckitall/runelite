@@ -80,7 +80,7 @@ import net.runelite.http.api.item.ItemPrice;
 	name = "Supplies Used Tracker",
 	description = "Tracks supplies used during the session",
 	tags = {"cost"},
-	type = PluginType.UTILITY,
+	type = PluginType.MISCELLANEOUS,
 	enabledByDefault = false
 )
 @Singleton
@@ -819,13 +819,13 @@ public class SuppliesTrackerPlugin extends Plugin
 				case ITEM_THIRD_OPTION:
 				case ITEM_FOURTH_OPTION:
 				case ITEM_FIFTH_OPTION:
-				case EXAMINE_ITEM_BANK_EQ:
+				case CC_OP_LOW_PRIORITY:
 				case WIDGET_FIRST_OPTION:
 				case WIDGET_SECOND_OPTION:
 				case WIDGET_THIRD_OPTION:
 				case WIDGET_FOURTH_OPTION:
 				case WIDGET_FIFTH_OPTION:
-				case WIDGET_DEFAULT:
+				case CC_OP:
 					break;
 				default:
 					return;

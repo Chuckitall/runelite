@@ -408,9 +408,9 @@ public class RaidsPlugin extends Plugin
 		}
 
 		final String playerName = client.getLocalPlayer().getName();
-		RaidRoom[] rooms = raid.getRooms();
+		List<RaidRoom> orderedRooms = raid.getOrderedRooms();
 
-		LayoutRoom[] layoutRooms = Arrays.stream(rooms)
+		LayoutRoom[] layoutRooms = orderedRooms.stream()
 				.map(room -> LayoutRoom.valueOf(room.name()))
 				.toArray(LayoutRoom[]::new);
 
@@ -789,7 +789,9 @@ public class RaidsPlugin extends Plugin
 
 				layoutFullCode = layout.getCode();
 				raid.updateLayout(layout);
-				RotationSolver.solve(raid.getCombatRooms());
+				RaidRoom[] rooms = raid.getCombatRooms();
+				RotationSolver.solve(rooms);
+				raid.setCombatRooms(rooms);
 				setOverlayStatus(true);
 				if (this.displayLayoutMessage)
 				{

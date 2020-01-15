@@ -55,6 +55,7 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginType;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.Graceful;
 import net.runelite.client.util.ImageUtil;
@@ -63,7 +64,8 @@ import org.apache.commons.lang3.StringUtils;
 @PluginDescriptor(
 	name = "Status Orbs",
 	description = "Configure settings for the Minimap orbs",
-	tags = {"minimap", "orb", "regen", "energy", "special"}
+	tags = {"minimap", "orb", "regen", "energy", "special"},
+	type = PluginType.UTILITY
 )
 public class StatusOrbsPlugin extends Plugin
 {
@@ -125,6 +127,8 @@ public class StatusOrbsPlugin extends Plugin
 	private int lastEnergy = 0;
 	private boolean localPlayerRunningToDestination;
 	private WorldPoint prevLocalPlayerLocation;
+	@Getter(AccessLevel.PACKAGE)
+	private double recoverRate = 1;
 
 	private BufferedImage heart;
 
@@ -287,6 +291,8 @@ public class StatusOrbsPlugin extends Plugin
 
 		prevLocalPlayerLocation = client.getLocalPlayer().getWorldLocation();
 
+		recoverRate = Graceful.calculateRecoveryRate(client.getItemContainer(InventoryID.EQUIPMENT));
+
 		if (this.replaceOrbText)
 		{
 			setRunOrbText(getEstimatedRunTimeRemaining(true));
@@ -380,11 +386,7 @@ public class StatusOrbsPlugin extends Plugin
 
 		// Calculate the amount of energy recovered every second
 		double recoverRate = (48 + client.getBoostedSkillLevel(Skill.AGILITY)) / 360.0;
-
-		if (Graceful.hasFullSet(client.getItemContainer(InventoryID.EQUIPMENT)))
-		{
-			recoverRate *= 1.3; // 30% recover rate increase from Graceful set effect
-		}
+		recoverRate *= Graceful.calculateRecoveryRate(client.getItemContainer(InventoryID.EQUIPMENT));
 
 		// Calculate the number of seconds left
 		final double secondsLeft = (100 - client.getEnergy()) / recoverRate;
@@ -430,11 +432,8 @@ public class StatusOrbsPlugin extends Plugin
 	private double runRegenPerTick()
 	{
 		double recoverRate = (client.getBoostedSkillLevel(Skill.AGILITY) / 6d + 8) / 100;
+		recoverRate *= Graceful.calculateRecoveryRate(client.getItemContainer(InventoryID.EQUIPMENT));
 
-		if (Graceful.hasFullSet(client.getItemContainer(InventoryID.EQUIPMENT)))
-		{
-			return recoverRate * 1.3;
-		}
 		return recoverRate;
 	}
 

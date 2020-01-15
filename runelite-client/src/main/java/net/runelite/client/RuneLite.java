@@ -82,6 +82,7 @@ import net.runelite.client.ui.overlay.arrow.ArrowWorldOverlay;
 import net.runelite.client.ui.overlay.infobox.InfoBoxOverlay;
 import net.runelite.client.ui.overlay.tooltip.TooltipOverlay;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
+import net.runelite.client.ws.PartyService;
 import org.slf4j.LoggerFactory;
 
 @Singleton
@@ -166,6 +167,9 @@ public class RuneLite
 
 	@Inject
 	private Provider<ChatboxPanelManager> chatboxPanelManager;
+
+	@Inject
+	private Provider<PartyService> partyService;
 
 	@Inject
 	private Hooks hooks;
@@ -272,7 +276,6 @@ public class RuneLite
 			}
 		}
 
-
 		SentryClient client = Sentry.init("https://fa31d674e44247fa93966c69a903770f@sentry.io/1811856");
 		client.setRelease(RuneLiteProperties.getPlusVersion());
 
@@ -329,7 +332,6 @@ public class RuneLite
 			true));
 
 		injector.getInstance(RuneLite.class).start();
-
 		final long end = System.currentTimeMillis();
 		final RuntimeMXBean rb = ManagementFactory.getRuntimeMXBean();
 		final long uptime = rb.getUptime();
@@ -407,6 +409,7 @@ public class RuneLite
 			xpDropManager.get();
 			playerManager.get();
 			chatboxPanelManager.get();
+			partyService.get();
 
 			eventBus.subscribe(GameStateChanged.class, this, hooks::onGameStateChanged);
 			eventBus.subscribe(ScriptCallbackEvent.class, this, hooks::onScriptCallbackEvent);

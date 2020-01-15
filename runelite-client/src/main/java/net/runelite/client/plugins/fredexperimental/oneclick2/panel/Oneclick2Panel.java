@@ -28,7 +28,7 @@ public class Oneclick2Panel extends PluginPanel
 	{
 		ON_SWITCHER = new ImageIcon(ImageUtil.recolorImage(ImageUtil.getResourceStreamFromClass(Oneclick2.class, "script_on.png"), ColorScheme.BRAND_BLUE));
 		OFF_SWITCHER = new ImageIcon(ImageUtil.flipImage(
-			ImageUtil.grayscaleOffset(
+			ImageUtil.luminanceScale(
 				ImageUtil.grayscaleImage(ImageUtil.getResourceStreamFromClass(Oneclick2.class, "script_on.png")),
 				0.61f
 			),

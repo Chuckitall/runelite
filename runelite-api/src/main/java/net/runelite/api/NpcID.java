@@ -1255,6 +1255,13 @@ public final class NpcID
 	public static final int HARI = 1325;
 	public static final int BARFY_BILL = 1326;
 	public static final int TYRAS_GUARD_1327 = 1327;
+	public static final int TRADER_STAN = 1328;
+	public static final int TRADER_CREWMEMBER = 1329;
+	public static final int TRADER_CREWMEMBER_1330 = 1330;
+	public static final int TRADER_CREWMEMBER_1331 = 1331;
+	public static final int TRADER_CREWMEMBER_1332 = 1332;
+	public static final int TRADER_CREWMEMBER_1333 = 1333;
+	public static final int TRADER_CREWMEMBER_1334 = 1334;
 	public static final int JACK_SEAGULL = 1335;
 	public static final int LONGBOW_BEN = 1336;
 	public static final int AHAB = 1337;
@@ -8311,7 +8318,7 @@ public final class NpcID
 	public static final int TYPHOR_9296 = 9296;
 	public static final int VRITRA = 9297;
 	public static final int MAZ = 9298;
-	public static final int TRADER_STAN = 9299;
+	public static final int TRADER_STAN_9299 = 9299;
 	public static final int TRADER_STAN_9300 = 9300;
 	public static final int TRADER_STAN_9301 = 9301;
 	public static final int TRADER_STAN_9302 = 9302;
@@ -8323,7 +8330,7 @@ public final class NpcID
 	public static final int TRADER_STAN_9309 = 9309;
 	public static final int TRADER_STAN_9310 = 9310;
 	public static final int TRADER_STAN_9311 = 9311;
-	public static final int TRADER_CREWMEMBER = 9312;
+	public static final int TRADER_CREWMEMBER_9312 = 9312;
 	public static final int TRADER_CREWMEMBER_9313 = 9313;
 	public static final int TRADER_CREWMEMBER_9314 = 9314;
 	public static final int TRADER_CREWMEMBER_9315 = 9315;

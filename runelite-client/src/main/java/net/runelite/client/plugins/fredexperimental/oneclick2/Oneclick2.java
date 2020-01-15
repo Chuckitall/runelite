@@ -33,7 +33,6 @@ import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.queries.GameObjectQuery;
-import net.runelite.api.util.Text;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.events.ConfigChanged;
@@ -41,10 +40,11 @@ import net.runelite.client.menus.AbstractComparableEntry;
 import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.fred.api.scripting.ScriptPlugin;
+import net.runelite.client.plugins.fred.api.scripting.StockEntry;
 import net.runelite.client.plugins.fred.api.wrappers._GameObject;
 import net.runelite.client.plugins.fred.api.wrappers._Item;
-import net.runelite.client.plugins.fredexperimental.oneclick2.lua.LuaMatcher2;
-import net.runelite.client.plugins.fredexperimental.oneclick2.lua.StockEntry;
+import net.runelite.client.plugins.fredexperimental.oneclick2.lua.LuaMatcher;
 import net.runelite.client.plugins.fredexperimental.oneclick2.panel.Oneclick2Panel;
 import net.runelite.client.plugins.fredexperimental.oneclick2.panel.ScriptPanel;
 import net.runelite.client.ui.ClientToolbar;
@@ -59,7 +59,7 @@ import static net.runelite.api.MenuOpcode.LUA_MENU;
 	tags = {"oneclick", "oneclick2", "panel", "menu"}
 )
 @Slf4j
-public class Oneclick2 extends Plugin
+public class Oneclick2 extends Plugin implements ScriptPlugin
 {
 	static final Splitter NEWLINE_SPLITTER = Splitter
 		.on("\n")
@@ -166,10 +166,10 @@ public class Oneclick2 extends Plugin
 
 	private void onGameTick(GameTick tick)
 	{
-		luaMatchManager.callOnAllEnabled(LuaMatcher2::tick);
+		luaMatchManager.callOnAllEnabled(LuaMatcher::tick);
 	}
 
-	private Optional<StockEntry> onMenuAdded(LuaMatcher2 matcher, StockEntry e)
+	private Optional<StockEntry> onMenuAdded(LuaMatcher matcher, StockEntry e)
 	{
 		if (!matcher.peak(e.op, e.id))
 		{
@@ -213,7 +213,7 @@ public class Oneclick2 extends Plugin
 		{
 			return;
 		}
-		LuaMatcher2 m;
+		LuaMatcher m;
 		if (luaMatchManager.isUUID(event.getIdentifier()) && luaMatchManager.isScriptEnabled(event.getIdentifier()) && (m = luaMatchManager.getScriptMatcher(event.getIdentifier())) != null)
 		{
 			Optional<MenuEntry> t = Optional.ofNullable(m.onClick(new StockEntry(event))).map(StockEntry::build);

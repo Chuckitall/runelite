@@ -16,7 +16,7 @@ import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.fred.api.other.Tuples;
 import net.runelite.client.plugins.fred.api.other.Tuples.T3;
-import net.runelite.client.plugins.fredexperimental.oneclick2.lua.LuaMatcher2;
+import net.runelite.client.plugins.fredexperimental.oneclick2.lua.LuaMatcher;
 import net.runelite.client.plugins.fredexperimental.oneclick2.panel.ScriptPanel;
 
 @Singleton
@@ -38,7 +38,7 @@ public class LuaMatchManager
 		this.plugin = plugin;
 	}
 
-	private final Map<Integer, T3<Boolean, LuaMatcher2, ScriptPanel>> allLuaMatchers = new HashMap<>();
+	private final Map<Integer, T3<Boolean, LuaMatcher, ScriptPanel>> allLuaMatchers = new HashMap<>();
 
 	public String getScriptName(int uuid)
 	{
@@ -53,27 +53,27 @@ public class LuaMatchManager
 	public int registerScript(String path, String name)
 	{
 		String file = path.concat(name);
-		Optional<Entry<Integer, T3<Boolean, LuaMatcher2, ScriptPanel>>> clash = allLuaMatchers.entrySet().stream().filter(f -> f.getValue().get_2().getResolvedName().equalsIgnoreCase(file)).findFirst();
+		Optional<Entry<Integer, T3<Boolean, LuaMatcher, ScriptPanel>>> clash = allLuaMatchers.entrySet().stream().filter(f -> f.getValue().get_2().getResolvedName().equalsIgnoreCase(file)).findFirst();
 		if (clash.isPresent())
 		{
 			log.debug("New script \"{}\" clashes w/ existing script -> uuid: {}, path: {}", file, clash.get().getKey(), clash.get().getValue().get_2().getResolvedName());
-			allLuaMatchers.replace(clash.get().getKey(), Tuples.of(false, new LuaMatcher2(this.plugin, clash.get().getKey(), clash.get().getValue().get_2().getPath(), clash.get().getValue().get_2().getName()), buildJPanel(clash.get().getKey(), name, false)));
+			allLuaMatchers.replace(clash.get().getKey(), Tuples.of(false, new LuaMatcher<>(this.plugin, clash.get().getKey(), clash.get().getValue().get_2().getPath(), clash.get().getValue().get_2().getName()), buildJPanel(clash.get().getKey(), name, false)));
 			return clash.get().getKey();
 		}
 		else
 		{
 			int uuid = getUUID();
-			allLuaMatchers.put(uuid, Tuples.of(false, new LuaMatcher2(this.plugin, uuid, path, name), buildJPanel(uuid, name, false)));
+			allLuaMatchers.put(uuid, Tuples.of(false, new LuaMatcher<>(this.plugin, uuid, path, name), buildJPanel(uuid, name, false)));
 			return uuid;
 		}
 	}
 
 	public int reloadScript(int uuid)
 	{
-		Optional<Entry<Integer, T3<Boolean, LuaMatcher2, ScriptPanel>>> value = allLuaMatchers.entrySet().stream().filter(f -> f.getKey() == uuid).findFirst();
+		Optional<Entry<Integer, T3<Boolean, LuaMatcher, ScriptPanel>>> value = allLuaMatchers.entrySet().stream().filter(f -> f.getKey() == uuid).findFirst();
 		if (value.isPresent())
 		{
-			allLuaMatchers.replace(value.get().getKey(), Tuples.of(value.get().getValue().get_1(), new LuaMatcher2(this.plugin, value.get().getKey(), value.get().getValue().get_2().getPath(), value.get().getValue().get_2().getName()), value.get().getValue().get_3()));
+			allLuaMatchers.replace(value.get().getKey(), Tuples.of(value.get().getValue().get_1(), new LuaMatcher<>(this.plugin, value.get().getKey(), value.get().getValue().get_2().getPath(), value.get().getValue().get_2().getName()), value.get().getValue().get_3()));
 			return value.get().getKey();
 		}
 		else
@@ -90,7 +90,7 @@ public class LuaMatchManager
 			log.error("No such uuid {}", uuid);
 			return;
 		}
-		T3<Boolean, LuaMatcher2, ScriptPanel> value = allLuaMatchers.get(uuid);
+		T3<Boolean, LuaMatcher, ScriptPanel> value = allLuaMatchers.get(uuid);
 		if (value != null && !value.get_1())
 		{
 			allLuaMatchers.replace(uuid, Tuples.of(true, value.get_2(), value.get_3()));
@@ -110,7 +110,7 @@ public class LuaMatchManager
 			log.error("No such uuid {}", uuid);
 			return;
 		}
-		T3<Boolean, LuaMatcher2, ScriptPanel> value = allLuaMatchers.get(uuid);
+		T3<Boolean, LuaMatcher, ScriptPanel> value = allLuaMatchers.get(uuid);
 		if (value != null && value.get_1())
 		{
 			allLuaMatchers.replace(uuid, Tuples.of(false, value.get_2(), value.get_3()));
@@ -130,18 +130,18 @@ public class LuaMatchManager
 			log.error("No such uuid {}", uuid);
 			return false;
 		}
-		T3<Boolean, LuaMatcher2, ScriptPanel> value = allLuaMatchers.get(uuid);
+		T3<Boolean, LuaMatcher, ScriptPanel> value = allLuaMatchers.get(uuid);
 		return value != null && value.get_1();
 	}
 
-	public LuaMatcher2 getScriptMatcher(int uuid)
+	public LuaMatcher getScriptMatcher(int uuid)
 	{
 		if (!allLuaMatchers.containsKey(uuid))
 		{
 			log.error("No such uuid {}", uuid);
 			return null;
 		}
-		T3<Boolean, LuaMatcher2, ScriptPanel> value = allLuaMatchers.get(uuid);
+		T3<Boolean, LuaMatcher, ScriptPanel> value = allLuaMatchers.get(uuid);
 		if (value != null)
 		{
 			return value.get_2();
@@ -175,12 +175,12 @@ public class LuaMatchManager
 		return ImmutableList.copyOf(allLuaMatchers.keySet());
 	}
 
-	public List<LuaMatcher2> getAllEnabled()
+	public List<LuaMatcher> getAllEnabled()
 	{
 		return allLuaMatchers.values().stream().filter(T3::get_1).map(T3::get_2).collect(Collectors.toList());
 	}
 
-	public void callOnAllEnabled(Consumer<? super LuaMatcher2> action)
+	public void callOnAllEnabled(Consumer<? super LuaMatcher> action)
 	{
 		allLuaMatchers.values().stream().filter(T3::get_1).map(T3::get_2).collect(Collectors.toList()).forEach(action);
 	}

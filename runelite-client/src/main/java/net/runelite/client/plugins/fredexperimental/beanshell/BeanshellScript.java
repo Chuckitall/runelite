@@ -3,6 +3,7 @@ package net.runelite.client.plugins.fredexperimental.beanshell;
 import bsh.EvalError;
 import bsh.Interpreter;
 import java.io.IOException;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import net.runelite.api.events.MenuOpened;
@@ -60,7 +61,7 @@ public class BeanshellScript implements BeanshellMatcher
 	}
 
 	@Override
-	public StockEntry added(StockEntry e)
+	public List<StockEntry> added(StockEntry e)
 	{
 		if (matcher != null)
 		{

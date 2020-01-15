@@ -8,6 +8,7 @@ import com.google.inject.Binder;
 import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -188,7 +189,7 @@ public class BeanshellPlugin extends Plugin implements ScriptPlugin
 		beanshellManager.callOnAllEnabled(BeanshellMatcher::opened, event);
 	}
 
-	private Optional<StockEntry> onMenuAdded(BeanshellScript script, StockEntry e)
+	private Optional<List<StockEntry>> onMenuAdded(BeanshellScript script, StockEntry e)
 	{
 		if (!script.peak(e.op, e.id))
 		{
@@ -200,11 +201,11 @@ public class BeanshellPlugin extends Plugin implements ScriptPlugin
 			return Optional.empty();
 		}
 
-		Optional<StockEntry> toAdd = Optional.ofNullable(script.added(e));
-		toAdd.ifPresent(f -> {
-			f.op = BEAN_MENU.getId();
-			f.id = script.getUuid();
-		});
+		Optional<List<StockEntry>> toAdd = Optional.ofNullable(script.added(e));
+		toAdd.ifPresent(f -> f.forEach(j -> {
+			j.op = BEAN_MENU.getId();
+			j.id = script.getUuid();
+		}));
 		return toAdd;
 	}
 
@@ -214,7 +215,7 @@ public class BeanshellPlugin extends Plugin implements ScriptPlugin
 		{
 			return;
 		}
-		List<MenuEntry> toAdd = beanshellManager.getAllEnabled().stream().map(f -> onMenuAdded(f, new StockEntry(event))).map(f -> f.map(StockEntry::build)).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+		List<MenuEntry> toAdd = beanshellManager.getAllEnabled().stream().map(f -> onMenuAdded(f, new StockEntry(event))).filter(Optional::isPresent).map(Optional::get).flatMap(f -> f.stream().map(StockEntry::build)).collect(Collectors.toList());
 		if (!toAdd.isEmpty())
 		{
 			toAdd.forEach(f -> client.insertMenuItem(

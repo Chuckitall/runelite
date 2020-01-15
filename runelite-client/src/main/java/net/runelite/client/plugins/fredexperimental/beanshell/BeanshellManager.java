@@ -57,11 +57,11 @@ public class BeanshellManager
 		Optional<Entry<Integer, T3<Boolean, BeanshellScript, ScriptPanel>>> clash = allBeanshellScripts.entrySet().stream().filter(f -> f.getValue().get_2().getResolvedName().equalsIgnoreCase(file)).findFirst();
 		if (clash.isPresent())
 		{
-			log.debug("New script \"{}\" clashes w/ existing script -> uuid: {}, path: {}", file, clash.get().getKey(), clash.get().getValue().get_2().getResolvedName());
-			log.debug("Reloading script instead");
-			clash.get().getValue().get_2().load();
-			//allBeanshellScripts.replace(clash.get().getKey(), Tuples.of(false, new BeanshellScript(this.plugin, clash.get().getKey(), clash.get().getValue().get_2().getPath(), clash.get().getValue().get_2().getName()), buildJPanel(clash.get().getKey(), name, false)));
-			return clash.get().getKey();
+			int uuid = clash.get().getKey();
+			log.debug("New script \"{}\" clashes w/ existing script -> uuid: {}, path: {}", file, uuid, clash.get().getValue().get_2().getResolvedName());
+			allBeanshellScripts.replace(uuid, Tuples.of(false, new BeanshellScript(this.plugin, uuid, clash.get().getValue().get_2().getPath(), clash.get().getValue().get_2().getName()), buildJPanel(uuid, name, false)));
+			allBeanshellScripts.get(uuid).get_2().load();
+			return uuid;
 		}
 		else
 		{

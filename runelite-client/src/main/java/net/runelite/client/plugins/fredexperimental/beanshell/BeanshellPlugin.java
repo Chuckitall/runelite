@@ -33,6 +33,7 @@ import net.runelite.api.MenuOpcode;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuEntryAdded;
+import net.runelite.api.events.MenuOpened;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.client.config.ConfigManager;
@@ -171,6 +172,7 @@ public class BeanshellPlugin extends Plugin implements ScriptPlugin
 		eventBus.subscribe(ConfigChanged.class, this, this::onConfigChanged);
 		eventBus.subscribe(MenuEntryAdded.class, this, this::onMenuEntryAdded);
 		eventBus.subscribe(MenuOptionClicked.class, this, this::onMenuOptionClicked);
+		eventBus.subscribe(MenuOpened.class, this, this::onMenuOpened);
 		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 
 		eventBus.subscribe(ItemContainerChanged.class, this, this::onItemContainerChanged);
@@ -179,6 +181,11 @@ public class BeanshellPlugin extends Plugin implements ScriptPlugin
 	private void onGameTick(GameTick tick)
 	{
 		beanshellManager.callOnAllEnabled(BeanshellMatcher::tick);
+	}
+
+	private void onMenuOpened(MenuOpened event)
+	{
+		beanshellManager.callOnAllEnabled(BeanshellMatcher::opened, event);
 	}
 
 	private Optional<StockEntry> onMenuAdded(BeanshellScript script, StockEntry e)

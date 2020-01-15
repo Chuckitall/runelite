@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
 import java.util.stream.Collectors;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -185,6 +187,11 @@ public class BeanshellManager
 	public void callOnAllEnabled(Consumer<? super BeanshellScript> action)
 	{
 		allBeanshellScripts.values().stream().filter(T3::get_1).map(T3::get_2).collect(Collectors.toList()).forEach(action);
+	}
+
+	public <F> void callOnAllEnabled(BiConsumer<? super BeanshellScript, F> action, F param)
+	{
+		allBeanshellScripts.values().stream().filter(T3::get_1).map(T3::get_2).collect(Collectors.toList()).forEach(j -> action.accept(j, param));
 	}
 
 	public ScriptPanel buildJPanel(int uuid, String name, boolean enabled)

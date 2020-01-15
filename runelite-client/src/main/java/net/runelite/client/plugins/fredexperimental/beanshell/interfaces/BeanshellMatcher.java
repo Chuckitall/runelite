@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.fredexperimental.beanshell.interfaces;
 
+import net.runelite.api.events.MenuOpened;
 import net.runelite.client.plugins.fred.api.scripting.StockEntry;
 
 public interface BeanshellMatcher
@@ -9,4 +10,5 @@ public interface BeanshellMatcher
 	boolean peak(int op, int id);
 	boolean isMatch(StockEntry e);
 	void tick();
+	void opened(MenuOpened e);
 }

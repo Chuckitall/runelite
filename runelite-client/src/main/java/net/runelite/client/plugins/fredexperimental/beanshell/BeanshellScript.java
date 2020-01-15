@@ -5,6 +5,7 @@ import bsh.Interpreter;
 import java.io.IOException;
 import lombok.AccessLevel;
 import lombok.Getter;
+import net.runelite.api.events.MenuOpened;
 import net.runelite.client.plugins.fred.api.scripting.StockEntry;
 import net.runelite.client.plugins.fredexperimental.beanshell.interfaces.BeanshellMatcher;
 
@@ -104,6 +105,15 @@ public class BeanshellScript implements BeanshellMatcher
 		if (matcher != null)
 		{
 			matcher.tick();
+		}
+	}
+
+	@Override
+	public void opened(MenuOpened e)
+	{
+		if (matcher != null)
+		{
+			matcher.opened(e);
 		}
 	}
 }

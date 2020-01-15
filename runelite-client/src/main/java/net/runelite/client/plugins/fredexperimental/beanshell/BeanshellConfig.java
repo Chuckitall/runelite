@@ -53,7 +53,7 @@ public interface BeanshellConfig extends Config
 		section = "generalSettings",
 		keyName = "beanshells",
 		parse = true,
-		clazz = ScriptLocationsParse.class,
+		clazz = BeanshellLocationsParse.class,
 		method = "parse"
 	)
 	default String beanshells()

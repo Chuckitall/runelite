@@ -12,10 +12,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,18 +41,32 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.menus.AbstractComparableEntry;
 import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.fred.api.scripting.ScriptPlugin;
 import net.runelite.client.plugins.fred.api.scripting.StockEntry;
 import net.runelite.client.plugins.fred.api.wrappers._GameObject;
 import net.runelite.client.plugins.fred.api.wrappers._Item;
+import net.runelite.client.plugins.fredexperimental.beanshell.interfaces.BeanshellMatcher;
 import net.runelite.client.plugins.fredexperimental.beanshell.panel.BeanshellPanel;
 import net.runelite.client.plugins.fredexperimental.beanshell.panel.ScriptPanel;
 import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 
 import static net.runelite.api.MenuOpcode.BEAN_MENU;
 
+/**
+ * Authors fred
+ */
+@PluginDescriptor(
+	name = "Beanshell",
+	description = "Allows for Beanshell scripting at runtime",
+	tags = {"fred", "shell", "scripting", "panel", "menu"},
+	type = PluginType.FRED
+)
+@Singleton
 @Slf4j
 public class BeanshellPlugin extends Plugin implements ScriptPlugin
 {
@@ -76,9 +92,9 @@ public class BeanshellPlugin extends Plugin implements ScriptPlugin
 	@Inject
 	private EventBus eventBus;
 
-//	@Inject
-//	@Getter(AccessLevel.PUBLIC)
-//	private BeanshellMatchManager beanshellMatchManager;
+	@Inject
+	@Getter(AccessLevel.PUBLIC)
+	private BeanshellManager beanshellManager;
 
 	@Inject
 	private ScheduledExecutorService executorService;
@@ -120,15 +136,15 @@ public class BeanshellPlugin extends Plugin implements ScriptPlugin
 		}
 	};
 
-	private final Supplier<List<ScriptPanel>> scriptEntrySupplier = Collections::emptyList;
+	private final Supplier<List<ScriptPanel>> scriptEntrySupplier = () -> beanshellManager.getScriptPanels();
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		panel = new BeanshellPanel(this, scriptEntrySupplier);
-		final BufferedImage icon = loadImage("panel_icon");
+		final BufferedImage icon = ImageUtil.recolorImage(loadImage("panel_icon"), ColorScheme.BRAND_BLUE);
 		navButton = NavigationButton.builder()
-			.tooltip("Oneclick 2.0")
+			.tooltip("beanshell")
 			.icon(icon)
 			.priority(2)
 			.panel(panel)
@@ -142,11 +158,12 @@ public class BeanshellPlugin extends Plugin implements ScriptPlugin
 	}
 
 	@Override
-	protected void shutDown() throws Exception
+	protected void shutDown()
 	{
 		eventBus.unregister(this);
 		clientToolbar.removeNavigation(navButton);
 		menuManager.removePriorityEntry(prioritiseCheck);
+
 	}
 
 	private void addSubscriptions()
@@ -161,45 +178,45 @@ public class BeanshellPlugin extends Plugin implements ScriptPlugin
 
 	private void onGameTick(GameTick tick)
 	{
-//		beanshellMatchManager.callOnAllEnabled(BeanshellMatcher::tick);
+		beanshellManager.callOnAllEnabled(BeanshellMatcher::tick);
 	}
 
-//	private Optional<StockEntry> onMenuAdded(BeanshellMatcher matcher, StockEntry e)
-//	{
-//		if (!matcher.peak(e.op, e.id))
-//		{
-//			return Optional.empty();
-//		}
-//
-//		matcher.refresh(e);
-//		if (!matcher.isMatch(e))
-//		{
-//			return Optional.empty();
-//		}
-//		Optional<StockEntry> toAdd = Optional.ofNullable(matcher.doAdd(e));
-//		toAdd.ifPresent(f -> {
-//			f.op = BEAN_MENU.getId();
-//			f.id = matcher.getUuid();
-//		});
-//		return toAdd;
-//	}
+	private Optional<StockEntry> onMenuAdded(BeanshellScript script, StockEntry e)
+	{
+		if (!script.peak(e.op, e.id))
+		{
+			return Optional.empty();
+		}
+
+		if (!script.isMatch(e))
+		{
+			return Optional.empty();
+		}
+
+		Optional<StockEntry> toAdd = Optional.ofNullable(script.added(e));
+		toAdd.ifPresent(f -> {
+			f.op = BEAN_MENU.getId();
+			f.id = script.getUuid();
+		});
+		return toAdd;
+	}
 
 	private void onMenuEntryAdded(MenuEntryAdded event)
 	{
-//		if (event.getOpcode() == BEAN_MENU.getId())
-//		{
-//			return;
-//		}
-//		List<MenuEntry> toAdd = beanshellMatchManager.getAllEnabled().stream().map(f -> onMenuAdded(f, new StockEntry(event))).map(f -> f.map(StockEntry::build)).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
-//		if (!toAdd.isEmpty())
-//		{
-//			toAdd.forEach(f -> client.insertMenuItem(
-//				f.getOption(), f.getTarget(),
-//				f.getOpcode(), f.getIdentifier(),
-//				f.getParam0(), f.getParam1(),
-//				f.isForceLeftClick())
-//			);
-//		}
+		if (event.getOpcode() == BEAN_MENU.getId())
+		{
+			return;
+		}
+		List<MenuEntry> toAdd = beanshellManager.getAllEnabled().stream().map(f -> onMenuAdded(f, new StockEntry(event))).map(f -> f.map(StockEntry::build)).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+		if (!toAdd.isEmpty())
+		{
+			toAdd.forEach(f -> client.insertMenuItem(
+				f.getOption(), f.getTarget(),
+				f.getOpcode(), f.getIdentifier(),
+				f.getParam0(), f.getParam1(),
+				f.isForceLeftClick())
+			);
+		}
 	}
 
 	private void onMenuOptionClicked(MenuOptionClicked event)
@@ -208,32 +225,32 @@ public class BeanshellPlugin extends Plugin implements ScriptPlugin
 		{
 			return;
 		}
-//		BeanshellMatcher m;
-//		if (beanshellMatchManager.isUUID(event.getIdentifier()) && beanshellMatchManager.isScriptEnabled(event.getIdentifier()) && (m = beanshellMatchManager.getScriptMatcher(event.getIdentifier())) != null)
-//		{
-//			Optional<MenuEntry> t = Optional.ofNullable(m.onClick(new StockEntry(event))).map(StockEntry::build);
-//			if (t.isPresent())
-//			{
-//				event.setMenuEntry(t.get());
-//			}
-//			else
-//			{
-//				event.consume();
-//			}
-//		}
-//		else
-//		{
-//			event.consume();
-//		}
+		BeanshellScript m;
+		if (beanshellManager.isUUID(event.getIdentifier()) && beanshellManager.isScriptEnabled(event.getIdentifier()) && (m = beanshellManager.getScript(event.getIdentifier())) != null)
+		{
+			Optional<MenuEntry> t = Optional.ofNullable(m.clicked(new StockEntry(event))).map(StockEntry::build);
+			if (t.isPresent())
+			{
+				event.setMenuEntry(t.get());
+			}
+			else
+			{
+				event.consume();
+			}
+		}
+		else
+		{
+			event.consume();
+		}
 	}
 
 	private void onConfigChanged(ConfigChanged event)
 	{
-		if (!event.getGroup().equals("oneclick2"))
+		if (!event.getGroup().equals("beanshell"))
 		{
 			return;
 		}
-		if (event.getKey().equalsIgnoreCase("scripts"))
+		if (event.getKey().equalsIgnoreCase("beanshells"))
 		{
 			loadScriptsFromConfig();
 		}
@@ -272,22 +289,22 @@ public class BeanshellPlugin extends Plugin implements ScriptPlugin
 			{
 				final String name = entry.getKey().trim();
 				final boolean enabled = Boolean.parseBoolean(entry.getValue().trim());
-//				int uuid = beanshellMatchManager.registerScript(rootPath, name);
-//				if (enabled && !beanshellMatchManager.isScriptEnabled(uuid))
-//				{
-//					beanshellMatchManager.enableScript(uuid);
-//				}
-//				else if (!enabled && beanshellMatchManager.isScriptEnabled(uuid))
-//				{
-//					beanshellMatchManager.disableScript(uuid);
-//				}
+				int uuid = beanshellManager.registerScript(rootPath, name);
+				if (enabled && !beanshellManager.isScriptEnabled(uuid))
+				{
+					beanshellManager.enableScript(uuid);
+				}
+				else if (!enabled && beanshellManager.isScriptEnabled(uuid))
+				{
+					beanshellManager.disableScript(uuid);
+				}
 			}
 		}
 	}
 
 	BufferedImage loadImage(String path)
 	{
-		return ImageUtil.getResourceStreamFromClass(getClass(), "/net/runelite/client/plugins/fredexperimental/oneclick2/" + path + ".png");
+		return ImageUtil.getResourceStreamFromClass(getClass(), "/net/runelite/client/plugins/fredexperimental/beanshell/" + path + ".png");
 	}
 
 	//methods used to keep track of state. Lua matchers query these w/ my api libraries.

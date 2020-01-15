@@ -40,6 +40,7 @@ import net.runelite.client.menus.AbstractComparableEntry;
 import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.fred.api.scripting.ScriptPlugin;
 import net.runelite.client.plugins.fred.api.scripting.StockEntry;
 import net.runelite.client.plugins.fred.api.wrappers._GameObject;
@@ -56,7 +57,8 @@ import static net.runelite.api.MenuOpcode.LUA_MENU;
 @PluginDescriptor(
 	name = "Oneclick 2.0",
 	description = "Enable the Oneclick 2.0 panel",
-	tags = {"oneclick", "oneclick2", "panel", "menu"}
+	tags = {"oneclick", "oneclick2", "panel", "menu"},
+	type = PluginType.FRED
 )
 @Slf4j
 public class Oneclick2 extends Plugin implements ScriptPlugin

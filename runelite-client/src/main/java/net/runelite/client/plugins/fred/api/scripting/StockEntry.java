@@ -1,9 +1,11 @@
 package net.runelite.client.plugins.fred.api.scripting;
 
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.MenuEntry;
 
 @Slf4j
+@ToString
 public class StockEntry
 {
 	public int op;
@@ -51,4 +53,5 @@ public class StockEntry
 	{
 		return new MenuEntry(e.option, e.target, e.id, e.op, e.p0, e.p1, e.forceLeftClick);
 	}
+
 }

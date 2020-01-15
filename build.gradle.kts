@@ -134,7 +134,9 @@ application {
 
 tasks {
     named<JavaExec>("run") {
-        this.args((project.property("arg") as String).split(","))
+        if (project.hasProperty("arg")) {
+            this.args((project.property("arg") as String).split(","))
+        }
         group = "openosrs"
         classpath = project(":runelite-client").sourceSets.main.get().runtimeClasspath
     }

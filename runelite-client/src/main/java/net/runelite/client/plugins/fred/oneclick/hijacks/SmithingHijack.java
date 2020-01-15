@@ -23,7 +23,7 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.fred.oneclick.util.MenuEntryHijack;
 
 import static net.runelite.api.MenuOpcode.ITEM_USE_ON_GAME_OBJECT;
-import static net.runelite.api.MenuOpcode.WIDGET_DEFAULT;
+import static net.runelite.api.MenuOpcode.CC_OP;
 import static net.runelite.api.MenuOpcode.WIDGET_TYPE_6;
 import static net.runelite.api.ObjectID.ANVIL_2097;
 
@@ -124,7 +124,7 @@ public class SmithingHijack extends MenuEntryHijack
 				}
 				else
 				{
-					client.insertMenuItem(MAKEDART, "<col=ff9040>" + client.getItemDefinition(barId).getName().split(" ")[0] + " dart tip</col>", WIDGET_DEFAULT.getId(), 1, -1, w.getId(), true);
+					client.insertMenuItem(MAKEDART, "<col=ff9040>" + client.getItemDefinition(barId).getName().split(" ")[0] + " dart tip</col>", CC_OP.getId(), 1, -1, w.getId(), true);
 				}
 			}
 		}
@@ -155,7 +155,7 @@ public class SmithingHijack extends MenuEntryHijack
 			client.setSelectedItemSlot(barIdx);
 			client.setSelectedItemID(barId);
 		}
-		else if (hammer && bar && event.getMenuOpcode() == WIDGET_DEFAULT && event.getOption().equals(MAKEDART))
+		else if (hammer && bar && event.getMenuOpcode() == CC_OP && event.getOption().equals(MAKEDART))
 		{
 			event.setOption("Smith set");
 		}

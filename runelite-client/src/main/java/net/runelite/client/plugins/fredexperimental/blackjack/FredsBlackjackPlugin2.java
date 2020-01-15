@@ -385,7 +385,7 @@ public class FredsBlackjackPlugin2 extends Plugin
 					case "RUNAWAY":
 						event.setParam0(-1);
 						event.setParam1(WidgetInfo.EQUIPMENT_CAPE.getId());
-						event.setOpcode(MenuOpcode.WIDGET_DEFAULT.getId());
+						event.setOpcode(MenuOpcode.CC_OP.getId());
 						event.setOption("Kandarin Monastery");
 						event.setIdentifier(2);
 						toggleMoveMouse(false);

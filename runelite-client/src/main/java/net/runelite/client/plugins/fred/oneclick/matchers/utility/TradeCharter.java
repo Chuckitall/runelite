@@ -44,7 +44,7 @@ import net.runelite.client.plugins.worldhopper.WorldHopperPlugin;
 import static net.runelite.api.ItemID.COINS_995;
 import static net.runelite.api.MenuOpcode.ITEM_USE;
 import static net.runelite.api.MenuOpcode.WALK;
-import static net.runelite.api.MenuOpcode.WIDGET_DEFAULT;
+import static net.runelite.api.MenuOpcode.CC_OP;
 
 @Singleton
 @Slf4j
@@ -152,11 +152,11 @@ public class TradeCharter extends MenuEntryMatcher
 			log.debug("no items");
 			return false;
 		}
-		if (added.getOpcode() != ITEM_USE.getId() && added.getOpcode() != WIDGET_DEFAULT.getId())
+		if (added.getOpcode() != ITEM_USE.getId() && added.getOpcode() != CC_OP.getId())
 		{
 			return false;
 		}
-		if (added.getOpcode() == WIDGET_DEFAULT.getId() && !added.getOption().equals("Value<col=ff9040>"))
+		if (added.getOpcode() == CC_OP.getId() && !added.getOption().equals("Value<col=ff9040>"))
 		{
 			return false;
 		}
@@ -167,9 +167,9 @@ public class TradeCharter extends MenuEntryMatcher
 	public MenuEntry generate(MenuEntryAdded added)
 	{
 //		log.debug("Area contains tiles: {} -> {}", _Tile.ofPlayer(client), this.inTargetArea(_Tile.ofPlayer(client)));
-		if (added.getOpcode() != ITEM_USE.getId() && added.getOpcode() != WIDGET_DEFAULT.getId())
+		if (added.getOpcode() != ITEM_USE.getId() && added.getOpcode() != CC_OP.getId())
 		{
-			log.error("added.getOpcode was {}, not {} or {}", added.getOpcode(), ITEM_USE.getId(), WIDGET_DEFAULT.getId());
+			log.error("added.getOpcode was {}, not {} or {}", added.getOpcode(), ITEM_USE.getId(), CC_OP.getId());
 			return null;
 		}
 		else if (!plugin.isShiftPressed() && haveCrew() && haveCoins() && added.getParam0() == coins.getIdx())
@@ -194,7 +194,7 @@ public class TradeCharter extends MenuEntryMatcher
 				if (l != null && l.getItemQuantity() > 0)
 				{
 					//("Buy 50", "<col=ff9040>Soda ash</col>", 5, 57, 23, 19660816, false)
-					return new MenuEntry("BUY ALL", "<col=ff9040>" + client.getItemDefinition(targetItem.getId()).getName() + "</col>", 5, MenuOpcode.WIDGET_DEFAULT.getId(), targetItem.getIdx(), l.getId(), true);
+					return new MenuEntry("BUY ALL", "<col=ff9040>" + client.getItemDefinition(targetItem.getId()).getName() + "</col>", 5, MenuOpcode.CC_OP.getId(), targetItem.getIdx(), l.getId(), true);
 				}
 				else
 				{

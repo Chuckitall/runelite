@@ -68,9 +68,10 @@ dependencies {
     implementation(Libraries.sentry)
     implementation(Libraries.slf4jApi)
     implementation(project(":http-api"))
-    implementation(Libraries.luaJ)
-    api(project(":runelite-api"))
+    implementation(project(":runelite-api"))
     implementation(Libraries.naturalMouse)
+    implementation(Libraries.luaJ)
+    implementation(Libraries.beanshell)
 
     runtimeOnly(Libraries.trident)
     runtimeOnly(Libraries.jogampGluegenLinuxAmd64)

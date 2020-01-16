@@ -3,12 +3,16 @@ package net.runelite.client.plugins.beanshell2;
 import com.google.common.base.Strings;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
+import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.config.ConfigManager;
@@ -19,7 +23,13 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.beanshell2.interfaces.BshContext;
+import net.runelite.client.plugins.beanshell2.ui.BshCorePanel;
+import net.runelite.client.plugins.beanshell2.ui.BshPluginPanel;
+import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.util.ImageUtil;
+
 import static net.runelite.client.plugins.beanshell2.BshLocationsParse.NEWLINE_SPLITTER;
 
 /**
@@ -36,7 +46,15 @@ import static net.runelite.client.plugins.beanshell2.BshLocationsParse.NEWLINE_S
 public class BshCore extends Plugin
 {
 	@Inject
-	private ScheduledExecutorService executorService; //Used for rebuilding the gui
+	private ScheduledExecutorService executorService;
+
+	private NavigationButton navButton;
+
+	@Setter(AccessLevel.PACKAGE)
+	private BshCorePanel panel;
+
+	@Inject
+	private ClientToolbar clientToolbar;
 
 	@Inject
 	private Client client;
@@ -98,20 +116,39 @@ public class BshCore extends Plugin
 				final boolean enabled = Boolean.parseBoolean(entry.getValue().trim());
 				final String resolvedName = bshRoot + name;
 
-				BshContext context = new BshContext(name, client, eventBus, menuManager, overlayManager);
+				BshContext context = new BshContext(name, resolvedName, client, eventBus, menuManager, overlayManager);
 
-				int uuid = bshManager.registerScript(resolvedName, context);
+				int uuid = bshManager.registerScript(context);
 				bshManager.enablePlugin(uuid, enabled);
 			}
 		}
 	}
 
+	private final Supplier<List<BshPluginPanel>> scriptEntrySupplier = () -> bshManager.getScriptPanels();
+
 	@Override
 	protected void startUp()
 	{
+		panel = new BshCorePanel(this, scriptEntrySupplier);
+		final BufferedImage icon = loadImage("panel_icon");
+		navButton = NavigationButton.builder()
+			.tooltip("BshCore")
+			.icon(icon)
+			.priority(2)
+			.panel(panel)
+			.build();
+		clientToolbar.addNavigation(navButton);
+
 		this.bshRoot = config.bshRoot();
+
 		loadScriptsFromConfig();
 		addSubscriptions();
+		this.updateList();
+	}
+
+	BufferedImage loadImage(String path)
+	{
+		return ImageUtil.getResourceStreamFromClass(getClass(), "/net/runelite/client/plugins/beanshell2/" + path + ".png");
 	}
 
 	@Override
@@ -119,6 +156,7 @@ public class BshCore extends Plugin
 	{
 		bshManager.clear();
 		eventBus.unregister(this);
+		clientToolbar.removeNavigation(navButton);
 	}
 
 	private void addSubscriptions()
@@ -136,5 +174,10 @@ public class BshCore extends Plugin
 		{
 			loadScriptsFromConfig();
 		}
+	}
+
+	void updateList()
+	{
+		executorService.submit(panel::rebuildScriptPanels);
 	}
 }

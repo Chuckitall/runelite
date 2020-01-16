@@ -16,6 +16,9 @@ public class BshContext
 	private final String namespace;
 
 	@Getter(AccessLevel.PUBLIC)
+	private final String resolvedName;
+
+	@Getter(AccessLevel.PUBLIC)
 	private Client client;
 
 	@Getter(AccessLevel.PUBLIC)
@@ -27,9 +30,10 @@ public class BshContext
 	@Getter(AccessLevel.PUBLIC)
 	private EventBus eventBus;
 
-	public BshContext(String namespace, Client client, EventBus eventBus, MenuManager menuManager, OverlayManager overlayManager)
+	public BshContext(String namespace, String resolvedName, Client client, EventBus eventBus, MenuManager menuManager, OverlayManager overlayManager)
 	{
 		this.namespace = namespace;
+		this.resolvedName = resolvedName;
 		this.client = client;
 		this.eventBus = eventBus;
 		this.menuManager = menuManager;

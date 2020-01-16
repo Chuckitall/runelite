@@ -1,8 +1,11 @@
 package net.runelite.client.plugins.beanshell2.interfaces;
 
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
 import lombok.AccessLevel;
 import lombok.Getter;
 import net.runelite.api.Client;
+import net.runelite.api.events.Event;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.menus.MenuManager;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -31,5 +34,15 @@ public class BshContext
 		this.eventBus = eventBus;
 		this.menuManager = menuManager;
 		this.overlayManager = overlayManager;
+	}
+
+	public <T extends Event> void subscribe(Class<T> eventClass, @NonNull Consumer<T> action)
+	{
+		eventBus.subscribe(eventClass, this, action);
+	}
+
+	public void unregister()
+	{
+		eventBus.unregister(this);
 	}
 }

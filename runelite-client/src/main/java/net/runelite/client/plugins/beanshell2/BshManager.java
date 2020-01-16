@@ -53,8 +53,8 @@ public class BshManager
 				"import net.runelite.client.plugins.beanshell2.interfaces.*;\n" +
 				"import net.runelite.client.events.*;\n" +
 				"import net.runelite.api.events.*;");
-			i.eval("BshContext getContext() { return context; }");
 			i.source(resolvedName);
+			//i.eval("BshContext getContext() { return context; }");
 			plugin = (BshPlugin) i.getInterface(BshPlugin.class);
 		}
 		catch (EvalError evalError)
@@ -102,7 +102,8 @@ public class BshManager
 		{
 			return;
 		}
-		else if (!value.get_1() && enable)
+		log.debug("uuid: {}, enable: {}, current: {}", uuid, enable, value.get_1());
+		if (!value.get_1() && enable)
 		{
 			value.get_2().startup();
 			allPlugins.replace(uuid, Tuples.of(true, value.get_2()));

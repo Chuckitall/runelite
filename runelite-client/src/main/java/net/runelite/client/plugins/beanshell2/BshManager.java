@@ -52,9 +52,10 @@ public class BshManager
 				"import net.runelite.client.menus.MenuManager;\n" +
 				"import net.runelite.client.plugins.beanshell2.interfaces.*;\n" +
 				"import net.runelite.client.events.*;\n" +
-				"import net.runelite.api.events.*;");
+				"import net.runelite.api.events.*;\n" +
+				"import io.reactivex.functions.*;");
+			i.eval("BshContext getContext() { return context; }");
 			i.source(resolvedName);
-			//i.eval("BshContext getContext() { return context; }");
 			plugin = (BshPlugin) i.getInterface(BshPlugin.class);
 		}
 		catch (EvalError evalError)

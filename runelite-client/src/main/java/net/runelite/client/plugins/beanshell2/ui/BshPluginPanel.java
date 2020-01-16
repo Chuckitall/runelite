@@ -66,7 +66,6 @@ public class BshPluginPanel extends JPanel
 		buttonsContent.add(avatar);
 		buttonsContent.add(gear);
 
-		this.add(buttonsContent, BorderLayout.CENTER);
 
 		upAndContent = new JPanel();
 		upAndContent.setLayout(new BoxLayout(upAndContent, BoxLayout.Y_AXIS));
@@ -81,16 +80,14 @@ public class BshPluginPanel extends JPanel
 		titleLabel.setForeground(darkerForeground);
 		titleLabel.setPreferredSize(new Dimension(CONTENT_WIDTH - TIME_WIDTH, 0));
 
-//		content = new JPanel(new BorderLayout());
-//		content.setBackground(null);
-
 		upAndContent.add(titleLabel);
-//		upAndContent.add(content);
 		upAndContent.add(new Box.Filler(new Dimension(0, 0),
 			new Dimension(0, Short.MAX_VALUE),
 			new Dimension(0, Short.MAX_VALUE)));
+		upAndContent.add(buttonsContent);
 
 		this.add(upAndContent, BorderLayout.CENTER);
+//		this.add(buttonsContent, BorderLayout.CENTER);
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e)

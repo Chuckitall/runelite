@@ -18,6 +18,7 @@ public class BshCorePanel extends PluginPanel
 {
 	public static final ImageIcon ON_SWITCHER;
 	public static final ImageIcon OFF_SWITCHER;
+	public static final ImageIcon GEAR_ICON;
 	public static final int CONTENT_WIDTH = 148;
 	public static final int TIME_WIDTH = 20;
 
@@ -32,6 +33,7 @@ public class BshCorePanel extends PluginPanel
 			true,
 			false
 		));
+		GEAR_ICON = new ImageIcon(ImageUtil.recolorImage(ImageUtil.getResourceStreamFromClass(BshCore.class, "config_edit_icon.png"), ColorScheme.LIGHT_GRAY_COLOR));
 	}
 
 	private final Comparator<BshPluginPanel> SCRIPT_ITEM_COMPARATOR = (o1, o2) ->

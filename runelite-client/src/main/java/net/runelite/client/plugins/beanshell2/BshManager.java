@@ -23,6 +23,8 @@ import net.runelite.client.plugins.beanshell2.ui.BshPluginPanel;
 import net.runelite.client.plugins.fred.api.other.Tuples;
 import net.runelite.client.plugins.fred.api.other.Tuples.T3;
 
+import static net.runelite.client.plugins.beanshell2.ui.BshCorePanel.GEAR_ICON;
+
 @Singleton
 @Slf4j
 public class BshManager
@@ -60,9 +62,14 @@ public class BshManager
 				"import net.runelite.api.events.*;\n" +
 				"import io.reactivex.functions.*;\n" +
 				"import net.runelite.client.plugins.fred4106.api.other.*;\n" +
+				"import net.runelite.client.plugins.fred.api.other.Tuples.T1;\n" +
+				"import net.runelite.client.plugins.fred.api.other.Tuples.T2;\n" +
+				"import net.runelite.client.plugins.fred.api.other.Tuples.T3;\n" +
+				"import net.runelite.client.plugins.fred.api.other.Tuples.T4;\n" +
+				"import net.runelite.client.plugins.fred.api.other.Tuples.T5;\n" +
+				"import net.runelite.client.plugins.fred.api.other.Tuples.T6;\n" +
 				"\n" +
 				"import net.runelite.client.plugins.beanshell2.interfaces.*;");
-			i.set("Tuples", Tuples.class);
 			i.eval("BshContext getContext() { return context; }");
 			i.source(context.getResolvedName());
 			plugin = (BshPlugin) i.getInterface(BshPlugin.class);
@@ -181,6 +188,7 @@ public class BshManager
 	{
 		BshPluginPanel toRet = new BshPluginPanel(uuid, name);
 		toRet.setEnabled(enabled);
+		toRet.gear.setIcon(GEAR_ICON);
 		toRet.avatar.addMouseListener(new MouseAdapter()
 		{
 			@Override

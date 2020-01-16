@@ -77,7 +77,6 @@ public class BeanshellPlugin extends Plugin implements ScriptPlugin
 		.omitEmptyStrings()
 		.trimResults();
 
-
 	@Inject
 	private ClientToolbar clientToolbar;
 
@@ -165,7 +164,6 @@ public class BeanshellPlugin extends Plugin implements ScriptPlugin
 		eventBus.unregister(this);
 		clientToolbar.removeNavigation(navButton);
 		menuManager.removePriorityEntry(prioritiseCheck);
-
 	}
 
 	private void addSubscriptions()

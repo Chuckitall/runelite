@@ -1,12 +1,12 @@
-package net.runelite.client.plugins.fredexperimental.beanshell;
+package net.runelite.client.plugins.beanshell2;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 
-@ConfigGroup("beanshell")
-public interface BeanshellConfig extends Config
+@ConfigGroup("bsh")
+public interface BshConfig extends Config
 {
 	@ConfigSection(
 		position = 0,
@@ -21,40 +21,28 @@ public interface BeanshellConfig extends Config
 
 	@ConfigItem(
 		position = 0,
-		name = "Placeholder",
-		description = "Placeholder description!",
-		section = "generalSettings",
-		keyName = "placeholder"
-	)
-	default boolean placeholder()
-	{
-		return false;
-	}
-
-	@ConfigItem(
-		position = 1,
-		name = "Scripts Root",
+		name = "Bsh Root",
 		description = "Beanshell scripts root",
 		section = "generalSettings",
-		keyName = "beanshellPath"
+		keyName = "bshRoot"
 	)
-	default String beanshellPath()
+	default String bshRoot()
 	{
 		return "";
 	}
 
 	@ConfigItem(
-		position = 2,
-		name = "Scripts",
+		position = 1,
+		name = "Bsh Scripts",
 //		description = "Comma separated list of absolute paths to scripts",
-		description = "Add custom bsh scripts here, 1 per line. Syntax: \'filename | enabled\'",
+		description = "Add custom bsh plugins here, 1 per line. Syntax: \'filename.bsh | [true/false]\'",
 		section = "generalSettings",
-		keyName = "beanshells",
+		keyName = "bshScripts",
 		parse = true,
-		clazz = BeanshellLocationsParse.class,
+		clazz = BshLocationsParse.class,
 		method = "parse"
 	)
-	default String beanshells()
+	default String bshScripts()
 	{
 		return "";
 	}

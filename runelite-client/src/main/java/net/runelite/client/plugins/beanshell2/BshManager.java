@@ -46,6 +46,13 @@ public class BshManager
 		{
 			Interpreter i = new Interpreter();
 			i.set("context", context);
+			i.eval("import net.runelite.api.Client;\n" +
+				"import net.runelite.client.eventbus.EventBus;\n" +
+				"import net.runelite.client.ui.overlay.OverlayManager;\n" +
+				"import net.runelite.client.menus.MenuManager;\n" +
+				"import net.runelite.client.plugins.beanshell2.interfaces.*;\n" +
+				"import net.runelite.client.events.*;\n" +
+				"import net.runelite.api.events.*;");
 			i.eval("BshContext getContext() { return context; }");
 			i.source(resolvedName);
 			plugin = (BshPlugin) i.getInterface(BshPlugin.class);

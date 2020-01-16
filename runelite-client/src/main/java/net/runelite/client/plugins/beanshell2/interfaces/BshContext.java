@@ -1,8 +1,5 @@
 package net.runelite.client.plugins.beanshell2.interfaces;
 
-import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
 import lombok.AccessLevel;
 import lombok.Getter;
 import net.runelite.api.Client;

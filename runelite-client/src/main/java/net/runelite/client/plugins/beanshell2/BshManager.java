@@ -22,7 +22,6 @@ import net.runelite.client.plugins.beanshell2.interfaces.BshPlugin;
 import net.runelite.client.plugins.beanshell2.ui.BshPluginPanel;
 import net.runelite.client.plugins.fred.api.other.Tuples;
 import net.runelite.client.plugins.fred.api.other.Tuples.T3;
-import net.runelite.client.plugins.fredexperimental.beanshell.panel.ScriptPanel;
 
 @Singleton
 @Slf4j
@@ -62,9 +61,8 @@ public class BshManager
 				"import io.reactivex.functions.*;\n" +
 				"import net.runelite.client.plugins.fred4106.api.other.*;\n" +
 				"\n" +
-				"import net.runelite.client.plugins.beanshell2.interfaces.*;\n" +
-				"import net.runelite.client.plugins.beanshell2.interfaces.config.*;\n"
-			);
+				"import net.runelite.client.plugins.beanshell2.interfaces.*;");
+			i.set("Tuples", Tuples.class);
 			i.eval("BshContext getContext() { return context; }");
 			i.source(context.getResolvedName());
 			plugin = (BshPlugin) i.getInterface(BshPlugin.class);

@@ -8,7 +8,7 @@ import net.runelite.client.plugins.fred.api.other.Tuples.T2;
 public interface BshPlugin
 {
 	BshContext getContext();
-	List<T2<String, ConfigTypeBase<?>>> getConfigDefinition();
+	List<T2<String, String>> getConfigDefinition();
 	void startup();
 	void shutdown();
 }

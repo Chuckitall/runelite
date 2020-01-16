@@ -43,7 +43,7 @@ public abstract class Tuples
 	@Getter
 	@ToString
 	@EqualsAndHashCode(callSuper = false)
-	@AllArgsConstructor(access = AccessLevel.PRIVATE)
+	@AllArgsConstructor(access = AccessLevel.PUBLIC)
 	@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 	public static class T2<T, U> extends Tuple<T2>
 	{
@@ -54,7 +54,7 @@ public abstract class Tuples
 	@Getter
 	@ToString
 	@EqualsAndHashCode(callSuper = false)
-	@AllArgsConstructor(access = AccessLevel.PRIVATE)
+	@AllArgsConstructor(access = AccessLevel.PUBLIC)
 	@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 	public static class T3<T, U, V> extends Tuple<T3>
 	{
@@ -66,7 +66,7 @@ public abstract class Tuples
 	@Getter
 	@ToString
 	@EqualsAndHashCode(callSuper = false)
-	@AllArgsConstructor(access = AccessLevel.PRIVATE)
+	@AllArgsConstructor(access = AccessLevel.PUBLIC)
 	@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 	public static class T4<T, U, V, W> extends Tuple<T4>
 	{
@@ -79,7 +79,7 @@ public abstract class Tuples
 	@Getter
 	@ToString
 	@EqualsAndHashCode(callSuper = false)
-	@AllArgsConstructor(access = AccessLevel.PRIVATE)
+	@AllArgsConstructor(access = AccessLevel.PUBLIC)
 	@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 	public static class T5<T, U, V, W, X> extends Tuple<T5>
 	{
@@ -93,7 +93,7 @@ public abstract class Tuples
 	@Getter
 	@ToString
 	@EqualsAndHashCode(callSuper = false)
-	@AllArgsConstructor(access = AccessLevel.PRIVATE)
+	@AllArgsConstructor(access = AccessLevel.PUBLIC)
 	@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 	public static class T6<T, U, V, W, X, Y> extends Tuple<T6>
 	{

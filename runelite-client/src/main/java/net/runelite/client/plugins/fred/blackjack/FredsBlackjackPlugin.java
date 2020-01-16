@@ -89,7 +89,7 @@ import static net.runelite.api.MenuOpcode.NPC_FIRST_OPTION;
 		name = "Fred's Blackjack",
 		description = "Allows for one - click blackjacking, both knocking out and pickpocketing",
 		tags = {"fred", "flexo", "blackjack", "thieving"},
-	type = PluginType.EXTERNAL
+	type = PluginType.FRED
 )
 @Singleton
 @Slf4j

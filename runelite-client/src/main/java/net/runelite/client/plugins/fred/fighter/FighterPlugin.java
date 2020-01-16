@@ -80,7 +80,7 @@ import static net.runelite.client.plugins.fred.fighter.TaskEnum.WALK_CLOSER_TO_T
 	name = "Fred's New Fighter",
 	description = "AIO Fighter",
 	tags = {"flexo", "combat", "aio", "bot", "fred"},
-	type = PluginType.EXTERNAL
+	type = PluginType.FRED
 )
 @Slf4j
 public class FighterPlugin extends Plugin

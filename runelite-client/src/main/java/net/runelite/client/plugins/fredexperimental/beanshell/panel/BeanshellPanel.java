@@ -18,9 +18,6 @@ public class BeanshellPanel extends PluginPanel
 {
 	public static final ImageIcon ON_SWITCHER;
 	public static final ImageIcon OFF_SWITCHER;
-
-
-
 	public static final int CONTENT_WIDTH = 148;
 	public static final int TIME_WIDTH = 20;
 

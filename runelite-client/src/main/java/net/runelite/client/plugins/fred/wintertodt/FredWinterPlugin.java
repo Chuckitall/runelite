@@ -71,7 +71,7 @@ import static net.runelite.api.ItemID.*;
 	name = "Fred's Wintertodt",
 	description = "Wintertodt bot",
 	tags = {"flexo", "wintertodt", "bot", "fredwinter", "fred"},
-	type = PluginType.EXTERNAL
+	type = PluginType.FRED
 )
 @Slf4j
 public class FredWinterPlugin extends Plugin

@@ -50,7 +50,7 @@ import net.runelite.client.plugins.fred.api.wrappers._Item;
 	name = "Fred's Oneclick",
 	description = "1 Click MES Hijacks -DO NOT ABUSE/AUTOCLICK THESE-",
 	tags = {"fred", "MES", "hijack"},
-	type = PluginType.EXTERNAL
+	type = PluginType.FRED
 )
 @Slf4j
 @Singleton

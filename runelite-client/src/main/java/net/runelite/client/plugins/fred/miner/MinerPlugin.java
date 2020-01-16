@@ -89,7 +89,7 @@ import static net.runelite.api.ItemID.STEEL_PICKAXE;
 	name = "Fred's Miner",
 	description = "Miner bot",
 	tags = {"flexo", "mining", "bot", "fredminer"},
-	type = PluginType.EXTERNAL
+	type = PluginType.FRED
 )
 @Slf4j
 public class MinerPlugin extends Plugin

@@ -53,7 +53,7 @@ import org.jetbrains.annotations.Contract;
 	name = "Fred's Talker",
 	description = "Talker/Interactor bot",
 	tags = {"flexo", "utility", "bot", "fred"},
-	type = PluginType.EXTERNAL
+	type = PluginType.FRED
 )
 @Slf4j
 public class TalkerPlugin extends Plugin

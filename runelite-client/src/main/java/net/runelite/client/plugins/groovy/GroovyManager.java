@@ -48,9 +48,9 @@ public class GroovyManager
 
 	private GroovyPlugin loadPlugin(GroovyContext context)
 	{
-		log.debug("loading plugin {} w/ main file {} @ root {}", context.getName(), context.getMainFile(), core.getGroovyRoot());
+		log.debug("loading plugin {} w/ main file {} @ root {}", context.getName(), context.getMainFile(), GroovyCore.getGroovyRoot());
 		String fileName = context.getMainFile() + ".groovy";
-		String path = core.getGroovyRoot() + context.getName();
+		String path = GroovyCore.getGroovyRoot() + context.getName();
 //		String resolvedName = path + fileName;
 		GroovyPlugin plugin = null;
 		GroovyClassLoader gcl = new GroovyClassLoader();

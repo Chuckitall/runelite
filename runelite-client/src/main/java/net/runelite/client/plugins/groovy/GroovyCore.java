@@ -4,12 +4,10 @@ import com.google.common.base.Strings;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.AccessLevel;
@@ -78,10 +76,10 @@ public class GroovyCore extends Plugin
 
 	//settings
 	@Getter(AccessLevel.PUBLIC)
-	private String groovyRoot;
+	private static String groovyRoot;
 
 	@Getter(AccessLevel.PUBLIC)
-	private String groovyScripts;
+	private static String groovyScripts;
 
 	@Provides
 	GroovyConfig provideConfig(ConfigManager configManager)
@@ -97,7 +95,7 @@ public class GroovyCore extends Plugin
 
 	private void loadScriptsFromConfig()
 	{
-		this.groovyScripts = config.groovyScripts();
+		groovyScripts = config.groovyScripts();
 		groovyManager.clear();
 		if (!Strings.isNullOrEmpty(groovyScripts))
 		{
@@ -143,7 +141,7 @@ public class GroovyCore extends Plugin
 			.build();
 		clientToolbar.addNavigation(navButton);
 
-		this.groovyRoot = config.groovyRoot();
+		groovyRoot = config.groovyRoot();
 
 		loadScriptsFromConfig();
 		addSubscriptions();

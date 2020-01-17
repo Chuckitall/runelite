@@ -72,7 +72,6 @@ dependencies {
     implementation(Libraries.naturalMouse)
     implementation(Libraries.luaJ)
     implementation(Libraries.groovy)
-    implementation(Libraries.beanshell)
 
     runtimeOnly(Libraries.trident)
     runtimeOnly(Libraries.jogampGluegenLinuxAmd64)

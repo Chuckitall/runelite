@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Adam <Adam@sigterm.info>
+ * Copyright (c) 2019, dekvall <https://github.com/dekvall>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,29 +22,52 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#version 330
+package net.runelite.client.plugins.leftclickonly;
 
-#define SAMPLING_DEFAULT 0
-#define SAMPLING_MITCHELL 1
-#define SAMPLING_CATROM 2
-#define SAMPLING_XBR 3
-uniform int samplingMode;
-uniform ivec2 sourceDimensions;
-uniform ivec2 targetDimensions;
+import javax.inject.Inject;
+import net.runelite.api.Client;
+import net.runelite.api.MenuEntry;
+import net.runelite.api.events.MenuOpened;
+import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.input.MouseManager;
+import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginType;
 
-#include scale/xbr_lv2_vert.glsl
-
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec2 aTexCoord;
-
-out vec2 TexCoord;
-out XBRTable xbrTable;
-
-void main()
+@PluginDescriptor(
+	name = "Left Click Only",
+	description = "Only allow leftclicks",
+	tags = {"left", "click", "only", "gamemode", "leftclick"},
+	type = PluginType.GAMEMODE,
+	enabledByDefault = false
+)
+public class LeftClickOnlyPlugin extends Plugin
 {
-    gl_Position = vec4(aPos, 1.0);
-    TexCoord = aTexCoord;
+	@Inject
+	private Client client;
 
-    if (samplingMode == SAMPLING_XBR)
-        xbrTable = xbr_vert(TexCoord, sourceDimensions);
+	@Inject
+	private RightClickConsumer rightClickConsumer;
+
+	@Inject
+	private MouseManager mouseManager;
+
+	@Override
+	protected void startUp() throws Exception
+	{
+		mouseManager.registerMouseListener(rightClickConsumer);
+	}
+
+	@Override
+	protected void shutDown() throws Exception
+	{
+		mouseManager.unregisterMouseListener(rightClickConsumer);
+	}
+
+	@Subscribe
+	public void onMenuOpened(MenuOpened event)
+	{
+		MenuEntry first = event.getFirstEntry();
+		client.setMenuEntries(new MenuEntry[]{first});
+	}
 }

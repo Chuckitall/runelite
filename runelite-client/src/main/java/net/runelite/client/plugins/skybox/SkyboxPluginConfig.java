@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Adam <Adam@sigterm.info>
+ * Copyright (c) 2019 logarrhytmic <https://github.com/logarrhythmic>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,29 +22,37 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#version 330
 
-#define SAMPLING_DEFAULT 0
-#define SAMPLING_MITCHELL 1
-#define SAMPLING_CATROM 2
-#define SAMPLING_XBR 3
-uniform int samplingMode;
-uniform ivec2 sourceDimensions;
-uniform ivec2 targetDimensions;
+package net.runelite.client.plugins.skybox;
 
-#include scale/xbr_lv2_vert.glsl
+import java.awt.Color;
+import net.runelite.client.config.Config;
+import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigItem;
+import net.runelite.client.plugins.skybox.config.SkyOverrideMode;
 
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec2 aTexCoord;
-
-out vec2 TexCoord;
-out XBRTable xbrTable;
-
-void main()
+@ConfigGroup("skybox")
+public interface SkyboxPluginConfig extends Config
 {
-    gl_Position = vec4(aPos, 1.0);
-    TexCoord = aTexCoord;
+	@ConfigItem(
+		keyName = "customColor",
+		name = "Custom sky color",
+		description = "Set a color here to use for the sky",
+		position = 1
+	)
+	default Color customColor()
+	{
+		return Color.BLACK;
+	}
 
-    if (samplingMode == SAMPLING_XBR)
-        xbrTable = xbr_vert(TexCoord, sourceDimensions);
+	@ConfigItem(
+		keyName = "skyOverrideMode",
+		name = "Mode",
+		description = "Replace the sky color in just the overworld, or everywhere",
+		position = 2
+	)
+	default SkyOverrideMode overrideMode()
+	{
+		return SkyOverrideMode.NONE;
+	}
 }

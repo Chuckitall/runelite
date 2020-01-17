@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2018, Adam <Adam@sigterm.info>
+ * Copyright (c) 2019 logarrhytmic <https://github.com/logarrhythmic>
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -22,29 +22,25 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#version 330
 
-#define SAMPLING_DEFAULT 0
-#define SAMPLING_MITCHELL 1
-#define SAMPLING_CATROM 2
-#define SAMPLING_XBR 3
-uniform int samplingMode;
-uniform ivec2 sourceDimensions;
-uniform ivec2 targetDimensions;
+package net.runelite.client.plugins.skybox.config;
 
-#include scale/xbr_lv2_vert.glsl
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec2 aTexCoord;
-
-out vec2 TexCoord;
-out XBRTable xbrTable;
-
-void main()
+@Getter
+@RequiredArgsConstructor
+public enum SkyOverrideMode
 {
-    gl_Position = vec4(aPos, 1.0);
-    TexCoord = aTexCoord;
+	NONE("None"),
+	OVERWORLD("Overworld"),
+	ALL("Everywhere");
 
-    if (samplingMode == SAMPLING_XBR)
-        xbrTable = xbr_vert(TexCoord, sourceDimensions);
+	private final String name;
+
+	@Override
+	public String toString()
+	{
+		return name;
+	}
 }

@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2018, Adam <Adam@sigterm.info>
+ * Copyright (c) 2019 Hydrox6 <ikada@protonmail.ch>
+ * Copyright (c) 2019 Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,29 +23,46 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#version 330
+package net.runelite.client.plugins.runecraft;
 
-#define SAMPLING_DEFAULT 0
-#define SAMPLING_MITCHELL 1
-#define SAMPLING_CATROM 2
-#define SAMPLING_XBR 3
-uniform int samplingMode;
-uniform ivec2 sourceDimensions;
-uniform ivec2 targetDimensions;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import javax.inject.Inject;
+import net.runelite.api.widgets.WidgetItem;
+import net.runelite.client.ui.overlay.WidgetItemOverlay;
+import net.runelite.client.ui.overlay.components.TextComponent;
 
-#include scale/xbr_lv2_vert.glsl
-
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec2 aTexCoord;
-
-out vec2 TexCoord;
-out XBRTable xbrTable;
-
-void main()
+class EssencePouchOverlay extends WidgetItemOverlay
 {
-    gl_Position = vec4(aPos, 1.0);
-    TexCoord = aTexCoord;
+	@Inject
+	EssencePouchOverlay()
+	{
+		showOnInventory();
+	}
 
-    if (samplingMode == SAMPLING_XBR)
-        xbrTable = xbr_vert(TexCoord, sourceDimensions);
+	@Override
+	public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem itemWidget)
+	{
+		final Pouch pouch = Pouch.forItem(itemId);
+		if (pouch == null)
+		{
+			return;
+		}
+
+		final Rectangle bounds = itemWidget.getCanvasBounds();
+		final TextComponent textComponent = new TextComponent();
+		textComponent.setPosition(new Point(bounds.x - 1, bounds.y + 8));
+		textComponent.setColor(Color.CYAN);
+		if (pouch.isUnknown())
+		{
+			textComponent.setText("?");
+		}
+		else
+		{
+			textComponent.setText(Integer.toString(pouch.getHolding()));
+		}
+		textComponent.render(graphics);
+	}
 }

@@ -30,6 +30,33 @@ import static net.runelite.client.plugins.beanshell2.ui.BshCorePanel.GEAR_ICON;
 public class BshManager
 {
 	private static int __OFFSET__ = 0;
+	private static String __DEFAULT_IMPORTS__ = "\n" +
+		"import net.runelite.client.events.*;\n" +
+		"import net.runelite.api.util.*;\n" +
+		"import net.runelite.api.events.*;\n" +
+		"\n" +
+		"import io.reactivex.functions.*;\n" +
+		"\n" +
+		"import net.runelite.client.plugins.fred4106.api.other.*;\n" +
+		"import net.runelite.client.plugins.beanshell2.interfaces.*;\n" +
+		"\n" +
+		"import net.runelite.api.Client;\n" +
+		"import net.runelite.client.eventbus.EventBus;\n" +
+		"import net.runelite.client.ui.overlay.OverlayManager;\n" +
+		"import net.runelite.client.menus.MenuManager;\n" +
+		"\n" +
+		"import net.runelite.client.plugins.fred.api.other.Tuples.T1;\n" +
+		"import net.runelite.client.plugins.fred.api.other.Tuples.T2;\n" +
+		"import net.runelite.client.plugins.fred.api.other.Tuples.T3;\n" +
+		"import net.runelite.client.plugins.fred.api.other.Tuples.T4;\n" +
+		"import net.runelite.client.plugins.fred.api.other.Tuples.T5;\n" +
+		"import net.runelite.client.plugins.fred.api.other.Tuples.T6;\n" +
+		"\n" +
+		"";
+
+	private static String __DEFAULT_FUNCTIONS__ = "\n" +
+		"BshContext getContext() { return context; }\n" +
+		"";
 
 	private static int getUUID()
 	{
@@ -54,23 +81,8 @@ public class BshManager
 		{
 			Interpreter i = new Interpreter();
 			i.set("context", context);
-			i.eval("import net.runelite.api.Client;\n" +
-				"import net.runelite.client.eventbus.EventBus;\n" +
-				"import net.runelite.client.ui.overlay.OverlayManager;\n" +
-				"import net.runelite.client.menus.MenuManager;\n" +
-				"import net.runelite.client.events.*;\n" +
-				"import net.runelite.api.events.*;\n" +
-				"import io.reactivex.functions.*;\n" +
-				"import net.runelite.client.plugins.fred4106.api.other.*;\n" +
-				"import net.runelite.client.plugins.fred.api.other.Tuples.T1;\n" +
-				"import net.runelite.client.plugins.fred.api.other.Tuples.T2;\n" +
-				"import net.runelite.client.plugins.fred.api.other.Tuples.T3;\n" +
-				"import net.runelite.client.plugins.fred.api.other.Tuples.T4;\n" +
-				"import net.runelite.client.plugins.fred.api.other.Tuples.T5;\n" +
-				"import net.runelite.client.plugins.fred.api.other.Tuples.T6;\n" +
-				"\n" +
-				"import net.runelite.client.plugins.beanshell2.interfaces.*;");
-			i.eval("BshContext getContext() { return context; }");
+			i.eval(__DEFAULT_IMPORTS__);
+			i.eval(__DEFAULT_FUNCTIONS__);
 			i.source(context.getResolvedName());
 			plugin = (BshPlugin) i.getInterface(BshPlugin.class);
 		}
@@ -138,7 +150,7 @@ public class BshManager
 		{
 			return;
 		}
-		log.debug("uuid: {}, enable: {}, current: {}", uuid, enable, value.get_1());
+		log.info("uuid: {}, enable: {}, current: {}", uuid, enable, value.get_1());
 		if (!value.get_1() && enable)
 		{
 			value.get_2().startup();

@@ -362,7 +362,7 @@ public class ScriptWrapper
 
 	private final String name;
 
-	private BaseScript script = null;
+	private GroovyPluginBase script = null;
 	private ScriptContext ctx = null;
 	private ScriptPanel panel;
 	private ScriptState state = UNLOADED;
@@ -401,10 +401,10 @@ public class ScriptWrapper
 					{
 						Class clazz = gcl.parseClass(new File(GroovyCore.getGroovyRoot(), fileName)) ;
 						Object inst = clazz.getDeclaredConstructor(ScriptContext.class).newInstance(ctx);
-						if (inst instanceof  BaseScript)
+						if (inst instanceof GroovyPluginBase)
 						{
 							log.debug("we got here? (inside the inst instanceof BaseScript");
-							this.script = (BaseScript) inst;
+							this.script = (GroovyPluginBase) inst;
 						}
 					}
 					catch (IOException e)

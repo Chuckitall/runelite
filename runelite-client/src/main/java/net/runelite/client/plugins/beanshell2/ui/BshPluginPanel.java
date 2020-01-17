@@ -3,6 +3,7 @@ package net.runelite.client.plugins.beanshell2.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.Box;
@@ -49,7 +50,7 @@ public class BshPluginPanel extends JPanel
 		this.setPreferredSize(new Dimension(0, 56));
 
 		buttonsContent = new JPanel();
-		buttonsContent.setLayout(new BoxLayout(buttonsContent, BoxLayout.Y_AXIS));
+		buttonsContent.setLayout(new BorderLayout());
 		buttonsContent.setBorder(new EmptyBorder(4, 8, 4, 4));
 		buttonsContent.setBackground(null);
 
@@ -63,8 +64,8 @@ public class BshPluginPanel extends JPanel
 		gear.setPreferredSize(new Dimension(29, 15));
 		gear.setBorder(new EmptyBorder(0, 4, 0, 0));
 
-		buttonsContent.add(avatar);
-		buttonsContent.add(gear);
+		buttonsContent.add(avatar, BorderLayout.WEST);
+		buttonsContent.add(gear, BorderLayout.EAST);
 
 
 		upAndContent = new JPanel();

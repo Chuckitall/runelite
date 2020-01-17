@@ -49,17 +49,12 @@ public class GroovyScriptsParse
 				}
 			}
 
-			@SuppressWarnings("UnstableApiUsage") final Map<String, String> tmp = NEWLINE_SPLITTER.withKeyValueSeparator("|").split(sb);
+			@SuppressWarnings("UnstableApiUsage") final Map<String, String> tmp = NEWLINE_SPLITTER.withKeyValueSeparator(" | ").split(sb);
 
 			for (Entry<String, String> e : tmp.entrySet())
 			{
 				String key = e.getKey().trim();
-				if (key.length() < 3 || !key.contains(":"))
-				{
-					return false;
-				}
-				String[] parts = key.split(":");
-				if (parts.length != 2 || parts[0].length() == 0 || parts[1].length() == 0)
+				if (key.length() == 0 || key.contains("."))
 				{
 					return false;
 				}

@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.groovy.GroovyCore;
+import net.runelite.client.plugins.groovy.loader.ScriptWrapper.ScriptPanel;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
@@ -36,15 +37,15 @@ public class GroovyPanel extends PluginPanel
 		GEAR_ICON = new ImageIcon(ImageUtil.recolorImage(ImageUtil.getResourceStreamFromClass(GroovyCore.class, "config_edit_icon.png"), ColorScheme.LIGHT_GRAY_COLOR));
 	}
 
-	private final Comparator<GroovyScriptPanel> SCRIPT_ITEM_COMPARATOR = (o1, o2) ->
+	private final Comparator<ScriptPanel> SCRIPT_ITEM_COMPARATOR = (o1, o2) ->
 	{
-		return o1.getUuid() - o2.getUuid();
+		return o1.getName().compareTo(o2.getName());
 	};
 
-	private final Supplier<List<GroovyScriptPanel>> scriptSupplier;
+	private final Supplier<List<ScriptPanel>> scriptSupplier;
 	private GroovyCore core;
 
-	public GroovyPanel(GroovyCore plugin, Supplier<List<GroovyScriptPanel>> scriptSupplier)
+	public GroovyPanel(GroovyCore plugin, Supplier<List<ScriptPanel>> scriptSupplier)
 	{
 		super();
 		this.core = plugin;
@@ -56,7 +57,7 @@ public class GroovyPanel extends PluginPanel
 
 	public void rebuildScriptPanels()
 	{
-		List<GroovyScriptPanel> scripts = scriptSupplier.get();
+		List<ScriptPanel> scripts = scriptSupplier.get();
 
 		if (scripts == null)
 		{
@@ -73,7 +74,7 @@ public class GroovyPanel extends PluginPanel
 		});
 	}
 
-	private void addItemToPanel(GroovyScriptPanel item)
+	private void addItemToPanel(ScriptPanel item)
 	{
 		add(item);
 	}

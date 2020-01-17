@@ -4,10 +4,12 @@ import com.google.common.base.Strings;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.AccessLevel;
@@ -22,9 +24,12 @@ import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
-import net.runelite.client.plugins.groovy.interfaces.GroovyContext;
+import net.runelite.client.plugins.groovy.loader.ScriptContext;
+import net.runelite.client.plugins.groovy.loader.ScriptWrapper;
+import net.runelite.client.plugins.groovy.loader.ScriptWrapper.ScriptCommand;
+import net.runelite.client.plugins.groovy.loader.ScriptWrapper.ScriptPanel;
+import net.runelite.client.plugins.groovy.loader.ScriptWrapper.ScriptState;
 import net.runelite.client.plugins.groovy.ui.GroovyPanel;
-import net.runelite.client.plugins.groovy.ui.GroovyScriptPanel;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -71,8 +76,8 @@ public class GroovyCore extends Plugin
 	@Inject
 	private GroovyConfig config;
 
-	@Inject
-	private GroovyManager groovyManager;
+//	@Inject
+//	private GroovyManager groovyManager;
 
 	//settings
 	@Getter(AccessLevel.PUBLIC)
@@ -80,6 +85,8 @@ public class GroovyCore extends Plugin
 
 	@Getter(AccessLevel.PUBLIC)
 	private static String groovyScripts;
+
+	private final List<ScriptWrapper> scripts = new ArrayList<>();
 
 	@Provides
 	GroovyConfig provideConfig(ConfigManager configManager)
@@ -93,10 +100,24 @@ public class GroovyCore extends Plugin
 		log.debug("configure callback");
 	}
 
+	private void purgeAllScripts()
+	{
+		scripts.stream().filter(f->f.getState() == ScriptState.ENABLED).forEach(f -> f.doCommand(ScriptCommand.DISABLE));
+		scripts.clear();
+	}
+
 	private void loadScriptsFromConfig()
 	{
+		purgeAllScripts();
+
+		groovyRoot = config.groovyRoot();
 		groovyScripts = config.groovyScripts();
-		groovyManager.clear();
+		if (!GroovyScriptsParse.parse(groovyScripts))
+		{
+			return;
+		}
+
+
 		if (!Strings.isNullOrEmpty(groovyScripts))
 		{
 			final StringBuilder sb = new StringBuilder();
@@ -109,24 +130,23 @@ public class GroovyCore extends Plugin
 				}
 			}
 
-			@SuppressWarnings("UnstableApiUsage") final Map<String, String> split = NEWLINE_SPLITTER.withKeyValueSeparator("|").split(sb);
+			@SuppressWarnings("UnstableApiUsage") final Map<String, String> split = NEWLINE_SPLITTER.withKeyValueSeparator(" | ").split(sb);
 			for (Map.Entry<String, String> entry : split.entrySet())
 			{
-				final String folderName = entry.getKey().trim().split(":")[0].trim();
-				final String fileName =  entry.getKey().trim().split(":")[1].trim();
-
+				final String fileName =  entry.getKey().trim();
 				final boolean enabled = Boolean.parseBoolean(entry.getValue().trim());
-
-				GroovyContext context = new GroovyContext(folderName, fileName, client, eventBus, menuManager, overlayManager);
-
-
-				int uuid = groovyManager.registerScript(context);
-				groovyManager.enablePlugin(uuid, enabled);
+				ScriptWrapper temp = new ScriptWrapper(fileName, new ScriptContext(client, eventBus, menuManager, overlayManager));
+				temp.doCommand(ScriptCommand.LOAD);
+				if (enabled)
+				{
+					temp.doCommand(ScriptCommand.ENABLE);
+				}
+				scripts.add(temp);
 			}
 		}
 	}
 
-	private final Supplier<List<GroovyScriptPanel>> scriptEntrySupplier = () -> groovyManager.getScriptPanels();
+	private final Supplier<List<ScriptPanel>> scriptEntrySupplier = () -> scripts.stream().map(ScriptWrapper::getPanel).collect(Collectors.toList());
 
 	@Override
 	protected void startUp()
@@ -141,8 +161,6 @@ public class GroovyCore extends Plugin
 			.build();
 		clientToolbar.addNavigation(navButton);
 
-		groovyRoot = config.groovyRoot();
-
 		loadScriptsFromConfig();
 		addSubscriptions();
 		this.updateList();
@@ -156,7 +174,7 @@ public class GroovyCore extends Plugin
 	@Override
 	protected void shutDown()
 	{
-		groovyManager.clear();
+		purgeAllScripts();
 		eventBus.unregister(this);
 		clientToolbar.removeNavigation(navButton);
 	}

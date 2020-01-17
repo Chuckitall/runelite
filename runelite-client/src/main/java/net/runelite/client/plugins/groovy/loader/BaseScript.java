@@ -1,37 +1,27 @@
 package net.runelite.client.plugins.groovy.loader;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
+import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.menus.MenuManager;
+import net.runelite.client.ui.overlay.OverlayManager;
 
 @Slf4j
 public abstract class BaseScript
 {
-	@Getter(AccessLevel.PROTECTED)
-	private final ScriptContext ctx;
+	public Client game;
+	public EventBus eventBus;
+	public MenuManager menuManager;
+	public OverlayManager overlayManager;
 
 	public BaseScript(ScriptContext ctx)
 	{
-		this.ctx = ctx;
+		this.game = ctx.getClient();
+		this.eventBus = ctx.getEventBus();
+		this.menuManager = ctx.getMenuManager();
+		this.overlayManager = ctx.getOverlayManager();
 	}
 
-	@Getter(AccessLevel.PUBLIC)
-	private boolean running = false;
-
-	abstract boolean startup();
-	abstract boolean shutdown();
-	void _startup()
-	{
-		if (startup())
-		{
-			running = true;
-		}
-	}
-	void _shutdown()
-	{
-		if (shutdown())
-		{
-			running = false;
-		}
-	}
+	public abstract void startup();
+	public abstract void shutdown();
 }

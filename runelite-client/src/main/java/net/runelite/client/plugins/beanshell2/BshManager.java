@@ -30,10 +30,11 @@ import static net.runelite.client.plugins.beanshell2.ui.BshCorePanel.GEAR_ICON;
 public class BshManager
 {
 	private static int __OFFSET__ = 0;
-	private static String __DEFAULT_IMPORTS__ = "\n" +
+	private static String __DEFAULT_IMPORTS__ = "" +
 		"import net.runelite.client.events.*;\n" +
 		"import net.runelite.api.util.*;\n" +
 		"import net.runelite.api.events.*;\n" +
+		"import net.runelite.api.*;\n" +
 		"\n" +
 		"import io.reactivex.functions.*;\n" +
 		"\n" +
@@ -51,11 +52,10 @@ public class BshManager
 		"import net.runelite.client.plugins.fred.api.other.Tuples.T4;\n" +
 		"import net.runelite.client.plugins.fred.api.other.Tuples.T5;\n" +
 		"import net.runelite.client.plugins.fred.api.other.Tuples.T6;\n" +
-		"\n" +
 		"";
 
 	private static String __DEFAULT_FUNCTIONS__ = "\n" +
-		"BshContext getContext() { return context; }\n" +
+		"\n" +
 		"";
 
 	private static int getUUID()
@@ -81,9 +81,9 @@ public class BshManager
 		{
 			Interpreter i = new Interpreter();
 			i.set("context", context);
-			i.eval(__DEFAULT_IMPORTS__);
-			i.eval(__DEFAULT_FUNCTIONS__);
+//			i.eval(__DEFAULT_IMPORTS__);
 			i.source(context.getResolvedName());
+			i.eval("BshContext getContext() { return context; }");
 			plugin = (BshPlugin) i.getInterface(BshPlugin.class);
 		}
 		catch (EvalError evalError)

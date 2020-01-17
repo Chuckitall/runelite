@@ -26,6 +26,7 @@ package net.runelite.api;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * An enumeration of right-click menu actions.
@@ -318,5 +319,10 @@ public enum MenuOpcode
 	public static MenuOpcode of(int id)
 	{
 		return map.getOrDefault(id, UNKNOWN);
+	}
+
+	public static MenuOpcode of(String name)
+	{
+		return map.entrySet().stream().filter(f -> f.getValue().name().equalsIgnoreCase(name)).findFirst().map(Entry::getValue).orElse(UNKNOWN);
 	}
 }

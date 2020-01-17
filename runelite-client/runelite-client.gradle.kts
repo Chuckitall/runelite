@@ -71,6 +71,7 @@ dependencies {
     implementation(project(":runelite-api"))
     implementation(Libraries.naturalMouse)
     implementation(Libraries.luaJ)
+    implementation(Libraries.groovy)
     implementation(Libraries.beanshell)
 
     runtimeOnly(Libraries.trident)

@@ -4,6 +4,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.events.Event;
 import net.runelite.client.eventbus.EventBus;
@@ -13,10 +14,10 @@ import net.runelite.client.ui.overlay.OverlayManager;
 public class GroovyContext
 {
 	@Getter(AccessLevel.PUBLIC)
-	private final String namespace;
+	private final String name;
 
 	@Getter(AccessLevel.PUBLIC)
-	private final String resolvedName;
+	private final String mainFile;
 
 	@Getter(AccessLevel.PUBLIC)
 	private Client client;
@@ -30,10 +31,15 @@ public class GroovyContext
 	@Getter(AccessLevel.PUBLIC)
 	private EventBus eventBus;
 
-	public GroovyContext(String namespace, String resolvedName, Client client, EventBus eventBus, MenuManager menuManager, OverlayManager overlayManager)
+	@Getter(AccessLevel.PUBLIC)
+	@Setter(AccessLevel.PUBLIC)
+	private int uuid = -1;
+
+	public GroovyContext(String name, String mainFile, Client client, EventBus eventBus, MenuManager menuManager, OverlayManager overlayManager)
 	{
-		this.namespace = namespace;
-		this.resolvedName = resolvedName;
+		this.name = name;
+		this.mainFile = mainFile;
+
 		this.client = client;
 		this.eventBus = eventBus;
 		this.menuManager = menuManager;

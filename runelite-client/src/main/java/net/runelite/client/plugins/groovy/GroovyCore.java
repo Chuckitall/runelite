@@ -4,10 +4,12 @@ import com.google.common.base.Strings;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.AccessLevel;
@@ -109,17 +111,19 @@ public class GroovyCore extends Plugin
 				}
 			}
 
-			@SuppressWarnings("UnstableApiUsage") final Map<String, String> split = NEWLINE_SPLITTER.withKeyValueSeparator(" | ").split(sb);
+			@SuppressWarnings("UnstableApiUsage") final Map<String, String> split = NEWLINE_SPLITTER.withKeyValueSeparator("|").split(sb);
 			for (Map.Entry<String, String> entry : split.entrySet())
 			{
-				final String name = entry.getKey().trim();
+				final String folderName = entry.getKey().trim().split(":")[0].trim();
+				final String fileName =  entry.getKey().trim().split(":")[1].trim();
+
 				final boolean enabled = Boolean.parseBoolean(entry.getValue().trim());
-				final String resolvedName = groovyRoot + name;
 
-				GroovyContext context = new GroovyContext(name, resolvedName, client, eventBus, menuManager, overlayManager);
+				GroovyContext context = new GroovyContext(folderName, fileName, client, eventBus, menuManager, overlayManager);
 
-//				int uuid = groovyManager.registerScript(context);
-//				groovyManager.enablePlugin(uuid, enabled);
+
+				int uuid = groovyManager.registerScript(context);
+				groovyManager.enablePlugin(uuid, enabled);
 			}
 		}
 	}

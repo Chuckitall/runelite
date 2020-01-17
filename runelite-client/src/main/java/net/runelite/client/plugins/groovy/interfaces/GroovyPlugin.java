@@ -7,6 +7,7 @@ import net.runelite.client.plugins.fred.api.other.Tuples.T2;
 public interface GroovyPlugin
 {
 	GroovyContext getContext();
+	void setContext(GroovyContext context);
 	List<T2<String, String>> getConfigDefinition();
 	void startup();
 	void shutdown();

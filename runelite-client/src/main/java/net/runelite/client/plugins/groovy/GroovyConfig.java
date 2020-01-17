@@ -35,7 +35,7 @@ public interface GroovyConfig extends Config
 		position = 1,
 		name = "Groovy Scripts",
 //		description = "Comma separated list of absolute paths to scripts",
-		description = "Add custom bsh plugins here, 1 per line. Syntax: \'foldername:pluginname.groovy | [true/false]\'",
+		description = "Add custom groovy plugins here, 1 per line. Syntax: \'[foldername]:[filename]|[true/false]\'",
 		section = "generalSettings",
 		keyName = "groovyScripts",
 		parse = true,

@@ -16,10 +16,10 @@ import lombok.Getter;
 import lombok.Setter;
 import net.runelite.client.ui.FontManager;
 
-import static net.runelite.client.plugins.beanshell2.ui.BshCorePanel.CONTENT_WIDTH;
-import static net.runelite.client.plugins.beanshell2.ui.BshCorePanel.OFF_SWITCHER;
-import static net.runelite.client.plugins.beanshell2.ui.BshCorePanel.ON_SWITCHER;
-import static net.runelite.client.plugins.beanshell2.ui.BshCorePanel.TIME_WIDTH;
+import static net.runelite.client.plugins.groovy.ui.GroovyPanel.CONTENT_WIDTH;
+import static net.runelite.client.plugins.groovy.ui.GroovyPanel.OFF_SWITCHER;
+import static net.runelite.client.plugins.groovy.ui.GroovyPanel.ON_SWITCHER;
+import static net.runelite.client.plugins.groovy.ui.GroovyPanel.TIME_WIDTH;
 
 public class GroovyScriptPanel extends JPanel
 {

@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.groovy.loader;
+package net.runelite.client.plugins.groovy.script;
 
 
 import com.google.inject.Inject;
@@ -28,19 +28,19 @@ import net.runelite.api.Client;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.groovy.GroovyCore;
-import net.runelite.client.plugins.groovy.ui.GroovyPanel;
+import net.runelite.client.plugins.groovy.GroovyPanel;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.OverlayManager;
 
-import static net.runelite.client.plugins.groovy.loader.ScriptWrapper.ScriptCommand.DISABLE;
-import static net.runelite.client.plugins.groovy.loader.ScriptWrapper.ScriptCommand.ENABLE;
-import static net.runelite.client.plugins.groovy.loader.ScriptWrapper.ScriptCommand.LOAD;
-import static net.runelite.client.plugins.groovy.loader.ScriptWrapper.ScriptCommand.RELOAD;
-import static net.runelite.client.plugins.groovy.loader.ScriptWrapper.ScriptState.*;
-import static net.runelite.client.plugins.groovy.ui.GroovyPanel.CONTENT_WIDTH;
-import static net.runelite.client.plugins.groovy.ui.GroovyPanel.OFF_SWITCHER;
-import static net.runelite.client.plugins.groovy.ui.GroovyPanel.ON_SWITCHER;
-import static net.runelite.client.plugins.groovy.ui.GroovyPanel.TIME_WIDTH;
+import static net.runelite.client.plugins.groovy.script.ScriptWrapper.ScriptCommand.DISABLE;
+import static net.runelite.client.plugins.groovy.script.ScriptWrapper.ScriptCommand.ENABLE;
+import static net.runelite.client.plugins.groovy.script.ScriptWrapper.ScriptCommand.LOAD;
+import static net.runelite.client.plugins.groovy.script.ScriptWrapper.ScriptCommand.RELOAD;
+import static net.runelite.client.plugins.groovy.script.ScriptWrapper.ScriptState.*;
+import static net.runelite.client.plugins.groovy.GroovyPanel.CONTENT_WIDTH;
+import static net.runelite.client.plugins.groovy.GroovyPanel.OFF_SWITCHER;
+import static net.runelite.client.plugins.groovy.GroovyPanel.ON_SWITCHER;
+import static net.runelite.client.plugins.groovy.GroovyPanel.TIME_WIDTH;
 
 //This is the object that is held by the ScriptLoader.
 //We use this object to enable or disable the plugin.
@@ -362,7 +362,7 @@ public class ScriptWrapper
 
 	private final String name;
 
-	private GroovyPluginBase script = null;
+	private ScriptedPlugin script = null;
 	private ScriptContext ctx = null;
 	private ScriptPanel panel;
 	private ScriptState state = UNLOADED;
@@ -401,10 +401,10 @@ public class ScriptWrapper
 					{
 						Class clazz = gcl.parseClass(new File(GroovyCore.getGroovyRoot(), fileName)) ;
 						Object inst = clazz.getDeclaredConstructor(ScriptContext.class).newInstance(ctx);
-						if (inst instanceof GroovyPluginBase)
+						if (inst instanceof ScriptedPlugin)
 						{
 							log.debug("we got here? (inside the inst instanceof BaseScript");
-							this.script = (GroovyPluginBase) inst;
+							this.script = (ScriptedPlugin) inst;
 						}
 					}
 					catch (IOException e)

@@ -1372,7 +1372,7 @@ public abstract class RSClientMixin implements RSClient
 		if (printMenuActions && client.getLogger().isDebugEnabled())
 		{
 			client.getLogger().debug(
-				"|MenuAction|: Param0={} Param1={} Opcode={} Id={} MenuOption={} MenuTarget={} CanvasX={} CanvasY={} Authentic={}",
+				"param<{}, {}>, op<{}>, Id<{}>, option<\"{}\">, target<\"{}\">, loc<{}, {}>, authentic<{}>",
 				param0, param1, opcode, id, menuOption, menuTarget, canvasX, canvasY, authentic
 			);
 		}

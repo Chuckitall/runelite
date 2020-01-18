@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.groovy.ui;
+package net.runelite.client.plugins.groovy;
 
 import java.awt.GridLayout;
 import java.util.Comparator;
@@ -9,7 +9,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.groovy.GroovyCore;
-import net.runelite.client.plugins.groovy.loader.ScriptWrapper.ScriptPanel;
+import net.runelite.client.plugins.groovy.script.ScriptWrapper.ScriptPanel;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;

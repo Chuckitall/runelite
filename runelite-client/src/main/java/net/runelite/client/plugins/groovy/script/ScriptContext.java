@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.groovy.loader;
+package net.runelite.client.plugins.groovy.script;
 
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;

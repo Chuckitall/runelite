@@ -31,14 +31,4 @@ public class ScriptContext
 		this.menuManager = menuManager;
 		this.overlayManager = overlayManager;
 	}
-
-	public <T extends Event> void subscribe(Class<T> eventClass, @NonNull Consumer<T> action)
-	{
-		eventBus.subscribe(eventClass, this, action);
-	}
-
-	public void unregister()
-	{
-		eventBus.unregister(this);
-	}
 }

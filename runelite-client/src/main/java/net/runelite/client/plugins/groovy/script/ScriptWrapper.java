@@ -463,14 +463,6 @@ public class ScriptWrapper
 					this.doCommand(LOAD);
 				}
 				break;
-//			case ERROR_FILE_NOT_FOUND:
-//				if (command.equals(RELOAD))
-//				{
-//					this.script = null;
-//					this.state = UNLOADED;
-//					this.doCommand(LOAD);
-//				}
-//				break;
 		}
 		if (this.state != oldState)
 		{

@@ -75,10 +75,6 @@ public class GroovyCore extends Plugin
 	@Inject
 	private GroovyConfig config;
 
-//	@Inject
-//	private GroovyManager groovyManager;
-
-	//settings
 	@Getter(AccessLevel.PUBLIC)
 	private static String groovyRoot;
 
@@ -150,7 +146,7 @@ public class GroovyCore extends Plugin
 	@Override
 	protected void startUp()
 	{
-		panel = new GroovyPanel(this, scriptEntrySupplier);
+		panel = new GroovyPanel(this, client, eventBus, scriptEntrySupplier);
 		final BufferedImage icon = loadImage("panel_icon");
 		navButton = NavigationButton.builder()
 			.tooltip("Groovy")

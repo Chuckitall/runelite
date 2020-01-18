@@ -44,7 +44,6 @@ object Plugins {
     val jarTest = Pair("com.github.hauner.jarTest", "1.0.1")
     val shadow = Pair("com.github.johnrengelman.shadow", "5.2.0")
 }
-
 object Libraries {
     private object Versions {
         const val annotations = "18.0.0"
@@ -56,6 +55,9 @@ object Libraries {
         const val commonsCli = "1.4"
         const val discord = "1.1"
         const val fernflower = "07082019"
+        const val fifesoft_rsyntaxtextarea = "3.0.8"
+        const val fifesoft_autocomplete = "3.0.4"
+        const val fifesoft_rstaui = "3.0.3"
         const val findbugs = "3.0.2"
         const val groovy = "3.0.0-rc-3"
         const val gson = "2.8.6"
@@ -111,6 +113,9 @@ object Libraries {
     const val commonsCli = "commons-cli:commons-cli:${Versions.commonsCli}"
     const val discord = "net.runelite:discord:${Versions.discord}"
     const val fernflower = "net.runelite:fernflower:${Versions.fernflower}"
+    const val fifesoft_rsyntaxtextarea = "com.fifesoft:rsyntaxtextarea:${Versions.fifesoft_rsyntaxtextarea}"
+    const val fifesoft_autocomplete = "com.fifesoft:autocomplete:${Versions.fifesoft_autocomplete}"
+    const val fifesoft_rstaui = "com.fifesoft:rstaui:${Versions.fifesoft_rstaui}"
     const val findbugs = "com.google.code.findbugs:jsr305:${Versions.findbugs}"
     const val groovy = "org.codehaus.groovy:groovy:${Versions.groovy}"
     const val gson = "com.google.code.gson:gson:${Versions.gson}"

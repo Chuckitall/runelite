@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import net.runelite.api.Client;
 import static net.runelite.api.Opcodes.RUNELITE_EXECUTE;
 import net.runelite.api.events.ScriptCallbackEvent;
+import net.runelite.api.events.ScriptRunEvent;
 import net.runelite.api.mixins.Copy;
 import net.runelite.api.mixins.Inject;
 import net.runelite.api.mixins.Mixin;
@@ -127,6 +128,16 @@ public abstract class ScriptVMMixin implements RSClient
 				client.getLogger().error("Error in JavaScriptCallback", e);
 			}
 			return;
+		}
+		else if(arguments != null && arguments.length > 0)
+		{
+			ScriptRunEvent rlEvent = new ScriptRunEvent();
+			rlEvent.setArgs(event.getArguments());
+			rlEvent.setSource(event.getSource());
+			rlEvent.setOp(event.getOp());
+			rlEvent.setOpbase(event.getOpbase());
+			rlEvent.setMouseX(event.getMouseX());
+			client.getCallbacks().post(ScriptRunEvent.class, rlEvent);
 		}
 
 		try

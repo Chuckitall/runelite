@@ -22,34 +22,38 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.xtea;
+package net.runelite.client.plugins.animations;
 
 import java.io.IOException;
 import java.util.HashMap;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.GameState;
-import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.NPC;
+import net.runelite.api.events.AnimationChanged;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.http.api.xtea.XteaClient;
+import net.runelite.http.api.animation.AnimationsClient;
+import org.apache.commons.lang3.ArrayUtils;
 
 @PluginDescriptor(
-	name = "Xtea",
+	name = "Animations",
 	hidden = true
 )
 @Slf4j
-public class XteaPlugin extends Plugin
+public class AnimationsPlugin extends Plugin
 {
-	private final XteaClient xteaClient = new XteaClient();
+	private final AnimationsClient animationsClient = new AnimationsClient();
 
-	private HashMap<Integer, int[]> xteas;
+	private HashMap<Integer, int[]> animations;
+	@Inject
+	private Client client;
+
 	{
 		try
 		{
-			xteas = xteaClient.get();
+			animations = animationsClient.get();
 		}
 		catch (IOException e)
 		{
@@ -57,41 +61,21 @@ public class XteaPlugin extends Plugin
 		}
 	}
 
-	@Inject
-	private Client client;
-
 	@Subscribe
-	private void onGameStateChanged(GameStateChanged gameStateChanged)
+	private void onAnimationChanged(AnimationChanged event)
 	{
-		if (gameStateChanged.getGameState() != GameState.LOGGED_IN)
+		if (event.getActor() instanceof NPC)
 		{
-			return;
-		}
-
-		int[] regions = client.getMapRegions();
-		int[][] xteaKeys = client.getXteaKeys();
-
-		for (int idx = 0; idx < regions.length; ++idx)
-		{
-			int region = regions[idx];
-			int[] keys = xteaKeys[idx];
-
-			if (xteas.get(region) != null)
+			if (event.getActor().getAnimation() != -1)
 			{
-				continue;
+				if (ArrayUtils.contains(animations.get(((NPC) event.getActor()).getId()), event.getActor().getAnimation()))
+				{
+					return;
+				}
+				int[] newAnimations = ArrayUtils.add(animations.get(((NPC) event.getActor()).getId()), event.getActor().getAnimation());
+				animations.put(((NPC) event.getActor()).getId(), newAnimations);
+				animationsClient.submit(((NPC) event.getActor()).getId(), event.getActor().getAnimation());
 			}
-
-			xteas.put(region, keys);
-
-			log.debug("Region {} keys {}, {}, {}, {}", region, keys[0], keys[1], keys[2], keys[3]);
-
-			//Don't post non encrypted regions
-			if (keys[0] == 0 && keys[1] == 0 && keys[2] == 0 && keys[3] == 0)
-			{
-				continue;
-			}
-
-			xteaClient.submit(region, keys);
 		}
 	}
 }

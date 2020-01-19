@@ -14,7 +14,7 @@ public class ScriptData
 {
 
 	@Value
-	static class ScriptEntry
+	public static class ScriptEntry
 	{
 		int id;
 		String category;

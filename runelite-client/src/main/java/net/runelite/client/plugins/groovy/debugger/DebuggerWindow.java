@@ -143,7 +143,7 @@ public class DebuggerWindow extends JFrame
 		{
 
 			JLabel line = new JLabel(String.format("%s: %s", e.getName(), e.getMessage()));
-			line.setBackground(e.getLogLevel().getColor());
+			line.setForeground(e.getLogLevel().getColor());
 			tracker.add(line);
 
 			// Cull very old stuff

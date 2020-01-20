@@ -1372,7 +1372,7 @@ public abstract class RSClientMixin implements RSClient
 		if (printMenuActions && client.getLogger().isDebugEnabled())
 		{
 			client.getLogger().debug(
-				"param<{}, {}>, op<{}>, Id<{}>, option<\"{}\">, target<\"{}\">, loc<{}, {}>, authentic<{}>",
+				"|MenuAction|: Param0={} Param1={} Opcode={} Id={} MenuOption={} MenuTarget={} CanvasX={} CanvasY={} Authentic={}",
 				param0, param1, opcode, id, menuOption, menuTarget, canvasX, canvasY, authentic
 			);
 		}
@@ -1396,6 +1396,53 @@ public abstract class RSClientMixin implements RSClient
 			authentic,
 			client.getMouseCurrentButton()
 		);
+
+		if (menuOptionClicked.getOption().equals(menuOptionClicked.getTarget()))
+		{
+			MenuEntry match = null;
+			int matches = 0;
+			for (MenuEntry e : client.getMenuEntries())
+			{
+				if (e.getOpcode() != menuOptionClicked.getOpcode())
+				{
+					continue;
+				}
+				if (e.getParam0() != menuOptionClicked.getParam0())
+				{
+					continue;
+				}
+				if (e.getParam1() != menuOptionClicked.getParam1())
+				{
+					continue;
+				}
+				if (e.getIdentifier() != menuOptionClicked.getIdentifier())
+				{
+					continue;
+				}
+					match = e;
+				matches++;
+			}
+
+			if (matches == 1)
+			{
+				menuOptionClicked.setTarget(match.getTarget());
+			}
+			if (printMenuActions && client.getLogger().isDebugEnabled())
+			{
+				if (matches == 0)
+				{
+					client.getLogger().trace("Found no matches");
+				}
+				else if (matches > 1)
+				{
+					client.getLogger().trace("Found "+ matches + " matches");
+				}
+				client.getLogger().trace(
+					"|MenuAction|: Param0={} Param1={} Opcode={} Id={} MenuOption={} MenuTarget={} CanvasX={} CanvasY={} Authentic={}",
+					param0, param1, opcode, id, menuOption, menuTarget, canvasX, canvasY, authentic
+				);
+			}
+		}
 
 		client.getCallbacks().post(MenuOptionClicked.class, menuOptionClicked);
 

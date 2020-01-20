@@ -24,10 +24,12 @@
  */
 package net.runelite.mixins;
 
+import com.google.common.collect.ImmutableList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.runelite.api.Client;
 import static net.runelite.api.Opcodes.RUNELITE_EXECUTE;
+import net.runelite.api.events.RunScriptEvent;
 import net.runelite.api.events.ScriptCallbackEvent;
 import net.runelite.api.mixins.Copy;
 import net.runelite.api.mixins.Inject;
@@ -131,6 +133,13 @@ public abstract class ScriptVMMixin implements RSClient
 
 		try
 		{
+			if (event.getArguments() != null && event.getArguments().length > 0)
+			{
+				RunScriptEvent scriptEvent = new RunScriptEvent();
+				scriptEvent.setScriptId((Integer) event.getArguments()[0]);
+				scriptEvent.setArguments(ImmutableList.copyOf(event.getArguments()));
+				client.getCallbacks().post(RunScriptEvent.class, scriptEvent);
+			}
 			rs$runScript(event, maxExecutionTime);
 		}
 		finally

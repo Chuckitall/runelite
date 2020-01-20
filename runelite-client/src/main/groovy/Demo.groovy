@@ -23,6 +23,11 @@ class Demo extends ScriptedPlugin {
 		}
 	}
 
+	void onMenuEntryClicked()
+	{
+
+	}
+
 	void startup() {
 		_eventBus.subscribe(GameTick.class, this, this.&onTick as Consumer<GameTick>);
 		log(LogLevel.DEBUG, "Starting Up");

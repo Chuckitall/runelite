@@ -403,7 +403,6 @@ public class ScriptWrapper
 						Object inst = clazz.getDeclaredConstructor(ScriptContext.class).newInstance(ctx);
 						if (inst instanceof ScriptedPlugin)
 						{
-							log.debug("we got here? (inside the inst instanceof BaseScript");
 							this.script = (ScriptedPlugin) inst;
 						}
 					}

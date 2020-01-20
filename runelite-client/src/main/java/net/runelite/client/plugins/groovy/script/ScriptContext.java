@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.events.Event;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.menus.MenuManager;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -24,11 +25,15 @@ public class ScriptContext
 	@Getter(AccessLevel.PUBLIC)
 	private EventBus eventBus;
 
-	public ScriptContext(Client client, EventBus eventBus, MenuManager menuManager, OverlayManager overlayManager)
+	@Getter(AccessLevel.PUBLIC)
+	private ClientThread clientThread;
+
+	public ScriptContext(Client client, EventBus eventBus, MenuManager menuManager, OverlayManager overlayManager, ClientThread clientThread)
 	{
 		this.client = client;
 		this.eventBus = eventBus;
 		this.menuManager = menuManager;
 		this.overlayManager = overlayManager;
+		this.clientThread = clientThread;
 	}
 }

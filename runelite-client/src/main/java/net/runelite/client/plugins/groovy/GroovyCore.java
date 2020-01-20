@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.events.ConfigChanged;
@@ -62,6 +63,9 @@ public class GroovyCore extends Plugin
 
 	@Inject
 	private Client client;
+
+	@Inject
+	private ClientThread clientThread;
 
 	@Inject
 	private EventBus eventBus;
@@ -130,7 +134,7 @@ public class GroovyCore extends Plugin
 			{
 				final String fileName =  entry.getKey().trim();
 				final boolean enabled = Boolean.parseBoolean(entry.getValue().trim());
-				ScriptWrapper temp = new ScriptWrapper(fileName, new ScriptContext(client, eventBus, menuManager, overlayManager));
+				ScriptWrapper temp = new ScriptWrapper(fileName, new ScriptContext(client, eventBus, menuManager, overlayManager, clientThread));
 				temp.doCommand(ScriptCommand.LOAD);
 				if (enabled)
 				{

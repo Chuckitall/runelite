@@ -8,9 +8,15 @@ import net.runelite.client.plugins.groovy.script.ScriptedPlugin
 @CompileStatic
 @InheritConstructors
 class Demo extends ScriptedPlugin {
+	int[] ignored = [
+			1004, 3174, 39
+	];
 	void onScriptRunEvent(RunScriptEvent e)
 	{
-		log(LogLevel.INFO, "Script called with id: " + e.scriptId + " and arguments " + e.arguments.toString());
+		if (!ignored.contains(e.getScriptId()))
+		{
+			log(LogLevel.INFO, "Script called with id: " + e.scriptId + " and arguments " + e.arguments.toString());
+		}
 	}
 
 	void startup() {

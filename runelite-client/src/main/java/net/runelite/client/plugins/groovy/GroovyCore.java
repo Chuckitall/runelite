@@ -77,6 +77,9 @@ public class GroovyCore extends Plugin
 	private OverlayManager overlayManager;
 
 	@Inject
+	private ConfigManager configManager;
+
+	@Inject
 	private GroovyConfig config;
 
 	@Getter(AccessLevel.PUBLIC)
@@ -101,14 +104,11 @@ public class GroovyCore extends Plugin
 
 	private void purgeAllScripts()
 	{
-		scripts.stream().filter(f->f.getState() == ScriptState.ENABLED).forEach(f -> f.doCommand(ScriptCommand.DISABLE));
-		scripts.clear();
+
 	}
 
 	private void loadScriptsFromConfig()
 	{
-		purgeAllScripts();
-
 		groovyRoot = config.groovyRoot();
 		groovyScripts = config.groovyScripts();
 		if (!GroovyScriptsParse.parse(groovyScripts))
@@ -173,9 +173,12 @@ public class GroovyCore extends Plugin
 	@Override
 	protected void shutDown()
 	{
-		purgeAllScripts();
 		eventBus.unregister(this);
 		clientToolbar.removeNavigation(navButton);
+		String configOut = scripts.stream().map(s -> s.getName() + " | " + (s.getState() == ScriptState.ENABLED)).reduce((l, r) -> l + "\n" + r).orElse("");
+		scripts.stream().filter(f->f.getState() == ScriptState.ENABLED).forEach(f -> f.doCommand(ScriptCommand.DISABLE));
+		scripts.clear();
+		configManager.setConfiguration("groovy", "groovyScripts", configOut);
 	}
 
 	private void addSubscriptions()
@@ -191,7 +194,8 @@ public class GroovyCore extends Plugin
 		}
 		if (event.getKey().equalsIgnoreCase("groovyRoot") || event.getKey().equalsIgnoreCase("groovyScripts"))
 		{
-			loadScriptsFromConfig();
+			//loadScriptsFromConfig();
+			//TODO: Fix so we can still load scripts at runtime.
 		}
 	}
 

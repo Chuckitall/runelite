@@ -4,19 +4,14 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Arrays;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -26,12 +21,8 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.plugins.fred.util.Random;
-import net.runelite.client.plugins.groovy.debugger.LogLine.JLogLineLabel;
 import net.runelite.client.ui.ClientUI;
 import net.runelite.client.ui.DynamicGridLayout;
-
-import static java.awt.Color.LIGHT_GRAY;
 
 @Slf4j
 public class DebuggerWindow extends JFrame
@@ -57,6 +48,7 @@ public class DebuggerWindow extends JFrame
 		}
 	}
 
+
 	private final static int MAX_LOG_ENTRIES = 10000;
 
 	private final Client client;
@@ -66,12 +58,15 @@ public class DebuggerWindow extends JFrame
 
 	private int lastTick = 0;
 
-
+	private int ptr = 0;
+	private final LogLine[] history;
 
 	public DebuggerWindow(Client client, EventBus eventBus)
 	{
 		this.client = client;
 		this.eventBus = eventBus;
+		history = new LogLine[MAX_LOG_ENTRIES];
+		Arrays.fill(history, null);
 
 		setTitle("Groovy Debugger");
 		setIconImage(ClientUI.ICON);
@@ -131,7 +126,14 @@ public class DebuggerWindow extends JFrame
 		final JButton clearBtn = new JButton("Clear");
 		clearBtn.addActionListener(e ->
 		{
-			tracker.removeAll();
+			for (int i = 0; i < history.length; i++)
+			{
+				int idx = (ptr + i) % history.length;
+				if (history[idx] == null) continue;
+				tracker.remove(history[idx].getJLabel());
+				history[idx] = null;
+			}
+			ptr = 0;
 			tracker.revalidate();
 		});
 		trackerOpts.add(clearBtn);
@@ -147,31 +149,27 @@ public class DebuggerWindow extends JFrame
 		{
 			return;
 		}
+		LogLine oldest = history[ptr];
+		LogLine newest = new LogLine(e.getLogLevel(), e.getName(), e.getMessage());
+		history[ptr] = newest;
+		ptr = (ptr + 1) % history.length;
 
 		SwingUtilities.invokeLater(() ->
 		{
 
-			JLabel line = (new LogLine(e)).getJLabel();
-//			line.setOpaque(true);
-//			line.setForeground(e.getLogLevel().getColor());
-//			line.setBackground(new Color(Random.nextInt(120, 255), Random.nextInt(120, 255), Random.nextInt(120, 255), 80));
-
-			tracker.add(line);
-
-			// Cull very old stuff
-			for (; tracker.getComponentCount() > MAX_LOG_ENTRIES; )
+			if(oldest != null)
 			{
-				tracker.remove(0);
+				tracker.remove(oldest.getJLabel());
 			}
-
+			tracker.add(newest.getJLabel());
 			tracker.revalidate();
 		});
 	}
 
 	public void open()
 	{
+		ptr = 0;
 		eventBus.subscribe(GroovyLogEvent.class, this, this::onGroovyLogEvent);
-
 		setVisible(true);
 		toFront();
 		repaint();
@@ -179,8 +177,10 @@ public class DebuggerWindow extends JFrame
 
 	public void close()
 	{
-		tracker.removeAll();
 		eventBus.unregister(this);
+		tracker.removeAll();
+		ptr = 0;
+		Arrays.fill(history, null);
 		setVisible(false);
 	}
 }

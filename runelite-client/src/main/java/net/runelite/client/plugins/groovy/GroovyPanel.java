@@ -34,7 +34,8 @@ public class GroovyPanel extends PluginPanel
 	public static final int TIME_WIDTH = 20;
 
 
-	public DebuggerWindow debuggerWindow;
+	public static DebuggerWindow debuggerWindow;
+
 	public final JLabel title_label  = new JLabel("Groovy");
 
 	static
@@ -65,7 +66,10 @@ public class GroovyPanel extends PluginPanel
 		this.core = plugin;
 		this.scriptSupplier = scriptSupplier;
 
-		debuggerWindow = new DebuggerWindow(client, eventBus);
+		if (debuggerWindow == null)
+		{
+			debuggerWindow = new DebuggerWindow(client, eventBus);
+		}
 
 		setBorder(new EmptyBorder(10, 10, 10, 10));
 		setBackground(ColorScheme.DARK_GRAY_COLOR);

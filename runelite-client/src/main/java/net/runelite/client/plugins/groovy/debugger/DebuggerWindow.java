@@ -4,8 +4,13 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JButton;
@@ -21,13 +26,16 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.plugins.fred.util.Random;
+import net.runelite.client.plugins.groovy.debugger.LogLine.JLogLineLabel;
 import net.runelite.client.ui.ClientUI;
 import net.runelite.client.ui.DynamicGridLayout;
+
+import static java.awt.Color.LIGHT_GRAY;
 
 @Slf4j
 public class DebuggerWindow extends JFrame
 {
-
 	@Getter(AccessLevel.PUBLIC)
 	public enum LogLevel
 	{
@@ -58,6 +66,8 @@ public class DebuggerWindow extends JFrame
 
 	private int lastTick = 0;
 
+
+
 	public DebuggerWindow(Client client, EventBus eventBus)
 	{
 		this.client = client;
@@ -74,9 +84,7 @@ public class DebuggerWindow extends JFrame
 			@Override
 			public void windowClosing(WindowEvent e)
 			{
-				eventBus.unregister(this);
 				close();
-				//set button disabled if needed.
 			}
 		});
 
@@ -139,11 +147,15 @@ public class DebuggerWindow extends JFrame
 		{
 			return;
 		}
+
 		SwingUtilities.invokeLater(() ->
 		{
 
-			JLabel line = new JLabel(String.format("%s: %s", e.getName(), e.getMessage()));
-			line.setForeground(e.getLogLevel().getColor());
+			JLabel line = (new LogLine(e)).getJLabel();
+//			line.setOpaque(true);
+//			line.setForeground(e.getLogLevel().getColor());
+//			line.setBackground(new Color(Random.nextInt(120, 255), Random.nextInt(120, 255), Random.nextInt(120, 255), 80));
+
 			tracker.add(line);
 
 			// Cull very old stuff
@@ -159,8 +171,6 @@ public class DebuggerWindow extends JFrame
 	public void open()
 	{
 		eventBus.subscribe(GroovyLogEvent.class, this, this::onGroovyLogEvent);
-//		eventBus.subscribe(VarClientIntChanged.class, this, this::onVarClientIntChanged);
-//		eventBus.subscribe(VarClientStrChanged.class, this, this::onVarClientStrChanged);
 
 		setVisible(true);
 		toFront();

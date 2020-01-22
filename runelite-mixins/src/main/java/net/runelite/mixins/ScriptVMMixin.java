@@ -131,21 +131,23 @@ public abstract class ScriptVMMixin implements RSClient
 			return;
 		}
 
-		try
+		if (arguments != null && arguments.length > 0 && arguments[0] instanceof Integer)
 		{
-			if (event.getArguments() != null && event.getArguments().length > 0)
+			try
 			{
 				RunScriptEvent scriptEvent = new RunScriptEvent();
-				scriptEvent.setScriptId((Integer) event.getArguments()[0]);
-				scriptEvent.setArguments(ImmutableList.copyOf(event.getArguments()));
+				scriptEvent.setScriptId((Integer) arguments[0]);
+				scriptEvent.setArguments(ImmutableList.copyOf(arguments));
 				client.getCallbacks().post(RunScriptEvent.class, scriptEvent);
 			}
-			rs$runScript(event, maxExecutionTime);
+			catch (Exception e)
+			{
+				client.getLogger().error("Error in JavaScriptCallback", e);
+			}
 		}
-		finally
-		{
-			currentScript = null;
-		}
+
+		rs$runScript(event, maxExecutionTime);
+		currentScript = null;
 	}
 
 	@Inject

@@ -4,18 +4,24 @@ import io.reactivex.functions.Consumer
 import net.runelite.api.events.RunScriptEvent
 import net.runelite.client.plugins.groovy.debugger.DebuggerWindow.LogLevel
 import net.runelite.client.plugins.groovy.script.ScriptedPlugin
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder
+import org.apache.commons.lang3.builder.ToStringStyle
 
 @CompileStatic
 @InheritConstructors
 class Demo extends ScriptedPlugin {
 	int[] ignored = [
-			1004, 3174, 39
+			1004, 3174, 39, 2053, 839, 3277
 	];
 	void onScriptRunEvent(RunScriptEvent e)
 	{
 		if (!ignored.contains(e.getScriptId()))
 		{
-			log(LogLevel.INFO, "Script called with id: " + e.scriptId + " and arguments " + e.arguments.toString());
+			log((e.getScriptId() == -1) ? LogLevel.ERROR : LogLevel.INFO, "Script called with id: " + e.scriptId + " and arguments " + e.arguments.toString());
+			if(e.getScriptId() == -1)
+			{
+				log(LogLevel.ERROR, (ReflectionToStringBuilder.toString(e.getArguments()[0], ToStringStyle.SHORT_PREFIX_STYLE)));
+			}
 		}
 	}
 

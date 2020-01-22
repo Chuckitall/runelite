@@ -70,6 +70,7 @@ dependencies {
     implementation(project(":http-api"))
     implementation(project(":runelite-api"))
     implementation(Libraries.naturalMouse)
+    implementation(Libraries.apacheCommonsLang)
     implementation(Libraries.luaJ)
     implementation(Libraries.groovy)
     implementation(Libraries.fifesoft_rsyntaxtextarea)

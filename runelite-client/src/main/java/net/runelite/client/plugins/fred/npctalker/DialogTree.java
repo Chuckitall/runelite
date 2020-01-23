@@ -1,13 +1,14 @@
 package net.runelite.client.plugins.fred.npctalker;
 
-import lombok.Data;
+import net.runelite.api.events.MenuEntryAdded;
+import net.runelite.api.events.MenuOptionClicked;
 
-@Data
-public class DialogTree
+public interface DialogTree
 {
-	//the number of dialogs we have to interact with to complete a conversation.
-	int size;
+	//return all the potential paths this tree can walk
+	String[] getPaths();
+	boolean shouldShowOptions(MenuEntryAdded added); //is this an entry we should piggy back onto?
+	int[] getPath(int j); //returns a list of options it needs to click to reach a specific outcome
 
-	String modes;
-
+	MenuOptionClicked transform(MenuOptionClicked clicked);
 }

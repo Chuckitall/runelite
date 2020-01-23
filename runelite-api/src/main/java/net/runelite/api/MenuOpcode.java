@@ -244,7 +244,8 @@ public enum MenuOpcode
 	PRIO_RUNELITE(666),
 
 	LUA_MENU(700),
-	BEAN_MENU(800),
+	TALKER_MENU(800),
+	TALKER_MENU_MAX(900),
 
 	/**
 	 * Menu action triggered by examining an object.

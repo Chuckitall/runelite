@@ -1,9 +1,14 @@
 package net.runelite.client.plugins.fred.npctalker;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Provides;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -16,10 +21,13 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Actor;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.MenuOpcode;
 import net.runelite.api.NPC;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.InteractingChanged;
+import net.runelite.api.events.MenuEntryAdded;
+import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -42,7 +50,10 @@ import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
+import net.runelite.client.plugins.fred.npctalker.dialogs.GamesNecklace;
+import net.runelite.client.plugins.fred.npctalker.dialogs.RingOfDueling;
 import net.runelite.client.ui.overlay.OverlayManager;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Contract;
 
 /**
@@ -153,16 +164,16 @@ public class TalkerPlugin extends Plugin
 	{
 		int group = parent != null ? TO_GROUP(parent.getId()) : -1;
 		log.debug("Get option w/ widget group {}", group);
-		if (parent == null || group != DIALOG_OPTION_GROUP_ID || interactingWith == null) return FLEXO_CHAT_KEY.NULL;
+		if (parent == null || group != DIALOG_OPTION_GROUP_ID) return FLEXO_CHAT_KEY.NULL;
 		Widget[] dChild = parent.getDynamicChildren();
-		if (interactingWith.getId() == ALI_MORRISANE)
+		if (interactingWith != null && interactingWith.getId() == ALI_MORRISANE)
 		{
 			if (dChild.length > 1 && dChild[1] != null && dChild[1].getText().equalsIgnoreCase("I would like to have a look at your selection of runes."))
 				return FLEXO_CHAT_KEY.ONE;
 			else if (dChild.length > 4 && dChild[4] != null && dChild[4].getText().equalsIgnoreCase("Buy other runes."))
 				return FLEXO_CHAT_KEY.FOUR;
 		}
-		else if(interactingWith.getId() == CAPTAIN_KHALED_6972)
+		else if(interactingWith != null && interactingWith.getId() == CAPTAIN_KHALED_6972)
 		{
 			if (dChild.length > 1 && dChild[1] != null && dChild[1].getText().equalsIgnoreCase("I have what it takes."))
 			{
@@ -171,6 +182,27 @@ public class TalkerPlugin extends Plugin
 			else if (dChild.length > 2 && dChild[2] != null && dChild[2].getText().equalsIgnoreCase("Looking for any help?"))
 			{
 				return FLEXO_CHAT_KEY.TWO;
+			}
+		}
+		else if(active != null && active_ptr > -1)
+		{
+			log.debug("active: {}, ptr: {}", active, active_ptr);
+			Optional<FLEXO_CHAT_KEY> k = Arrays.stream(FLEXO_CHAT_KEY.values()).filter(j -> j.getValue() == active[active_ptr]).findFirst();
+			log.debug(k.toString());
+			if (k.isPresent())
+			{
+				active_ptr++;
+				if(active_ptr >= active.length)
+				{
+					active = null;
+					active_ptr = -1;
+				}
+				return k.get();
+			}
+			else
+			{
+				active = null;
+				active_ptr = -1;
 			}
 		}
 
@@ -205,6 +237,13 @@ public class TalkerPlugin extends Plugin
 		this.flexo = null;
 	}
 
+	private List<DialogTree> dialogTreeList = new ArrayList<>();
+	@Getter(AccessLevel.PACKAGE)
+	private int[] active = null;
+
+	@Getter(AccessLevel.PACKAGE)
+	private int active_ptr = -1;
+
 	@Override
 	protected void startUp()
 	{
@@ -214,7 +253,16 @@ public class TalkerPlugin extends Plugin
 		eventBus.subscribe(WidgetLoaded.class, this, this::onWidgetLoaded);
 		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 		eventBus.subscribe(InteractingChanged.class, this, this::onInteractingChanged);
+		eventBus.subscribe(MenuOptionClicked.class, this, this::onMenuOptionClicked);
+		eventBus.subscribe(MenuEntryAdded.class, this, this::onMenuEntryAdded);
 		overlayManager.add(talkerOverlay);
+
+		dialogTreeList.clear();
+		active = null;
+		active_ptr = -1;
+
+		dialogTreeList.add(new GamesNecklace());
+		dialogTreeList.add(new RingOfDueling());
 
 		//Initial state
 		loggedIn = client.getGameState() == GameState.LOGGED_IN;
@@ -227,6 +275,65 @@ public class TalkerPlugin extends Plugin
 		stopFlexo();
 		eventBus.unregister(this);
 		overlayManager.remove(talkerOverlay);
+		dialogTreeList.clear();
+		active = null;
+		active_ptr = -1;
+	}
+
+	private void onMenuOptionClicked(MenuOptionClicked clicked)
+	{
+		if (clicked.getOpcode() < MenuOpcode.TALKER_MENU.getId() || clicked.getOpcode() > MenuOpcode.TALKER_MENU_MAX.getId() || active != null)
+		{
+			return;
+		}
+
+		int idx = clicked.getOpcode() - MenuOpcode.TALKER_MENU.getId();
+		String option = clicked.getOption();
+		boolean found = false;
+		if (dialogTreeList.size() > idx)
+		{
+			DialogTree t = dialogTreeList.get(idx);
+			for (int j = 0; j < t.getPaths().length; j++)
+			{
+				if(clicked.getOption().equals(t.getPaths()[j]))
+				{
+					int[] tempActive = t.getPath(j);
+					if (tempActive != null && tempActive.length > 0)
+					{
+						active = tempActive;
+						active_ptr = 0;
+						found = true;
+						clicked = t.transform(clicked);
+						break;
+					}
+				}
+			}
+		}
+		if (!found)
+		{
+			clicked.consume();
+		}
+	}
+
+	private void onMenuEntryAdded(MenuEntryAdded added)
+	{
+		if (active != null)
+		{
+			return;
+		}
+		for (int i = 0; i < dialogTreeList.size(); i++)
+		{
+			DialogTree t = dialogTreeList.get(i);
+			if (t.shouldShowOptions(added))
+			{
+				String[] paths = t.getPaths();
+				for (int j = 0; j < paths.length; j++)
+				{
+					String option = paths[j];
+					client.insertMenuItem(option, added.getTarget(), MenuOpcode.TALKER_MENU.getId() + i, added.getIdentifier(), added.getParam0() , added.getParam1(), false);
+				}
+			}
+		}
 	}
 
 	private void onWidgetLoaded(WidgetLoaded widgetLoaded)

@@ -161,6 +161,7 @@ public class WidgetID
 	public static final int LMS_INGAME_GROUP_ID = 328;
 	public static final int JEWELLERY_BOX_GROUP_ID = 590;
 	public static final int OPTIONS_GROUP_ID = 261;
+	public static final int MULTISKILL_MENU_GROUP_ID = 270;
 	public static final int THEATRE_OF_BLOOD_PARTY_GROUP_ID = 28;
 	public static final int GWD_KC_GROUP_ID = 406;
 

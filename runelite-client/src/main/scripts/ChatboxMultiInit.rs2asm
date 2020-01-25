@@ -28,7 +28,7 @@
    sstore                 1
    sstore                 4
    sload                  4
-   string_length         
+   string_length
    iconst                 0
    if_icmpgt              LABEL29
    jump                   LABEL53
@@ -40,7 +40,7 @@ LABEL29:
    sstore                 1
    sstore                 5
    sload                  5
-   string_length         
+   string_length
    iconst                 0
    if_icmpgt              LABEL40
    jump                   LABEL53
@@ -52,7 +52,7 @@ LABEL40:
    sstore                 1
    sstore                 6
    sload                  6
-   string_length         
+   string_length
    iconst                 0
    if_icmpgt              LABEL51
    jump                   LABEL53
@@ -69,7 +69,7 @@ LABEL53:                                      ;start of modifications for the Ch
    sconst                 "ChatboxMultiInit"  ;runelite callback
    runelite_callback                          ;make sure to pop off the top int as well as 5 strings to ensure we dont overflow the stack.
    iconst                 14352385
-   cc_deleteall          
+   cc_deleteall
    iconst                 14352385
    iconst                 4
    iconst                 0
@@ -263,7 +263,7 @@ LABEL232:
 LABEL234:
    iconst                 5
    istore                 0
-LABEL236:
+LABEL236:                   ; this is the start of line 55 in chatbox_multi_init.cs2
    iconst                 479
    iconst                 20
    iconst                 0
@@ -289,7 +289,7 @@ LABEL236:
    sload                  0
    iconst                 479
    iconst                 497
-   parawidth             
+   parawidth
    istore                 2
    iload                  2
    iconst                 110
@@ -297,50 +297,50 @@ LABEL236:
    jump                   LABEL269
 LABEL267:
    iconst                 110
-   istore                 2
+   istore                 2     ;line 64
 LABEL269:
    iload                  2
    iconst                 350
-   if_icmpgt              LABEL273
+   if_icmpgt              LABEL273 ;line 67
    jump                   LABEL274
 LABEL273:
-   return                
-LABEL274:
+   return
+LABEL274:                          ; line 69 starts here
    iconst                 479
    iload                  2
    iconst                 111
-   add                   
-   sub                   
+   add
+   sub
    iconst                 2
-   div                   
+   div
    iconst                 57
-   sub                   
-   istore                 3
+   sub
+   istore                 3  ; line 69 ;ends here
    iload                  3
    iconst                 2
-   if_icmplt              LABEL288
+   if_icmplt              LABEL288  ; if ($int3 < 2)
    jump                   LABEL290
 LABEL288:
    iconst                 2
    istore                 3
-LABEL290:
+LABEL290:                ; line 73
    iconst                 14352385
    iconst                 5
    iload                  0
    iconst                 1
-   add                   
-   cc_create             
+   add
+   cc_create
    iconst                 14352385
    iconst                 5
    iload                  0
    iconst                 2
-   add                   
+   add
    cc_create              1
    iconst                 57
    iconst                 13
    iconst                 0
    iconst                 0
-   cc_setsize            
+   cc_setsize
    iconst                 57
    iconst                 13
    iconst                 0
@@ -349,23 +349,38 @@ LABEL290:
    iload                  3
    iload                  1
    iconst                 2
-   add                   
+   add
    iconst                 0
    iconst                 0
-   cc_setposition        
+   cc_setposition
    iconst                 479
    iload                  3
    iconst                 57
-   add                   
-   sub                   
+   add
+   sub
    iload                  1
    iconst                 2
-   add                   
+   add
    iconst                 0
    iconst                 0
    cc_setposition         1
    iconst                 302
-   cc_setgraphic         
+   cc_setgraphic
    iconst                 301
    cc_setgraphic          1
-   return                
+   iload                  0;
+   sconst                 "ChatboxMultiBuilt";runelite callback
+   runelite_callback
+   iload                  0;
+   if_icmpeq              RETURN
+   jump                   HACK
+RETURN:                ;
+   return
+HACK:
+   iconst             14352385
+   iload                     0
+   sconst                 "ChatboxMultiChanging";runelite callback
+   runelite_callback
+   cc_find
+   cc_resume_pausebutton
+   return

@@ -58,6 +58,7 @@ import net.runelite.client.callback.Hooks;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.CommandManager;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.cs2.Cs2Manager;
 import net.runelite.client.discord.DiscordService;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.game.ClanManager;
@@ -137,6 +138,8 @@ public class RuneLite
 
 	@Inject
 	private Provider<MenuManager> menuManager;
+
+	@Inject Provider<Cs2Manager> cs2Manager;
 
 	@Inject
 	private Provider<CommandManager> commandManager;
@@ -403,6 +406,7 @@ public class RuneLite
 			clanManager.get();
 			itemManager.get();
 			menuManager.get();
+			cs2Manager.get();
 			chatMessageManager.get();
 			commandManager.get();
 			lootManager.get();

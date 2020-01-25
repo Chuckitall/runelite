@@ -1,0 +1,72 @@
+.id                 57
+.int_stack_count    8
+.string_stack_count 2
+.int_var_count      9
+.string_var_count   2
+   clientclock           
+   iload                  7
+   if_icmplt              LABEL4
+   jump                   LABEL5
+LABEL4:
+   return                
+LABEL5:
+   iconst                 -1
+   iconst                 162
+   invoke                 1701
+   iconst                 0
+   if_icmpeq              LABEL11
+   jump                   LABEL12
+LABEL11:
+   return                
+LABEL12:
+   iconst                 0
+   istore                 8
+   iload                  0
+   iconst                 -1
+   if_icmpne              LABEL18
+   jump                   LABEL25
+LABEL18:
+   iload                  0
+   iload                  5
+   if_icmpeq              LABEL22
+   jump                   LABEL25
+LABEL22:
+   iconst                 1
+   istore                 8
+   jump                   LABEL44
+LABEL25:
+   iload                  1
+   iconst                 -1
+   if_icmpne              LABEL29
+   jump                   LABEL43
+LABEL29:
+   sload                  0
+   iload                  1
+   string_indexof_char   
+   iconst                 -1
+   if_icmpne              LABEL40
+   sload                  1
+   iload                  1
+   string_indexof_char   
+   iconst                 -1
+   if_icmpne              LABEL40
+   jump                   LABEL43
+LABEL40:
+   iconst                 1
+   istore                 8
+   jump                   LABEL44
+LABEL43:
+   return                
+LABEL44:
+   iload                  2
+   iload                  3
+   iload                  4
+   iload                  5
+   sload                  0
+   sload                  1
+   iload                  6
+   iload                  7
+   sconst          "ChatboxKeyInputListener_Spy"
+   runelite_callback
+   invoke                 2153
+   return                

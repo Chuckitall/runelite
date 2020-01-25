@@ -1,16 +1,30 @@
 import groovy.transform.CompileStatic;
 import groovy.transform.InheritConstructors
 import io.reactivex.functions.Consumer
+import net.runelite.api.MenuOpcode
 import net.runelite.api.events.GameTick
+import net.runelite.api.events.MenuEntryAdded
+import net.runelite.api.events.MenuOptionClicked
 import net.runelite.api.events.RunScriptEvent
 import net.runelite.api.events.ScriptCallbackEvent
+import net.runelite.api.widgets.WidgetID
 import net.runelite.api.widgets.WidgetInfo
 import net.runelite.client.cs2.events.ChatboxMultiInit
 import net.runelite.client.cs2.events.KeyInputListener
 import net.runelite.client.plugins.groovy.debugger.DebuggerWindow.LogLevel
 import net.runelite.client.plugins.groovy.script.ScriptedPlugin
+import org.apache.commons.lang3.ArrayUtils
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder
 import org.apache.commons.lang3.builder.ToStringStyle
+
+import static net.runelite.api.ItemID.RING_OF_DUELING1
+import static net.runelite.api.ItemID.RING_OF_DUELING2
+import static net.runelite.api.ItemID.RING_OF_DUELING3
+import static net.runelite.api.ItemID.RING_OF_DUELING4
+import static net.runelite.api.ItemID.RING_OF_DUELING5
+import static net.runelite.api.ItemID.RING_OF_DUELING6
+import static net.runelite.api.ItemID.RING_OF_DUELING7
+import static net.runelite.api.ItemID.RING_OF_DUELING8
 
 @CompileStatic
 @InheritConstructors
@@ -51,7 +65,7 @@ class Demo extends ScriptedPlugin {
 
 	void onTick(GameTick t)
 	{
-		log(LogLevel.TRACE, "tick: ${_client.getTickCount()}");
+//		log(LogLevel.TRACE, "tick: ${_client.getTickCount()}");
 //		if(foundChatbox)
 //		{
 //			if(_client.getWidget(219, 1) != null) {
@@ -137,18 +151,49 @@ class Demo extends ScriptedPlugin {
 		}
 	}
 
+	private final String[] options = new String[] { "Duel", "Castle", "Clan"};
+	String targetWord = "";
 	void onChatboxMultiInit(ChatboxMultiInit e)
 	{
-		log(LogLevel.DEBUG, e.toString());
+		log(LogLevel.DEBUG, e.toString() + " " + targetWord);
 		for (int i = 0; i < e.getOptionsNum(); i++)
 		{
-			log(LogLevel.INFO, "Option[${i+1}] = ${e.getOptions()[i]}");
-			if (e.getOptions()[i].equalsIgnoreCase("What is this place?"))
+			log(LogLevel.INFO, "Option[${i}] = ${e.getOptions()[i]}");
+			if (targetWord.length() > 0 && e.getOptions()[i].containsIgnoreCase(targetWord))
 			{
-				//e.setRequestedOp(i+1);
+				e.setRequestedOp(i+1);
+				targetWord = "";
+				break;
 			}
 		}
 		log(LogLevel.WARN, e.toString());
+	}
+
+	int[] ringsOfDueling = [RING_OF_DUELING1,RING_OF_DUELING2,RING_OF_DUELING3,RING_OF_DUELING4,RING_OF_DUELING5,RING_OF_DUELING6,RING_OF_DUELING7,RING_OF_DUELING8];
+
+	void onMenuEntryAdded(MenuEntryAdded e)
+	{
+		if (WidgetID.INVENTORY_GROUP_ID == WidgetInfo.TO_GROUP(e.getParam1()) && e.getOpcode() == MenuOpcode.ITEM_FOURTH_OPTION.getId() && e.getOption().contains("Rub") && ringsOfDueling.any {int it -> e.getIdentifier() == it} ) //check item is in inventory
+		{
+			for(int a = 0; a < options.length; a++)
+			{
+				_client.insertMenuItem(options[a], e.getTarget(), e.getOpcode(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
+			}
+			//return//Option[2] = Castle Wars Arena.Option[3] = Clan Wars Arena.
+		}
+//		log(LogLevel.DEBUG, e.toString());
+	}
+
+	void onMenuOptionClicked(MenuOptionClicked e)
+	{
+		if (WidgetID.INVENTORY_GROUP_ID == WidgetInfo.TO_GROUP(e.getParam1()) && e.getOpcode() == MenuOpcode.ITEM_FOURTH_OPTION.getId() && ringsOfDueling.any {int it -> e.getIdentifier() == it} ) //check item is in inventory
+		{
+			if(!e.getOption().equalsIgnoreCase("Rub"))
+			{
+				targetWord = e.getOption();
+			}
+		}
+		log(LogLevel.DEBUG, e.toString());
 	}
 
 	void startup() {
@@ -157,6 +202,9 @@ class Demo extends ScriptedPlugin {
 		_eventBus.subscribe(ChatboxMultiInit.class, this, this.&onChatboxMultiInit as Consumer<ChatboxMultiInit>);
 		_eventBus.subscribe(RunScriptEvent.class, this, this.&onScriptRunEvent as Consumer<RunScriptEvent>);
 		_eventBus.subscribe(KeyInputListener.class, this, this.&onKeyInputListenerCallback as Consumer<KeyInputListener>)
+
+		_eventBus.subscribe(MenuOptionClicked.class, this, this::onMenuOptionClicked as Consumer<MenuOptionClicked>);
+		_eventBus.subscribe(MenuEntryAdded.class, this, this::onMenuEntryAdded as Consumer<MenuEntryAdded>);
 		log(LogLevel.DEBUG, "Starting Up + " + TO_GROUP(17694744));
 	}
 

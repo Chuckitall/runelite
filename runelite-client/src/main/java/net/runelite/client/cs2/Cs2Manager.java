@@ -20,6 +20,7 @@ import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.menus.AbstractComparableEntry;
 import net.runelite.client.menus.WidgetMenuOption;
 import org.apache.commons.lang3.ArrayUtils;
+import org.codehaus.groovy.runtime.ArrayUtil;
 
 @Singleton
 @Slf4j
@@ -131,12 +132,16 @@ public class Cs2Manager
 			else if (callback.getEventName().equals("ChatboxMultiBuilt"))
 			{
 				log.debug(callback.getEventName());
-				client.getIntStack()[client.getIntStackSize() - 1] = requestedOp;
 				log.debug("_istack: {}", ArrayUtils.toString(client.getIntStack()));
-				requestedOp = 0;
+				if(requestedOp > 0)
+				{
+					client.getIntStack()[client.getIntStackSize() - 1] = requestedOp;
+				}
 			}
 			else if (callback.getEventName().equals("ChatboxMultiChanging"))
 			{
+				log.debug("_istack2: {}", ArrayUtils.toString(client.getIntStack()));
+				client.getIntStack()[client.getIntStackSize() - 1] = requestedOp;
 
 			}
 			return;
@@ -170,5 +175,6 @@ public class Cs2Manager
 
 	private void onGameTick(GameTick event)
 	{
+		requestedOp = 0;
 	}
 }

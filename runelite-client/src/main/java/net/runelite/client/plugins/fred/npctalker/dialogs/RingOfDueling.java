@@ -19,8 +19,8 @@ import static net.runelite.api.ItemID.RING_OF_DUELING8;
 
 public class RingOfDueling implements DialogTree
 {
-	private final String[] options = new String[] { "Castle Wars", "Clan Wars", "Sand Casino"};
-	private final int[][] paths = new int[][]{{2}, {3}, {1}};
+	private final String[] options = new String[] { "Sand Casino", "Castle Wars", "Clan Wars"};
+	private final int[][] paths = new int[][]{{1}, {2}, {3}};
 	private final int[] item_ids = new int[] {RING_OF_DUELING1,RING_OF_DUELING2,RING_OF_DUELING3,RING_OF_DUELING4,RING_OF_DUELING5,RING_OF_DUELING6,RING_OF_DUELING7,RING_OF_DUELING8};
 
 	@Override

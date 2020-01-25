@@ -169,6 +169,21 @@ class Demo extends ScriptedPlugin {
 		log(LogLevel.WARN, e.toString());
 	}
 
+	void onChatboxMultiInit2(ChatboxMultiInit e)
+	{
+		log(LogLevel.DEBUG, e.toString() + " " + targetWord);
+		for (int i = 0; i < e.getOptionsNum(); i++)
+		{
+			log(LogLevel.INFO, "Option[${i}] = ${e.getOptions()[i]}");
+			if (e.getOptions()[i].containsIgnoreCase("What is this place?"))
+			{
+				e.setRequestedOp(i+1);
+				break;
+			}
+		}
+		log(LogLevel.WARN, e.toString());
+	}
+
 	int[] ringsOfDueling = [RING_OF_DUELING1,RING_OF_DUELING2,RING_OF_DUELING3,RING_OF_DUELING4,RING_OF_DUELING5,RING_OF_DUELING6,RING_OF_DUELING7,RING_OF_DUELING8];
 
 	void onMenuEntryAdded(MenuEntryAdded e)
@@ -199,7 +214,7 @@ class Demo extends ScriptedPlugin {
 	void startup() {
 		_eventBus.subscribe(GameTick.class, this, this.&onTick as Consumer<GameTick>)
 		_eventBus.subscribe(ScriptCallbackEvent.class, this, this.&onScriptCallbackEvent as Consumer<ScriptCallbackEvent>);
-		_eventBus.subscribe(ChatboxMultiInit.class, this, this.&onChatboxMultiInit as Consumer<ChatboxMultiInit>);
+		_eventBus.subscribe(ChatboxMultiInit.class, this, this.&onChatboxMultiInit2 as Consumer<ChatboxMultiInit>);
 		_eventBus.subscribe(RunScriptEvent.class, this, this.&onScriptRunEvent as Consumer<RunScriptEvent>);
 		_eventBus.subscribe(KeyInputListener.class, this, this.&onKeyInputListenerCallback as Consumer<KeyInputListener>)
 

@@ -12,6 +12,6 @@ public class ChatboxMultiInit implements Event
 
 	public boolean modified()
 	{
-		return requestedOp > 0 && options.length >= requestedOp;
+		return requestedOp > 0 && requestedOp <= optionsNum;
 	}
 }

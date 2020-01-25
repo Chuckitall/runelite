@@ -83,7 +83,7 @@ public class Cs2Manager
 		return toRet;
 	}
 
-	private String copyStringOffStack(int i)
+	private String copyStringFromStack(int i)
 	{
 		int stringStackSize = client.getStringStackSize();
 		String string = client.getStringStack()[stringStackSize-1-i];
@@ -96,15 +96,22 @@ public class Cs2Manager
 		String[] toRet = new String[toSlurp];
 		for(int i = toSlurp-1; i >= 0; i--)
 		{
-			toRet[i] = copyStringOffStack(i);
+			toRet[i] = copyStringFromStack(i);
 		}
 		return toRet;
 	}
-	private int copyIntOffStack(int i)
+
+	private int copyIntFromStack(int i)
 	{
 		int intStackSize = client.getIntStackSize();
 		int integer = client.getIntStack()[intStackSize-1-i];
 		return integer;
+	}
+
+	private void pasteIntToStack(int i, int value)
+	{
+		int intStackSize = client.getIntStackSize();
+		client.getIntStack()[intStackSize-1-i] = value;
 	}
 
 	private int[] copyIntsFromStack(int toSlurp)
@@ -112,69 +119,25 @@ public class Cs2Manager
 		int[] toRet = new int[toSlurp];
 		for(int i = toSlurp-1; i >= 0; i--)
 		{
-			toRet[i] = copyIntOffStack(i);
+			toRet[i] = copyIntFromStack(i);
 		}
 		return toRet;
 	}
 
-	int requestedOp = 0;
 	private void onScriptCallbackEvent(ScriptCallbackEvent callback)
 	{
-		if (callback.getEventName().startsWith("ChatboxMulti"))
+		if (callback.getEventName().equals("ChatboxMultiBuilt"))
 		{
-			if (callback.getEventName().equals("ChatboxMultiInit"))
-			{
-				int numOfOps = popIntOffStack();
-				ChatboxMultiInit event = new ChatboxMultiInit(numOfOps, slurpStringsFromStack(5));
-				eventBus.post(ChatboxMultiInit.class, event);
-				requestedOp = event.getRequestedOp();
-			}
-			else if (callback.getEventName().equals("ChatboxMultiBuilt"))
-			{
-				log.debug(callback.getEventName());
-				log.debug("_istack: {}", ArrayUtils.toString(client.getIntStack()));
-				if(requestedOp > 0)
-				{
-					client.getIntStack()[client.getIntStackSize() - 1] = requestedOp;
-				}
-			}
-			else if (callback.getEventName().equals("ChatboxMultiChanging"))
-			{
-				log.debug("_istack2: {}", ArrayUtils.toString(client.getIntStack()));
-				client.getIntStack()[client.getIntStackSize() - 1] = requestedOp;
-
-			}
-			return;
+			int numberOfOps = copyIntFromStack(0);
+			String[] ops = slurpStringsFromStack(5);
+			ChatboxMultiInit event = new ChatboxMultiInit(numberOfOps, ops);
+			eventBus.post(ChatboxMultiInit.class, event);
+			log.debug("Event {}", event);
+			pasteIntToStack(0, event.getRequestedOp());
 		}
-		if (callback.getEventName().startsWith("ChatboxKeyInputListener"))
-		{
-			if (callback.getEventName().equals("ChatboxKeyInputListener_Spy"))
-			{
-				String[] copyS = copyStringsFromStack(2);
-				int[] copyI = copyIntsFromStack(6);
-				KeyInputListener event = new KeyInputListener(copyI[5], copyI[4], copyI[3], copyI[2], copyS[1], copyS[0], copyI[1], copyI[0]);
-				eventBus.post(KeyInputListener.class, event);
-			}
-			return;
-		}
-//		else if (callback.getEventName().startsWith("SkillMulti"))
-//		{
-//			if (callback.getEventName().equals("SkillMultiGenerated"))
-//			{
-//				int numOfOps = popIntOfStack();
-//				String s1 = popStringOfStack();
-//				String s2 = popStringOfStack();
-//				String s3 = popStringOfStack();
-//				String s4 = popStringOfStack();
-//				String s5 = popStringOfStack();
-//				ChatboxMultiInit event = new ChatboxMultiInit(numOfOps, new String[] {s1, s2, s3, s4, s5});
-//				eventBus.post(ChatboxMultiInit.class, event);
-//			}
-//		}
 	}
 
 	private void onGameTick(GameTick event)
 	{
-		requestedOp = 0;
 	}
 }

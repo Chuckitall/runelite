@@ -117,6 +117,7 @@ public abstract class ScriptVMMixin implements RSClient
 	@Replace("runScript")
 	static void rl$runScript(RSScriptEvent event, int maxExecutionTime)
 	{
+		boolean loggingEnabled = false;
 		Object[] arguments = event.getArguments();
 		if (arguments != null && arguments.length > 0 && arguments[0] instanceof JavaScriptCallback)
 		{
@@ -131,7 +132,7 @@ public abstract class ScriptVMMixin implements RSClient
 			return;
 		}
 
-		if (arguments != null && arguments.length > 0 && arguments[0] instanceof Integer)
+		if (loggingEnabled && arguments != null && arguments.length > 0 && arguments[0] instanceof Integer)
 		{
 			try
 			{
@@ -142,7 +143,7 @@ public abstract class ScriptVMMixin implements RSClient
 			}
 			catch (Exception e)
 			{
-				client.getLogger().error("Error in JavaScriptCallback", e);
+				client.getLogger().error("Error in Posting RunScriptEvent", e);
 			}
 		}
 

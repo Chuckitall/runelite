@@ -1,26 +1,14 @@
 package net.runelite.client.cs2;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.MenuEntry;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ScriptCallbackEvent;
-import net.runelite.client.cs2.events.ChatboxMultiInit;
-import net.runelite.client.cs2.events.KeyInputListener;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.menus.AbstractComparableEntry;
-import net.runelite.client.menus.WidgetMenuOption;
 import org.apache.commons.lang3.ArrayUtils;
-import org.codehaus.groovy.runtime.ArrayUtil;
 
 @Singleton
 @Slf4j
@@ -50,27 +38,12 @@ public class Cs2Manager
 		return toRet.append(string).toString();
 	}
 
-	private void pushStringToStack(String string)
-	{
-		int stringStackSize = client.getStringStackSize();
-		client.getStringStack()[++stringStackSize] = string;
-		client.setStringStackSize(stringStackSize);
-	}
-
 	private int popIntOffStack()
 	{
 		int intStackSize = client.getIntStackSize();
 		int i = client.getIntStack()[--intStackSize];
 		client.setIntStackSize(intStackSize);
 		return i;
-	}
-
-	private void pushIntToStack(int i)
-	{
-		int intStackSize = client.getIntStackSize();
-		int[] intStack = client.getIntStack();
-		intStack[++intStackSize] = i;
-		client.setIntStackSize(intStackSize);
 	}
 
 	private String[] slurpStringsFromStack(int toSlurp)
@@ -104,8 +77,7 @@ public class Cs2Manager
 	private int copyIntFromStack(int i)
 	{
 		int intStackSize = client.getIntStackSize();
-		int integer = client.getIntStack()[intStackSize-1-i];
-		return integer;
+		return client.getIntStack()[intStackSize-1-i];
 	}
 
 	private void pasteIntToStack(int i, int value)
@@ -124,16 +96,47 @@ public class Cs2Manager
 		return toRet;
 	}
 
+	private String skill_options_string = null;
 	private void onScriptCallbackEvent(ScriptCallbackEvent callback)
 	{
-		if (callback.getEventName().equals("ChatboxMultiBuilt"))
+		switch (callback.getEventName())
 		{
-			int numberOfOps = copyIntFromStack(0);
-			String[] ops = slurpStringsFromStack(5);
-			ChatboxMultiInit event = new ChatboxMultiInit(numberOfOps, ops);
-			eventBus.post(ChatboxMultiInit.class, event);
-			log.debug("Event {}", event);
-			pasteIntToStack(0, event.getRequestedOp());
+			case "ChatboxMultiBuilt":
+			{
+				int numberOfOps = copyIntFromStack(0);
+				String[] ops = slurpStringsFromStack(5);
+				String header = popStringOffStack();
+				ops = ArrayUtils.subarray(ops, 0, numberOfOps);
+				InterfaceChoice event = new InterfaceChoice(WidgetInfo.DIALOG_OPTION, header, ops);
+				eventBus.post(InterfaceChoice.class, event);
+				log.debug("Event {}", event);
+				pasteIntToStack(0, event.getRequestedOp());
+				break;
+			}
+			case "SkillMulti_Start":
+			{
+				skill_options_string = copyStringFromStack(0);
+				break;
+			}
+			case "SkillMulti_End":
+			{
+				int numberOfOps = copyIntFromStack(0);
+				pasteIntToStack(0, 0);
+				String[] ops = skill_options_string.split("\\|");
+				for (int i = 0; i < ops.length; i++)
+				{
+					log.info("Option[{}] = \"{}\"", i, ops[i]);
+				}
+				InterfaceChoice event = new InterfaceChoice(WidgetInfo.MULTI_SKILL_MENU, "SkillMulti", ops);
+				eventBus.post(InterfaceChoice.class, event);
+				log.debug("Skill Event {}", event);
+				if (!event.free())
+				{
+					pasteIntToStack(0, WidgetInfo.PACK(270, 13 + event.getRequestedOp()));
+				}
+				skill_options_string = null;
+				break;
+			}
 		}
 	}
 

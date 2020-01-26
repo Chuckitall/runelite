@@ -132,6 +132,7 @@ public abstract class ScriptVMMixin implements RSClient
 			return;
 		}
 
+		//noinspection ConstantConditions
 		if (loggingEnabled && arguments != null && arguments.length > 0 && arguments[0] instanceof Integer)
 		{
 			try

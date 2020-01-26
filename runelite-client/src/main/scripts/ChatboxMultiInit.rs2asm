@@ -361,6 +361,7 @@ LABEL290:                ; line 73
    iconst                 301
    cc_setgraphic          1
    iload                  0                   ;push the number of entries to the stack
+   sload                  0                   ;push the header text to the stack
    sload                  2                   ;push 1st option to the stack
    sload                  3                   ;push 2nd option to the stack
    sload                  4                   ;push 3rd option to the stack

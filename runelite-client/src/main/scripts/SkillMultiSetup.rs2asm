@@ -472,7 +472,7 @@ LABEL335:
    jump                   LABEL593
 LABEL431:
    sload                  0
-   sconst                 "SkillMultiGenerated"    ; Should be able to see the input string used to generate the multi button widget
+   sconst                 "SkillMulti_Start"    ; Should be able to see the input string used to generate the multi button widget
    runelite_callback      ;
    invoke                 632
    sstore                 0
@@ -646,22 +646,20 @@ LABEL584:
    invoke                 2048
 LABEL593:
    iload                  13                   ; this is how many buttons there are
-   sconst                 "SkillMultiFinished" ; 13 is now the bool for whether or not we want to do something
+   sconst                 "SkillMulti_End"     ; 13 will have the value of the selected button stored into it.
    runelite_callback                           ; it's still on the stack here
-   iload                  13                   ; load it again, if it hasn't been changed, return
+   istore                 13                   ; Store the value we transformed it into
+   iload                  13
+   iconst                 0
    if_icmpeq              RETURN
-   jump                   NOTRETURN
-RETURN:
-   return
-NOTRETURN:
-   iconst                 -1                   ; just change this to the widget ok
-   sconst                 "SkillMultiChanged"  ; yes
+HACK:
+   iload                  13
+   sconst                 "SkillMulti_D1"
    runelite_callback
-   get_varc_int           200                  ; idk they do this as well
+   get_varc_int           200
    cc_find
    iconst                 1
-   if_icmpeq              RESUMETHINGY
-   jump                   RETURN
-RESUMETHINGY:
+   if_icmpne              RETURN
    cc_resume_pausebutton
-   jump                   RETURN
+RETURN:
+   return

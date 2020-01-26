@@ -24,7 +24,7 @@ class BattleStaffs extends ScriptedPlugin {
 			return;
 		}
 		if (Text.standardize(e.getTarget()).equalsIgnoreCase("obelisk of water") && e.getOpcode() == 1002) {
-			log(LogLevel.INFO, "Added Menu after seeing\n\t$e");
+//			log(LogLevel.INFO, "Added Menu after seeing\n\t$e");
 			_client.insertMenuItem("<col=0000ff>Cast", "<col=00ff00>Charge Water Orb</col><col=ffffff> -> <col=ffff>Obelisk of Water", MenuOpcode.SPELL_CAST_ON_GAME_OBJECT.getId(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
 		}
 	}

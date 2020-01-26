@@ -5,19 +5,11 @@ import net.runelite.api.MenuOpcode
 import net.runelite.api.events.GameTick
 import net.runelite.api.events.MenuEntryAdded
 import net.runelite.api.events.MenuOptionClicked
-import net.runelite.api.events.RunScriptEvent
-import net.runelite.api.events.ScriptCallbackEvent
 import net.runelite.api.widgets.WidgetID
 import net.runelite.api.widgets.WidgetInfo
 import net.runelite.client.cs2.InterfaceChoice
-import net.runelite.client.cs2.events.ChatboxMultiInit
-import net.runelite.client.cs2.events.KeyInputListener
-import net.runelite.client.cs2.events.SkillMultiInit
 import net.runelite.client.plugins.groovy.debugger.DebuggerWindow.LogLevel
 import net.runelite.client.plugins.groovy.script.ScriptedPlugin
-import org.apache.commons.lang3.ArrayUtils
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder
-import org.apache.commons.lang3.builder.ToStringStyle
 
 import static net.runelite.api.ItemID.RING_OF_DUELING1
 import static net.runelite.api.ItemID.RING_OF_DUELING2
@@ -27,46 +19,29 @@ import static net.runelite.api.ItemID.RING_OF_DUELING5
 import static net.runelite.api.ItemID.RING_OF_DUELING6
 import static net.runelite.api.ItemID.RING_OF_DUELING7
 import static net.runelite.api.ItemID.RING_OF_DUELING8
+import static net.runelite.api.ItemID.GAMES_NECKLACE1
+import static net.runelite.api.ItemID.GAMES_NECKLACE2
+import static net.runelite.api.ItemID.GAMES_NECKLACE3
+import static net.runelite.api.ItemID.GAMES_NECKLACE4
+import static net.runelite.api.ItemID.GAMES_NECKLACE5
+import static net.runelite.api.ItemID.GAMES_NECKLACE6
+import static net.runelite.api.ItemID.GAMES_NECKLACE7
+import static net.runelite.api.ItemID.GAMES_NECKLACE8
 
 @CompileStatic
 @InheritConstructors
-class Demo extends ScriptedPlugin {
+class Demo extends ScriptedPlugin
+{
 
-	private final String[] options = new String[] { "Duel", "Castle", "Clan"};
+	int[] RingOfDuelingID = [RING_OF_DUELING1,RING_OF_DUELING2,RING_OF_DUELING3,RING_OF_DUELING4,RING_OF_DUELING5,RING_OF_DUELING6,RING_OF_DUELING7,RING_OF_DUELING8];
+	int[] GamesNecklaceID = [GAMES_NECKLACE1,GAMES_NECKLACE2,GAMES_NECKLACE3,GAMES_NECKLACE4,GAMES_NECKLACE5,GAMES_NECKLACE6,GAMES_NECKLACE7,GAMES_NECKLACE8];
+	private final String[] RingOfDuelingOptions = new String[] { "Duel", "Castle", "Clan"};
+	private final String[] GamesNecklaceOptions = new String[] { "Burthorpe", "Barbarian Outpost", "Tears of Guthix", "Wintertodt Camp"};
 	String targetWord = "";
-//	void onChatboxMultiInit(ChatboxMultiInit e)
-//	{
-//		log(LogLevel.DEBUG, e.toString() + " " + targetWord);
-//		for (int i = 0; i < e.getOptionsNum(); i++)
-//		{
-//			log(LogLevel.INFO, "Option[${i}] = ${e.getOptions()[i]}");
-//			if (targetWord.length() > 0 && e.getOptions()[i].containsIgnoreCase(targetWord))
-//			{
-//				e.setRequestedOp(i+1);
-//				targetWord = "";
-//				break;
-//			}
-//		}
-//		log(LogLevel.WARN, e.toString());
-//	}
-
 	private final String[] skillingTargets = new String[] { "Water battlestaff", "Maple longbow", "Water orb"};
-//	void onSkillMultiInit(SkillMultiInit e)
-//	{
-//		for (int i = 0; i < e.getOptionsNum(); i++)
-//		{
-//			log(LogLevel.INFO, "Option[${i}] = ${e.getOptions()[i]}");
-//			if (skillingTargets.any {it -> e.getOptions()[i].containsIgnoreCase(it) } )
-//			{
-//				e.setRequestedOp(i+1);
-//				break;
-//			}
-//		}
-//		log(LogLevel.WARN, e.toString());
-//	}
-
 	void onInterfaceChoice(InterfaceChoice event)
 	{
+		log(LogLevel.DEBUG, event.toString())
 		if(event.getOptionCount() == 1)
 		{
 			event.requestOption(1);
@@ -80,33 +55,52 @@ class Demo extends ScriptedPlugin {
 				{
 					event.requestOption(i);
 				}
-				else if(options.any {it -> op.containsIgnoreCase(it)})
+				else if(op.containsIgnoreCase(targetWord))
 				{
 					event.requestOption(i);
 					targetWord = "";
 				}
 			}
 		}
+		else
+		{
+			for(int i = 1; i <= event.getOptionCount() && event.free(); i++)
+			{
+				String op = event.getOption(i).toLowerCase();
+				if(op.containsIgnoreCase("yes"))
+				{
+					event.requestOption(i);
+				}
+			}
+		}
 	}
 
-	int[] ringsOfDueling = [RING_OF_DUELING1,RING_OF_DUELING2,RING_OF_DUELING3,RING_OF_DUELING4,RING_OF_DUELING5,RING_OF_DUELING6,RING_OF_DUELING7,RING_OF_DUELING8];
 	void onMenuEntryAdded(MenuEntryAdded e)
 	{
-		if (WidgetID.INVENTORY_GROUP_ID == WidgetInfo.TO_GROUP(e.getParam1()) && e.getOpcode() == MenuOpcode.ITEM_FOURTH_OPTION.getId() && e.getOption().contains("Rub") && ringsOfDueling.any {int it -> e.getIdentifier() == it} ) //check item is in inventory
+		if (WidgetID.INVENTORY_GROUP_ID == WidgetInfo.TO_GROUP(e.getParam1()) && e.getOpcode() == MenuOpcode.ITEM_FOURTH_OPTION.getId() && e.getOption().contains("Rub")) //check item is in inventory
 		{
-			for(int a = 0; a < options.length; a++)
+			if (RingOfDuelingID.any {int it -> e.getIdentifier() == it} )
 			{
-				_client.insertMenuItem(options[a], e.getTarget(), e.getOpcode(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
+				for(int a = 0; a < RingOfDuelingOptions.length; a++)
+				{
+					_client.insertMenuItem(RingOfDuelingOptions[a], e.getTarget(), e.getOpcode(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
+				}
 			}
-			//return//Option[2] = Castle Wars Arena.Option[3] = Clan Wars Arena.
+			else if (GamesNecklaceID.any {int it -> e.getIdentifier() == it} )
+			{
+				for(int a = 0; a < GamesNecklaceOptions.length; a++)
+				{
+					_client.insertMenuItem(GamesNecklaceOptions[a], e.getTarget(), e.getOpcode(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
+				}
+			}
 		}
-//		log(LogLevel.DEBUG, e.toString());
 	}
 
 	void onMenuOptionClicked(MenuOptionClicked e)
 	{
-		if (WidgetID.INVENTORY_GROUP_ID == WidgetInfo.TO_GROUP(e.getParam1()) && e.getOpcode() == MenuOpcode.ITEM_FOURTH_OPTION.getId() && ringsOfDueling.any {int it -> e.getIdentifier() == it} ) //check item is in inventory
+		if (WidgetID.INVENTORY_GROUP_ID == WidgetInfo.TO_GROUP(e.getParam1()) && e.getOpcode() == MenuOpcode.ITEM_FOURTH_OPTION.getId() && (RingOfDuelingID.any {int it -> e.getIdentifier() == it} || GamesNecklaceID.any {int it -> e.getIdentifier() == it}))
 		{
+
 			if(!e.getOption().equalsIgnoreCase("Rub"))
 			{
 				targetWord = e.getOption();

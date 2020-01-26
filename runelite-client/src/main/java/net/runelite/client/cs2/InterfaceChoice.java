@@ -46,7 +46,7 @@ public class InterfaceChoice implements Event
 		}
 	}
 
-	private String getOption(int i)
+	public String getOption(int i)
 	{
 		if (indexInRange(i))
 		{

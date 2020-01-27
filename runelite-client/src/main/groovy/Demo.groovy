@@ -123,6 +123,7 @@ class Demo extends ScriptedPlugin
 		else
 		{
 			List<Tuple2<String, String>> searchTargets = List.of(
+				new Tuple2<String, String>("Swap 30 flax notes for bowstrings?", "Agree"),
 				new Tuple2<String, String>("Pay 200 coins to have your tree chopped down?", "yes."),
 				new Tuple2<String, String>("Pay one basket of oranges?", "yes.")
 			);

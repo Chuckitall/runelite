@@ -1,4 +1,4 @@
-package net.runelite.client.cs2;
+package net.runelite.client.fred;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

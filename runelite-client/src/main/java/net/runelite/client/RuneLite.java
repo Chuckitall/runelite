@@ -58,9 +58,10 @@ import net.runelite.client.callback.Hooks;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.CommandManager;
 import net.runelite.client.config.ConfigManager;
-import net.runelite.client.cs2.Cs2Manager;
+import net.runelite.client.fred.Cs2Manager;
 import net.runelite.client.discord.DiscordService;
 import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.fred.FredMenu;
 import net.runelite.client.game.ClanManager;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.LootManager;
@@ -139,7 +140,11 @@ public class RuneLite
 	@Inject
 	private Provider<MenuManager> menuManager;
 
-	@Inject Provider<Cs2Manager> cs2Manager;
+	@Inject
+	private Provider<Cs2Manager> cs2Manager;
+
+	@Inject
+	private Provider<FredMenu> fredMenu;
 
 	@Inject
 	private Provider<CommandManager> commandManager;

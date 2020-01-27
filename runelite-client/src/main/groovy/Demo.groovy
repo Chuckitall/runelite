@@ -7,7 +7,7 @@ import net.runelite.api.events.MenuEntryAdded
 import net.runelite.api.events.MenuOptionClicked
 import net.runelite.api.widgets.WidgetID
 import net.runelite.api.widgets.WidgetInfo
-import net.runelite.client.cs2.InterfaceChoice
+import net.runelite.client.fred.InterfaceChoice
 import net.runelite.client.plugins.groovy.debugger.DebuggerWindow.LogLevel
 import net.runelite.client.plugins.groovy.script.ScriptedPlugin
 
@@ -38,8 +38,7 @@ class Demo extends ScriptedPlugin
 	private final String[] RingOfDuelingOptions = new String[] { "Duel", "Castle", "Clan"};
 	private final String[] GamesNecklaceOptions = new String[] { "Burthorpe", "Barbarian Outpost", "Tears of Guthix", "Wintertodt Camp"};
 	String targetWord = "";
-	private final String[] skillingTargets = new String[] { "Water battlestaff", "Maple longbow", "Water orb"};
-
+	private final String[] skillingTargets = new String[] { "Water battlestaff", "Maple longbow", "Water orb", "Unpowered staff orb"};
 	boolean targetInterfaceSearch(InterfaceChoice event, String heading, String target)
 	{
 		boolean toRet = false;
@@ -109,14 +108,21 @@ class Demo extends ScriptedPlugin
 			for(int i = 1; i <= event.getOptionCount() && event.free(); i++)
 			{
 				String op = event.getOption(i).toLowerCase();
-				if (skillingTargets.any(it -> it.equalsIgnoreCase(op)))
-				{
-					event.requestOption(i);
-				}
-				else if(op.containsIgnoreCase(targetWord))
+				if(op.containsIgnoreCase(targetWord))
 				{
 					event.requestOption(i);
 					targetWord = "";
+				}
+			}
+		}
+		else if(event.getHeaderText().equalsIgnoreCase("SkillMulti"))
+		{
+			for(int i = 1; i <= event.getOptionCount() && event.free(); i++)
+			{
+				String op = event.getOption(i).toLowerCase();
+				if (skillingTargets.any(it -> it.equalsIgnoreCase(op)))
+				{
+					event.requestOption(i);
 				}
 			}
 		}

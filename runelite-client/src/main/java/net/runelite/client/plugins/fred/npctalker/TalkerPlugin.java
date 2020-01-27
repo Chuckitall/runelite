@@ -1,14 +1,9 @@
 package net.runelite.client.plugins.fred.npctalker;
 
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Provides;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -21,13 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Actor;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.MenuOpcode;
 import net.runelite.api.NPC;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.InteractingChanged;
-import net.runelite.api.events.MenuEntryAdded;
-import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -50,10 +42,7 @@ import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
-import net.runelite.client.plugins.fred.npctalker.dialogs.GamesNecklace;
-import net.runelite.client.plugins.fred.npctalker.dialogs.RingOfDueling;
 import net.runelite.client.ui.overlay.OverlayManager;
-import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Contract;
 
 /**
@@ -184,28 +173,6 @@ public class TalkerPlugin extends Plugin
 				return FLEXO_CHAT_KEY.TWO;
 			}
 		}
-		else if(active != null && active_ptr > -1)
-		{
-			log.debug("active: {}, ptr: {}", active, active_ptr);
-			Optional<FLEXO_CHAT_KEY> k = Arrays.stream(FLEXO_CHAT_KEY.values()).filter(j -> j.getValue() == active[active_ptr]).findFirst();
-			log.debug(k.toString());
-			if (k.isPresent())
-			{
-				active_ptr++;
-				if(active_ptr >= active.length)
-				{
-					active = null;
-					active_ptr = -1;
-				}
-				return k.get();
-			}
-			else
-			{
-				active = null;
-				active_ptr = -1;
-			}
-		}
-
 		//hooks for talking to beanshell plugin
 		return FLEXO_CHAT_KEY.NULL;
 	}
@@ -237,13 +204,6 @@ public class TalkerPlugin extends Plugin
 		this.flexo = null;
 	}
 
-	private List<DialogTree> dialogTreeList = new ArrayList<>();
-	@Getter(AccessLevel.PACKAGE)
-	private int[] active = null;
-
-	@Getter(AccessLevel.PACKAGE)
-	private int active_ptr = -1;
-
 	@Override
 	protected void startUp()
 	{
@@ -253,87 +213,21 @@ public class TalkerPlugin extends Plugin
 		eventBus.subscribe(WidgetLoaded.class, this, this::onWidgetLoaded);
 		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 		eventBus.subscribe(InteractingChanged.class, this, this::onInteractingChanged);
-		eventBus.subscribe(MenuOptionClicked.class, this, this::onMenuOptionClicked);
-		eventBus.subscribe(MenuEntryAdded.class, this, this::onMenuEntryAdded);
 		overlayManager.add(talkerOverlay);
 
-		dialogTreeList.clear();
-		active = null;
-		active_ptr = -1;
 
-		dialogTreeList.add(new GamesNecklace());
-		dialogTreeList.add(new RingOfDueling());
 
 		//Initial state
 		loggedIn = client.getGameState() == GameState.LOGGED_IN;
 	}
 
 	@Override
-	protected void shutDown() throws Exception
+	protected void shutDown()
 	{
 		setClean();
 		stopFlexo();
 		eventBus.unregister(this);
 		overlayManager.remove(talkerOverlay);
-		dialogTreeList.clear();
-		active = null;
-		active_ptr = -1;
-	}
-
-	private void onMenuOptionClicked(MenuOptionClicked clicked)
-	{
-		if (clicked.getOpcode() < MenuOpcode.TALKER_MENU.getId() || clicked.getOpcode() > MenuOpcode.TALKER_MENU_MAX.getId() || active != null)
-		{
-			return;
-		}
-
-		int idx = clicked.getOpcode() - MenuOpcode.TALKER_MENU.getId();
-		String option = clicked.getOption();
-		boolean found = false;
-		if (dialogTreeList.size() > idx)
-		{
-			DialogTree t = dialogTreeList.get(idx);
-			for (int j = 0; j < t.getPaths().length; j++)
-			{
-				if(clicked.getOption().equals(t.getPaths()[j]))
-				{
-					int[] tempActive = t.getPath(j);
-					if (tempActive != null && tempActive.length > 0)
-					{
-						active = tempActive;
-						active_ptr = 0;
-						found = true;
-						clicked = t.transform(clicked);
-						break;
-					}
-				}
-			}
-		}
-		if (!found)
-		{
-			clicked.consume();
-		}
-	}
-
-	private void onMenuEntryAdded(MenuEntryAdded added)
-	{
-		if (active != null)
-		{
-			return;
-		}
-		for (int i = 0; i < dialogTreeList.size(); i++)
-		{
-			DialogTree t = dialogTreeList.get(i);
-			if (t.shouldShowOptions(added))
-			{
-				String[] paths = t.getPaths();
-				for (int j = 0; j < paths.length; j++)
-				{
-					String option = paths[j];
-					client.insertMenuItem(option, added.getTarget(), MenuOpcode.TALKER_MENU.getId() + i, added.getIdentifier(), added.getParam0() , added.getParam1(), false);
-				}
-			}
-		}
 	}
 
 	private void onWidgetLoaded(WidgetLoaded widgetLoaded)
@@ -345,7 +239,7 @@ public class TalkerPlugin extends Plugin
 		dirty_DIALOG_NPC = dirty_DIALOG_NPC || (g == DIALOG_NPC_GROUP_ID);
 		dirty_DIALOG_PLAYER = dirty_DIALOG_PLAYER || (g == DIALOG_PLAYER_GROUP_ID);
 		dirty_DIALOG_OPTION = dirty_DIALOG_OPTION || (g == DIALOG_OPTION_GROUP_ID);
-		//dirty quest action dialot
+		//dirty quest action dialog
 	}
 
 	private void onGameTick(GameTick event)

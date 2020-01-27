@@ -11,7 +11,6 @@ import net.runelite.api.widgets.WidgetInfo
 import net.runelite.client.plugins.groovy.debugger.DebuggerWindow.LogLevel
 import net.runelite.client.plugins.groovy.script.ScriptedPlugin
 
-@CompileStatic
 @InheritConstructors
 class Alch extends ScriptedPlugin {
 
@@ -41,6 +40,7 @@ class Alch extends ScriptedPlugin {
 		}
 		e.setOption("Cast");
 		_client.setSelectedSpellChildIndex(-1);
+		log(LogLevel.DEBUG, "fuck me");
 		if(e.getTarget().contains("High Level Alchemy")) {
 			_client.setSelectedSpellName("<col=00ff00>High Level Alchemy</col>");
 			_client.setSelectedSpellWidget(WidgetInfo.SPELL_HIGH_LEVEL_ALCHEMY.getId());
@@ -75,9 +75,9 @@ class Alch extends ScriptedPlugin {
 
 	void onScriptCallbackEvent(ScriptCallbackEvent e)
 	{
-		int[] intStack = _client.getIntStack();
 		if (e.getEventName().equalsIgnoreCase("OnSwitchTopLevel2"))
 		{
+			int[] intStack = _client.getIntStack();
 			log(LogLevel.ERROR, "Latch: ${latch}");
 			if(latch)
 			{

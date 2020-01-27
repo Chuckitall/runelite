@@ -121,8 +121,9 @@ public class WidgetID
 	public static final int DIARY_QUEST_GROUP_ID = 119;
 	public static final int THEATRE_OF_BLOOD_GROUP_ID = 28;
 	public static final int WORLD_SWITCHER_GROUP_ID = 69;
-	public static final int DIALOG_OPTION_GROUP_ID = 219;
 	public static final int DIALOG_PLAYER_GROUP_ID = 217;
+	public static final int DIALOG_OPTION_GROUP_ID = 219;
+	public static final int DIALOG_NOTIFICATION_GROUP_ID = 229;
 	public static final int FOSSIL_ISLAND_OXYGENBAR_ID = 609;
 	public static final int MINIGAME_TAB_ID = 76;
 	public static final int SPELLBOOK_GROUP_ID = 218;
@@ -194,6 +195,31 @@ public class WidgetID
 		static final int NAME = 2;
 		static final int CONTINUE = 3;
 		static final int TEXT = 4;
+	}
+
+
+	static class DialogPlayer
+	{
+		static final int HEAD_MODEL = 0;
+		static final int NAME = 1;
+		static final int CONTINUE = 2;
+		static final int TEXT = 3;
+	}
+
+	static class DialogNotification
+	{
+		static final int TEXT = 0;
+		static final int CONTINUE = 1;
+	}
+
+	static class DialogOption
+	{
+		static final int TEXT = 0;
+		static final int OPTION1 = 1;
+		static final int OPTION2 = 2;
+		static final int OPTION3 = 3;
+		static final int OPTION4 = 4;
+		static final int OPTION5 = 5;
 	}
 
 	static class LogoutPanel

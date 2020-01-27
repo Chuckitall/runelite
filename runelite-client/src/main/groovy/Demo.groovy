@@ -39,6 +39,64 @@ class Demo extends ScriptedPlugin
 	private final String[] GamesNecklaceOptions = new String[] { "Burthorpe", "Barbarian Outpost", "Tears of Guthix", "Wintertodt Camp"};
 	String targetWord = "";
 	private final String[] skillingTargets = new String[] { "Water battlestaff", "Maple longbow", "Water orb"};
+
+	boolean targetInterfaceSearch(InterfaceChoice event, String heading, String target)
+	{
+		boolean toRet = false;
+		if (event.free() && event.getHeaderText().equalsIgnoreCase(heading))
+		{
+			for(int i = 1; i <= event.getOptionCount() && event.free(); i++)
+			{
+				if(event.getOption(i).equalsIgnoreCase(target))
+				{
+					event.requestOption(i);
+					toRet = !event.free()
+				}
+			}
+		}
+		return toRet;
+	}
+
+	boolean interfaceContainsAll(InterfaceChoice event, String[] options, int target)
+	{
+		boolean toRet = true;
+		for(int i = 0; i < options.length; i++)
+		{
+			boolean foundI = false
+			for(int j = 1; j <= event.getOptionCount(); j++)
+			{
+				log(LogLevel.INFO, event.getOption(j) + "|" + options[i]);
+				if (event.getOption(j).equalsIgnoreCase(options[i]))
+				{
+					foundI = true;
+					break;
+				}
+			}
+			toRet = foundI;
+			if(!toRet)
+			{
+				break;
+			}
+		}
+		if(toRet)
+		{
+			setInterfaceOption(event, options[target]);
+		}
+		return toRet;
+	}
+
+	void setInterfaceOption(InterfaceChoice event, String target)
+	{
+		for(int i = 1; i <= event.getOptionCount() && event.free(); i++)
+		{
+			String op = event.getOption(i).toLowerCase();
+			if (op.equalsIgnoreCase(target))
+			{
+				event.requestOption(i);
+			}
+		}
+	}
+
 	void onInterfaceChoice(InterfaceChoice event)
 	{
 		log(LogLevel.DEBUG, event.toString())
@@ -64,13 +122,14 @@ class Demo extends ScriptedPlugin
 		}
 		else
 		{
-			for(int i = 1; i <= event.getOptionCount() && event.free(); i++)
+			List<Tuple2<String, String>> searchTargets = List.of(
+				new Tuple2<String, String>("Pay 200 coins to have your tree chopped down?", "yes."),
+				new Tuple2<String, String>("Pay one basket of oranges?", "yes.")
+			);
+
+			for(int j = 0; j < searchTargets.size() && event.free(); j++)
 			{
-				String op = event.getOption(i).toLowerCase();
-				if(op.containsIgnoreCase("yes"))
-				{
-					event.requestOption(i);
-				}
+				targetInterfaceSearch(event, searchTargets.get(j).v1, searchTargets.get(j).v2);
 			}
 		}
 	}
@@ -93,6 +152,10 @@ class Demo extends ScriptedPlugin
 					_client.insertMenuItem(GamesNecklaceOptions[a], e.getTarget(), e.getOpcode(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
 				}
 			}
+		}
+		else
+		{
+
 		}
 	}
 

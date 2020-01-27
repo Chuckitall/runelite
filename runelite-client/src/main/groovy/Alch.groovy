@@ -15,7 +15,10 @@ import net.runelite.client.plugins.groovy.script.ScriptedPlugin
 @InheritConstructors
 class Alch extends ScriptedPlugin {
 
-	int[] items_to_alch = [ItemID.WATER_BATTLESTAFF, ItemID.EARTH_BATTLESTAFF, ItemID.AIR_BATTLESTAFF, ItemID.FIRE_BATTLESTAFF];
+	int[] items_to_alch = [
+		ItemID.WATER_BATTLESTAFF, ItemID.EARTH_BATTLESTAFF, ItemID.AIR_BATTLESTAFF, ItemID.FIRE_BATTLESTAFF,
+		ItemID.MAPLE_LONGBOW
+	];
 //	Map<Integer, List<Integer>> items_to_enchant = [
 //		0: ,
 //		1: [ItemID.EMERALD_RING, ItemID.EMERALD_AMULET, ItemID.EMERALD_NECKLACE, ItemID.EMERALD_BRACELET],

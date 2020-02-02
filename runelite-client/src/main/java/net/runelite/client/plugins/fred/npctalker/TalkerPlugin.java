@@ -239,6 +239,7 @@ public class TalkerPlugin extends Plugin
 		dirty_DIALOG_NPC = dirty_DIALOG_NPC || (g == DIALOG_NPC_GROUP_ID);
 		dirty_DIALOG_PLAYER = dirty_DIALOG_PLAYER || (g == DIALOG_PLAYER_GROUP_ID);
 		dirty_DIALOG_OPTION = dirty_DIALOG_OPTION || (g == DIALOG_OPTION_GROUP_ID);
+		dirty_DIALOG_NPC = dirty_DIALOG_NPC || (g == DIALOG_NOTIFICATION_GROUP_ID);
 		//dirty quest action dialog
 	}
 

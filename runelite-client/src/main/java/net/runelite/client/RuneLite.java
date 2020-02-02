@@ -412,6 +412,7 @@ public class RuneLite
 			itemManager.get();
 			menuManager.get();
 			cs2Manager.get();
+			fredMenu.get();
 			chatMessageManager.get();
 			commandManager.get();
 			lootManager.get();

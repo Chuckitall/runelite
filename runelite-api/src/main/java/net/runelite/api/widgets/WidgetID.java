@@ -384,17 +384,17 @@ public class WidgetID
 
 	static class Equipment
 	{
-		static final int HELMET = 6;
-		static final int CAPE = 7;
-		static final int AMULET = 8;
-		static final int WEAPON = 9;
-		static final int BODY = 10;
-		static final int SHIELD = 11;
-		static final int LEGS = 12;
-		static final int GLOVES = 13;
-		static final int BOOTS = 14;
-		static final int RING = 15;
-		static final int AMMO = 16;
+		static final int HELMET = 14;
+		static final int CAPE = 15;
+		static final int AMULET = 16;
+		static final int WEAPON = 17;
+		static final int BODY = 18;
+		static final int SHIELD = 19;
+		static final int LEGS = 20;
+		static final int GLOVES = 21;
+		static final int BOOTS = 22;
+		static final int RING = 23;
+		static final int AMMO = 24;
 		static final int INVENTORY_ITEM_CONTAINER = 0;
 	}
 

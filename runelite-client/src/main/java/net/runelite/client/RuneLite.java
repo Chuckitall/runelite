@@ -66,6 +66,7 @@ import net.runelite.client.game.ClanManager;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.LootManager;
 import net.runelite.client.game.PlayerManager;
+import net.runelite.client.game.WorldService;
 import net.runelite.client.game.XpDropManager;
 import net.runelite.client.game.chatbox.ChatboxPanelManager;
 import net.runelite.client.graphics.ModelOutlineRenderer;
@@ -84,7 +85,10 @@ import net.runelite.client.ui.overlay.arrow.ArrowWorldOverlay;
 import net.runelite.client.ui.overlay.infobox.InfoBoxOverlay;
 import net.runelite.client.ui.overlay.tooltip.TooltipOverlay;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
+import net.runelite.client.util.WorldUtil;
 import net.runelite.client.ws.PartyService;
+import net.runelite.http.api.worlds.World;
+import net.runelite.http.api.worlds.WorldResult;
 import org.slf4j.LoggerFactory;
 
 @Singleton
@@ -110,6 +114,8 @@ public class RuneLite
 	private static Injector injector;
 	@Inject
 	public DiscordService discordService;
+	@Inject
+	private WorldService worldService;
 	@Inject
 	private PluginManager pluginManager;
 	@Inject
@@ -212,6 +218,9 @@ public class RuneLite
 		final ArgumentAcceptingOptionSpec<String> proxyInfo = parser
 			.accepts("proxy")
 			.withRequiredArg().ofType(String.class);
+		final ArgumentAcceptingOptionSpec<Integer> worldInfo = parser
+			.accepts("world")
+			.withRequiredArg().ofType(Integer.class);
 
 		final ArgumentAcceptingOptionSpec<String> localOption = parser
 			.accepts("local", "Local Folder to use")
@@ -282,6 +291,12 @@ public class RuneLite
 					}
 				});
 			}
+		}
+
+		if (options.has("world"))
+		{
+			int world = options.valueOf(worldInfo);
+			System.setProperty("cli.world", String.valueOf(world));
 		}
 
 		SentryClient client = Sentry.init("https://fa31d674e44247fa93966c69a903770f@sentry.io/1811856");
@@ -399,6 +414,10 @@ public class RuneLite
 		RuneLiteSplashScreen.stage(.80, "Initialize UI");
 		clientUI.init(this);
 
+		//Set the world if specified via CLI args - will not work until clientUI.init is called
+		Optional<Integer> worldArg = Optional.ofNullable(System.getProperty("cli.world")).map(Integer::parseInt);
+		worldArg.ifPresent(this::setWorld);
+
 		// Initialize Discord service
 		discordService.init();
 
@@ -447,6 +466,44 @@ public class RuneLite
 		RuneLiteSplashScreen.close();
 
 		clientUI.show();
+	}
+
+	private void setWorld(int cliWorld)
+	{
+		int correctedWorld = cliWorld < 300 ? cliWorld + 300 : cliWorld;
+
+		if (correctedWorld <= 300 || client.getWorld() == correctedWorld)
+		{
+			return;
+		}
+
+		final WorldResult worldResult = worldService.getWorlds();
+
+		if (worldResult == null)
+		{
+			log.warn("Failed to lookup worlds.");
+			return;
+		}
+
+		final World world = worldResult.findWorld(correctedWorld);
+
+		if (world != null)
+		{
+			final net.runelite.api.World rsWorld = client.createWorld();
+			rsWorld.setActivity(world.getActivity());
+			rsWorld.setAddress(world.getAddress());
+			rsWorld.setId(world.getId());
+			rsWorld.setPlayerCount(world.getPlayers());
+			rsWorld.setLocation(world.getLocation());
+			rsWorld.setTypes(WorldUtil.toWorldTypes(world.getTypes()));
+
+			client.changeWorld(rsWorld);
+			log.debug("Applied new world {}", correctedWorld);
+		}
+		else
+		{
+			log.warn("World {} not found.", correctedWorld);
+		}
 	}
 
 	public void shutdown()

@@ -352,7 +352,7 @@ public interface Widget
 
 	/**
 	 * Sets the amount zoomed in on the model displayed in the widget
-	 * 
+	 *
 	 * @param modelZoom the new zoom amount
 	 */
 	void setModelZoom(int modelZoom);
@@ -946,4 +946,8 @@ public interface Widget
 	 * @param args A ScriptID, then the args for the script
 	 */
 	void setOnReleaseListener(Object ...args);
+
+	boolean isWidgetItemDragged(int index);
+
+	Point getWidgetItemDragOffsets();
 }

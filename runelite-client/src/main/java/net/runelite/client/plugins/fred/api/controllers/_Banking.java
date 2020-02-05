@@ -114,7 +114,7 @@ public class _Banking
 				bounds.setBounds(bounds.x - 1, bounds.y - 1, 32, 32);
 
 				// Index is set to 0 because the widget's index does not correlate to the order in the bank
-				bankItems.add(_WidgetItem.from(new WidgetItem(child.getItemId(), child.getItemQuantity(), i, bounds, child)));
+				bankItems.add(_WidgetItem.from(new WidgetItem(child.getItemId(), child.getItemQuantity(), i, bounds, child, false)));
 			}
 			return ImmutableList.copyOf(bankItems);
 		}
@@ -143,7 +143,7 @@ public class _Banking
 				// set bounds to same size as default inventory
 				Rectangle bounds = child.getBounds();
 				bounds.setBounds(bounds.x - 1, bounds.y - 1, 32, 32);
-				invItems.add(_WidgetItem.from(new WidgetItem(child.getItemId(), child.getItemQuantity(), i, bounds, child)));
+				invItems.add(_WidgetItem.from(new WidgetItem(child.getItemId(), child.getItemQuantity(), i, bounds, child, false)));
 			}
 			return ImmutableList.copyOf(invItems);
 		}

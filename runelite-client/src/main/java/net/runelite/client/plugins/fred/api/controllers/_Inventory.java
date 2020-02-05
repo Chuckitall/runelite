@@ -53,7 +53,7 @@ public class _Inventory
 				child.getWidget().revalidate();
 				Rectangle bounds = child.getCanvasBounds();
 				//log.debug("child[{}] -> bounds: {}", child.getIndex(), bounds);
-				invItems.add(_WidgetItem.from(new WidgetItem(child.getId(), child.getQuantity(), child.getIndex(), bounds, child.getWidget())));
+				invItems.add(_WidgetItem.from(new WidgetItem(child.getId(), child.getQuantity(), child.getIndex(), bounds, child.getWidget(), false)));
 			}
 			return ImmutableList.copyOf(invItems);
 		}

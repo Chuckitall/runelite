@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Adam <Adam@sigterm.info>
+ * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,25 +22,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.config;
+package net.runelite.client.events;
 
-@ConfigGroup("test")
-public interface TestConfig extends Config
-{
-	@ConfigItem(
-		keyName = "key",
-		name = "Key Name",
-		description = "value"
-	)
-	default String key()
-	{
-		return "default";
-	}
+import lombok.Data;
+import net.runelite.api.events.Event;
 
-	@ConfigItem(
-		keyName = "key",
-		name = "Key Name",
-		description = "value"
-	)
-	void key(String key);
-}
+@Data
+public class ExternalPluginsLoaded implements Event
+{}

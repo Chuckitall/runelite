@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Adam <Adam@sigterm.info>
+ * Copyright (c) 2020 ThatGamerBlue
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,25 +22,36 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.config;
+package net.runelite.api.geometry;
 
-@ConfigGroup("test")
-public interface TestConfig extends Config
+import net.runelite.api.coords.WorldPoint;
+
+public class Cuboid
 {
-	@ConfigItem(
-		keyName = "key",
-		name = "Key Name",
-		description = "value"
-	)
-	default String key()
+	private WorldPoint southWest;
+	private WorldPoint northEast;
+
+	public Cuboid(int x1, int y1, int z1, int x2, int y2, int z2)
 	{
-		return "default";
+		this(new WorldPoint(x1, y1, z1), new WorldPoint(x2, y2, z2));
 	}
 
-	@ConfigItem(
-		keyName = "key",
-		name = "Key Name",
-		description = "value"
-	)
-	void key(String key);
+	public Cuboid(WorldPoint southWest, WorldPoint northEast)
+	{
+		this.southWest = southWest;
+		this.northEast = northEast;
+	}
+
+	public boolean contains(WorldPoint worldPoint)
+	{
+		if (worldPoint.getPlane() < southWest.getPlane() || worldPoint.getPlane() > northEast.getPlane())
+		{
+			return false;
+		}
+		if (worldPoint.getY() < southWest.getY() || worldPoint.getY() > northEast.getY())
+		{
+			return false;
+		}
+		return worldPoint.getX() >= southWest.getX() && worldPoint.getX() <= northEast.getX();
+	}
 }

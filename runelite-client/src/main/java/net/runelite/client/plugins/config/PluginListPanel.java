@@ -72,6 +72,8 @@ import net.runelite.client.config.RuneLiteConfig;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.events.ExternalPluginChanged;
+import net.runelite.client.events.ExternalPluginsLoaded;
 import net.runelite.client.events.PluginChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -181,6 +183,14 @@ public class PluginListPanel extends PluginPanel
 					listItem.setColor(getColorByCategory(listItem.getPluginType()));
 				});
 			}
+		});
+
+		eventBus.subscribe(ExternalPluginsLoaded.class, this, ignored -> {
+			eventBus.subscribe(ExternalPluginChanged.class, this, ev -> {
+				SwingUtilities.invokeLater(this::rebuildPluginList);
+			});
+
+			SwingUtilities.invokeLater(this::rebuildPluginList);
 		});
 
 		muxer = new MultiplexingPluginPanel(this);
@@ -417,36 +427,30 @@ public class PluginListPanel extends PluginPanel
 
 	void startPlugin(Plugin plugin)
 	{
-		executorService.submit(() ->
-		{
-			pluginManager.setPluginEnabled(plugin, true);
+		pluginManager.setPluginEnabled(plugin, true);
 
-			try
-			{
-				pluginManager.startPlugin(plugin);
-			}
-			catch (PluginInstantiationException ex)
-			{
-				log.warn("Error when starting plugin {}", plugin.getClass().getSimpleName(), ex);
-			}
-		});
+		try
+		{
+			pluginManager.startPlugin(plugin);
+		}
+		catch (PluginInstantiationException ex)
+		{
+			log.warn("Error when starting plugin {}", plugin.getClass().getSimpleName(), ex);
+		}
 	}
 
 	void stopPlugin(Plugin plugin)
 	{
-		executorService.submit(() ->
-		{
-			pluginManager.setPluginEnabled(plugin, false);
+		pluginManager.setPluginEnabled(plugin, false);
 
-			try
-			{
-				pluginManager.stopPlugin(plugin);
-			}
-			catch (PluginInstantiationException ex)
-			{
-				log.warn("Error when stopping plugin {}", plugin.getClass().getSimpleName(), ex);
-			}
-		});
+		try
+		{
+			pluginManager.stopPlugin(plugin);
+		}
+		catch (PluginInstantiationException ex)
+		{
+			log.warn("Error when stopping plugin {}", plugin.getClass().getSimpleName(), ex);
+		}
 	}
 
 	private List<String> getPinnedPluginNames()

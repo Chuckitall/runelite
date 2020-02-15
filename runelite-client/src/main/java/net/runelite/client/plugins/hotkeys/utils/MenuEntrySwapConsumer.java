@@ -12,7 +12,6 @@ import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.plugins.stretchedmode.StretchedModeConfig;
 
 @Slf4j
 public class MenuEntrySwapConsumer implements Runnable
@@ -115,8 +114,8 @@ public class MenuEntrySwapConsumer implements Runnable
 
 			if (client.isStretchedEnabled())
 			{
-				double scale = 1 + ((double) configManager.getConfig(StretchedModeConfig.class).scalingFactor() / 100);
-
+//				double scale = 1 + ((double) configManager.getConfig(StretchedModeConfig.class).scalingFactor() / 100);
+				double scale = 1.0d;
 				MouseEvent mousePressed = new MouseEvent(canvas, MouseEvent.MOUSE_PRESSED, time, 0, (int) (p.getX() * scale), (int) (p.getY() * scale), 1, false, 1);
 				canvas.dispatchEvent(mousePressed);
 				MouseEvent mouseReleased = new MouseEvent(canvas, MouseEvent.MOUSE_RELEASED, time, 0, (int) (p.getX() * scale), (int) (p.getY() * scale), 1, false, 1);

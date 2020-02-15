@@ -31,7 +31,6 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
-import net.runelite.client.plugins.stretchedmode.StretchedModeConfig;
 import net.runelite.client.ui.ClientUI;
 import net.runelite.client.ui.overlay.OverlayManager;
 
@@ -314,6 +313,7 @@ public class StrikerPlugin extends Plugin
 
 	public double getScaleFactor()
 	{
-		return configManager.getConfig(StretchedModeConfig.class).scalingFactor();
+//		return configManager.getConfig(StretchedModeConfig.class).scalingFactor();
+		return 1.0d;
 	}
 }

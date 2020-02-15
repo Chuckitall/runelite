@@ -72,7 +72,7 @@ public class CraftingInterfaceQuery extends WidgetItemQuery
 					if (child != null && child.getName() != null && child.getName().length() > 0)
 					{
 						// set bounds to same size as default inventory
-						widgetItems.add(new WidgetItem(child.getId(), child.getItemQuantity(), i - 1, child.getBounds(), child, false));
+						widgetItems.add(new WidgetItem(child.getId(), child.getItemQuantity(), i - 1, child.getBounds(), child, null));
 					}
 				}
 			}

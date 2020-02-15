@@ -132,7 +132,10 @@ class Demo extends ScriptedPlugin
 				new Tuple2<String, String>("What would you like to say?", "Sure, I like exploring mazes."),
 				new Tuple2<String, String>("Swap 60 flax notes for bowstrings?", "Agree"),
 				new Tuple2<String, String>("Pay 200 coins to have your tree chopped down?", "yes."),
-				new Tuple2<String, String>("Pay one basket of oranges?", "yes.")
+				new Tuple2<String, String>("Select an Option", "Clockwork mechanism"),
+				// new Tuple2<String, String>("Select an Option", "What do you have?"),
+				// new Tuple2<String, String>("Select an Option", "Could i have some stew please?"), 
+				new Tuple2<String, String>("Pay one basket of oranges?", "yes."),
 			);
 
 			for(int j = 0; j < searchTargets.size() && event.free(); j++)

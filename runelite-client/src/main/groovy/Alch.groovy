@@ -16,7 +16,7 @@ class Alch extends ScriptedPlugin {
 
 	int[] items_to_alch = [
 		ItemID.WATER_BATTLESTAFF, ItemID.EARTH_BATTLESTAFF, ItemID.AIR_BATTLESTAFF, ItemID.FIRE_BATTLESTAFF,
-		ItemID.MAPLE_LONGBOW
+		ItemID.MAPLE_LONGBOW, ItemID.YEW_SHORTBOW, ItemID.YEW_LONGBOW
 	];
 //	Map<Integer, List<Integer>> items_to_enchant = [
 //		0: ,

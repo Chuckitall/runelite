@@ -41,7 +41,6 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.pestcontrol.Game;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.api.util.Text;
 import javax.inject.Inject;

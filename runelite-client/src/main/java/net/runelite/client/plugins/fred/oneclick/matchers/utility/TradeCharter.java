@@ -39,7 +39,6 @@ import net.runelite.client.plugins.fred.util.Tab;
 import net.runelite.client.plugins.fred.util.TabUtils;
 import net.runelite.client.plugins.fredexperimental.striker.Striker;
 import net.runelite.client.plugins.fredexperimental.striker.StrikerUtils;
-import net.runelite.client.plugins.worldhopper.WorldHopperPlugin;
 
 import static net.runelite.api.ItemID.COINS_995;
 import static net.runelite.api.MenuOpcode.ITEM_USE;
@@ -122,7 +121,7 @@ public class TradeCharter extends MenuEntryMatcher
 	{
 		Striker.typeKey(KeyEvent.VK_ESCAPE);
 		Striker.delayMS(Random.nextInt(120, 200));
-		WorldHopperPlugin.request_hop(false);
+		//WorldHopperPlugin.request_hop(false);
 		int count = 0;
 		while (client.getGameState().equals(GameState.LOGGED_IN) && count++ < 200)
 		{

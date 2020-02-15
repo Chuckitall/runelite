@@ -27,6 +27,11 @@ import static net.runelite.api.ItemID.GAMES_NECKLACE5
 import static net.runelite.api.ItemID.GAMES_NECKLACE6
 import static net.runelite.api.ItemID.GAMES_NECKLACE7
 import static net.runelite.api.ItemID.GAMES_NECKLACE8
+import static net.runelite.api.ItemID.DIGSITE_PENDANT_1
+import static net.runelite.api.ItemID.DIGSITE_PENDANT_2
+import static net.runelite.api.ItemID.DIGSITE_PENDANT_3
+import static net.runelite.api.ItemID.DIGSITE_PENDANT_4
+import static net.runelite.api.ItemID.DIGSITE_PENDANT_5
 
 @CompileStatic
 @InheritConstructors
@@ -35,8 +40,12 @@ class Demo extends ScriptedPlugin
 
 	int[] RingOfDuelingID = [RING_OF_DUELING1,RING_OF_DUELING2,RING_OF_DUELING3,RING_OF_DUELING4,RING_OF_DUELING5,RING_OF_DUELING6,RING_OF_DUELING7,RING_OF_DUELING8];
 	int[] GamesNecklaceID = [GAMES_NECKLACE1,GAMES_NECKLACE2,GAMES_NECKLACE3,GAMES_NECKLACE4,GAMES_NECKLACE5,GAMES_NECKLACE6,GAMES_NECKLACE7,GAMES_NECKLACE8];
+	int[] DigsiteNecklaceID = [DIGSITE_PENDANT_1,DIGSITE_PENDANT_2,DIGSITE_PENDANT_3,DIGSITE_PENDANT_4,DIGSITE_PENDANT_5];
+
 	private final String[] RingOfDuelingOptions = new String[] { "Duel", "Castle", "Clan"};
 	private final String[] GamesNecklaceOptions = new String[] { "Burthorpe", "Barbarian Outpost", "Tears of Guthix", "Wintertodt Camp"};
+	private final String[] DigsiteNecklaceOptions = new String[] { "Digsite", "Fossil"};
+
 	String targetWord = "";
 	private final String[] skillingTargets = new String[] { "Water battlestaff", "Maple longbow", "Water orb", "Unpowered staff orb"};
 	boolean targetInterfaceSearch(InterfaceChoice event, String heading, String target)
@@ -163,6 +172,13 @@ class Demo extends ScriptedPlugin
 					_client.insertMenuItem(GamesNecklaceOptions[a], e.getTarget(), e.getOpcode(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
 				}
 			}
+			else if (DigsiteNecklaceID.any {int it -> e.getIdentifier() == it} )
+			{
+				for(int a = 0; a < DigsiteNecklaceOptions.length; a++)
+				{
+					_client.insertMenuItem(DigsiteNecklaceOptions[a], e.getTarget(), e.getOpcode(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
+				}
+			}
 		}
 		else
 		{
@@ -172,7 +188,7 @@ class Demo extends ScriptedPlugin
 
 	void onMenuOptionClicked(MenuOptionClicked e)
 	{
-		if (WidgetID.INVENTORY_GROUP_ID == WidgetInfo.TO_GROUP(e.getParam1()) && e.getOpcode() == MenuOpcode.ITEM_FOURTH_OPTION.getId() && (RingOfDuelingID.any {int it -> e.getIdentifier() == it} || GamesNecklaceID.any {int it -> e.getIdentifier() == it}))
+		if (WidgetID.INVENTORY_GROUP_ID == WidgetInfo.TO_GROUP(e.getParam1()) && e.getOpcode() == MenuOpcode.ITEM_FOURTH_OPTION.getId() && (RingOfDuelingID.any {int it -> e.getIdentifier() == it} || GamesNecklaceID.any {int it -> e.getIdentifier() == it} || DigsiteNecklaceID.any {int it -> e.getIdentifier() == it}))
 		{
 
 			if(!e.getOption().equalsIgnoreCase("Rub"))

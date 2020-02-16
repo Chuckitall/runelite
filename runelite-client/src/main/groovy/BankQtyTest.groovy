@@ -7,25 +7,31 @@ import net.runelite.client.plugins.groovy.script.ScriptedPlugin
 
 import static net.runelite.api.ItemID.FLAX
 import static net.runelite.api.ItemID.PURE_ESSENCE
+import static net.runelite.api.ItemID.BUCKET_OF_SAND
+import static net.runelite.api.ItemID.UNPOWERED_ORB
+
 @InheritConstructors
 class BankQtyTest extends ScriptedPlugin
 {
 	void onBankQtyInput(BankQtyInput event)
 	{
-		if(event.getItemID() == PURE_ESSENCE)
+		if(event.getItemID() == FLAX)
 		{
-
+			event.requestQtyOption(60)
 		}
-		else if(event.getItemID() == FLAX)
+		else if(event.getItemID() == BUCKET_OF_SAND)
 		{
-			event.requestQtyOption(30)
+			event.requestQtyOption(14)
+		}
+		else if(event.getItemID() == UNPOWERED_ORB)
+		{
+			event.requestQtyOption(24)
 		}
 	}
 
 	void startup()
 	{
 		log(LogLevel.DEBUG,"Starting up");
-		_client.setVarbit(Varbits.WITHDRAW_X_AMOUNT, 12);
 		_eventBus.subscribe(BankQtyInput.class, this, this.&onBankQtyInput as Consumer<BankQtyInput>);
 	}
 

@@ -19,6 +19,8 @@ import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.ScriptCallbackEvent;
+import net.runelite.api.events.WidgetHiddenChanged;
+import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.util.Text;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetID;
@@ -48,19 +50,20 @@ public class FredMenu
 		eventBus.subscribe(GameTick.class, this, this::onTick);
 		eventBus.subscribe(MenuEntryAdded.class, this, this::onMenuEntryAdded);
 		eventBus.subscribe(MenuOptionClicked.class, this, this::onMenuEntryClicked);
+		eventBus.subscribe(WidgetHiddenChanged.class, this, this::onWidgetHiddenChanged);
 	}
 
 	private final HashMap<Integer, int[]> cachedRequests = new HashMap<>();
 	private boolean latch = false;
 	private int qty = -1;
+
 	private void onTick(GameTick e)
 	{
 		latch = true;
 		Widget widget = client.getWidget(162, 45);
-
-		if (widget != null)
+		if (widget != null && !widget.isHidden())
 		{
-			if(qty > 0)
+			if (qty > 0)
 			{
 				client.setVar(VarClientInt.INPUT_TYPE, 7);
 				client.setVar(VarClientStr.INPUT_TEXT, String.valueOf(qty));
@@ -68,6 +71,26 @@ public class FredMenu
 				clientThread.invoke(() -> this.client.runScript(299, 0, 0));
 				this.qty = 0;
 			}
+		}
+	}
+
+	private void onWidgetHiddenChanged(WidgetHiddenChanged event)
+	{
+		if (event.getWidget() == null)
+		{
+			return;
+		}
+		int group = WidgetInfo.TO_GROUP(event.getWidget().getId());
+		int child = WidgetInfo.TO_CHILD(event.getWidget().getId());
+		boolean wasHidden = event.isHidden();
+		if (group == 162 && child == 40 && !wasHidden)
+		{
+//			client.setVar(VarClientInt.INPUT_TYPE, 7);
+//			client.setVar(VarClientStr.INPUT_TEXT, String.valueOf(qty));
+//			clientThread.invoke(() -> { this.client.runScript(681, null); });
+//			clientThread.invoke(() -> this.client.runScript(299, 0, 0));
+//			this.qty = 0;
+			log.debug("WidgetHiddenChanged: [{}, {}] -> [isHidden: {}]",group, child, event.getWidget().isHidden());
 		}
 	}
 

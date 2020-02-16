@@ -1,8 +1,10 @@
 import groovy.transform.CompileStatic;
 import groovy.transform.InheritConstructors
 import io.reactivex.functions.Consumer
+import net.runelite.api.ChatMessageType
 import net.runelite.api.MenuOpcode
 import net.runelite.api.events.GameTick
+import net.runelite.api.events.ScriptCallbackEvent
 import net.runelite.api.events.MenuEntryAdded
 import net.runelite.api.events.MenuOptionClicked
 import net.runelite.api.widgets.WidgetID
@@ -10,6 +12,8 @@ import net.runelite.api.widgets.WidgetInfo
 import net.runelite.client.fred.InterfaceChoice
 import net.runelite.client.plugins.groovy.debugger.DebuggerWindow.LogLevel
 import net.runelite.client.plugins.groovy.script.ScriptedPlugin
+import org.apache.commons.lang3.ArrayUtils
+import org.codehaus.groovy.runtime.ArrayUtil
 
 import static net.runelite.api.ItemID.RING_OF_DUELING1
 import static net.runelite.api.ItemID.RING_OF_DUELING2
@@ -143,7 +147,7 @@ class Demo extends ScriptedPlugin
 				new Tuple2<String, String>("Pay 200 coins to have your tree chopped down?", "yes."),
 				new Tuple2<String, String>("Select an Option", "Clockwork mechanism"),
 				// new Tuple2<String, String>("Select an Option", "What do you have?"),
-				// new Tuple2<String, String>("Select an Option", "Could i have some stew please?"), 
+				// new Tuple2<String, String>("Select an Option", "Could i have some stew please?"),
 				new Tuple2<String, String>("Pay one basket of oranges?", "yes."),
 			);
 
@@ -199,12 +203,41 @@ class Demo extends ScriptedPlugin
 		log(LogLevel.DEBUG, e.toString());
 	}
 
+	 int copyIntFromStack(int i)
+	 {
+	 	int intStackSize = _client.getIntStackSize();
+	 	return _client.getIntStack()[intStackSize-1-i];
+	 }
 
+	 int[] copyIntsFromStack(int toSlurp)
+	 {
+	 	int[] toRet = new int[toSlurp];
+	 	for(int i = toSlurp-1; i >= 0; i--)
+	 	{
+	 		toRet[i] = copyIntFromStack(i);
+	 	}
+	 	return toRet;
+	 }
+
+	 void onScriptCallbackEvent(ScriptCallbackEvent callback)
+	 {
+	 	switch (callback.getEventName())
+	 	{
+	 		case "OnMushroomTeleportWidgetBuilt":
+	 		{
+	 			int[] ops = copyIntsFromStack(4);
+	 			String debugMsg = "OnMushroomTeleportWidgetBuilt: " + Arrays.toString(ops)
+	 			_client.addChatMessage(ChatMessageType.SPAM, "", debugMsg, "")
+	 			log(LogLevel.DEBUG, debugMsg);
+	 			break;
+	 		}
+	 	}
+	 }
 
 	void startup()
 	{
 		_eventBus.subscribe(InterfaceChoice.class, this, this.&onInterfaceChoice as Consumer<InterfaceChoice>)
-
+		_eventBus.subscribe(ScriptCallbackEvent.class, this, this.&onScriptCallbackEvent as Consumer<ScriptCallbackEvent>)
 		_eventBus.subscribe(MenuOptionClicked.class, this, this::onMenuOptionClicked as Consumer<MenuOptionClicked>);
 		_eventBus.subscribe(MenuEntryAdded.class, this, this::onMenuEntryAdded as Consumer<MenuEntryAdded>);
 	}

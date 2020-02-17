@@ -1,14 +1,22 @@
 package net.runelite.client.fred;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ScriptCallbackEvent;
+import net.runelite.api.util.Text;
+import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.fred.events.MushroomTeleEvent;
+import net.runelite.client.plugins.fred.api.other.Tuples;
+import net.runelite.client.plugins.fred.api.other.Tuples.T2;
 import org.apache.commons.lang3.ArrayUtils;
+import org.codehaus.groovy.runtime.ArrayUtil;
 
 @Singleton
 @Slf4j
@@ -135,6 +143,17 @@ public class Cs2Manager
 					pasteIntToStack(0, WidgetInfo.PACK(270, 13 + event.getRequestedOp()));
 				}
 				skill_options_string = null;
+				break;
+			}
+			case "OnMushroomTeleportWidgetBuilt":
+			{
+				int[] options = copyIntsFromStack(4);
+				ArrayUtils.reverse(options);
+				MushroomTeleEvent event = new MushroomTeleEvent(options);
+				log.debug("Event {}", event);
+				eventBus.post(MushroomTeleEvent.class, event);
+				log.debug("Event {}", event);
+				pasteIntToStack(4, event.getSelectedOption());
 				break;
 			}
 		}

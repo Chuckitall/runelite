@@ -5,9 +5,11 @@ import net.runelite.api.MenuOpcode
 import net.runelite.api.events.ScriptCallbackEvent
 import net.runelite.api.events.MenuEntryAdded
 import net.runelite.api.events.MenuOptionClicked
+import net.runelite.api.util.Text
 import net.runelite.api.widgets.WidgetID
 import net.runelite.api.widgets.WidgetInfo
 import net.runelite.client.fred.InterfaceChoice
+import net.runelite.client.fred.events.MushroomTeleEvent
 import net.runelite.client.plugins.groovy.debugger.DebuggerWindow.LogLevel
 import net.runelite.client.plugins.groovy.script.ScriptedPlugin
 
@@ -33,10 +35,11 @@ import static net.runelite.api.ItemID.DIGSITE_PENDANT_3
 import static net.runelite.api.ItemID.DIGSITE_PENDANT_4
 import static net.runelite.api.ItemID.DIGSITE_PENDANT_5
 
-@CompileStatic
 @InheritConstructors
 class Demo extends ScriptedPlugin
 {
+
+	String[] MushtreeOptions = ["House", "Valley", "Swamp", "Meadow"];
 
 	int[] RingOfDuelingID = [RING_OF_DUELING1,RING_OF_DUELING2,RING_OF_DUELING3,RING_OF_DUELING4,RING_OF_DUELING5,RING_OF_DUELING6,RING_OF_DUELING7,RING_OF_DUELING8];
 	int[] GamesNecklaceID = [GAMES_NECKLACE1,GAMES_NECKLACE2,GAMES_NECKLACE3,GAMES_NECKLACE4,GAMES_NECKLACE5,GAMES_NECKLACE6,GAMES_NECKLACE7,GAMES_NECKLACE8];
@@ -180,9 +183,14 @@ class Demo extends ScriptedPlugin
 				}
 			}
 		}
-		else
+		else if(e.getMenuOpcode() == MenuOpcode.GAME_OBJECT_FIRST_OPTION && e.getOption().equalsIgnoreCase("Use") && Text.standardize(e.getTarget()).equalsIgnoreCase("Magic Mushtree"))
 		{
 
+			//Param0=52 Param1=56 Opcode=3 Id=30920 MenuOption=Use MenuTarget=<col=ffff>Magic Mushtree CanvasX=461 CanvasY=278 Authentic=true
+			for(String s : MushtreeOptions)
+			{
+				_client.insertMenuItem(s, e.getTarget(), e.getOpcode(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
+			}
 		}
 	}
 
@@ -194,7 +202,13 @@ class Demo extends ScriptedPlugin
 			if(!e.getOption().equalsIgnoreCase("Rub"))
 			{
 				targetWord = e.getOption();
+				e.setOption("Rub")
 			}
+		}
+		else if(e.getMenuOpcode() == MenuOpcode.GAME_OBJECT_FIRST_OPTION && Text.standardize(e.getTarget()).equalsIgnoreCase("Magic Mushtree") && !e.getOption().equalsIgnoreCase("use") && MushtreeOptions.any {String it -> e.getOption().equalsIgnoreCase(it)})
+		{
+			targetWord = e.getOption();
+			e.setOption("Use");
 		}
 		log(LogLevel.DEBUG, e.toString());
 	}
@@ -221,7 +235,7 @@ class Demo extends ScriptedPlugin
 		{
 			case "OnMushroomTeleportWidgetBuilt":
 			{
-				int[] ops = copyIntsFromStack(4);
+				int[] ops = copyIntsFromStack(5);
 				String debugMsg = "OnMushroomTeleportWidgetBuilt: " + Arrays.toString(ops)
 				log(LogLevel.DEBUG, debugMsg);
 				break;
@@ -243,11 +257,27 @@ class Demo extends ScriptedPlugin
 		}
 	}
 
+	void onMushroomTeleEvent(MushroomTeleEvent event)
+	{
+		log(LogLevel.DEBUG, event.toString());
+		for(int i = 0; i < event.getOptions().length; i++)
+		{
+			if(event.getOptions()[i].equalsIgnoreCase(targetWord))
+			{
+				event.requestOption(i);
+				targetWord = "";
+			}
+		}
+//		event.requestOption();
+//		log(LogLevel.DEBUG, event.toString());
+	}
+
 	void startup()
 	{
 		_eventBus.subscribe(InterfaceChoice.class, this, this.&onInterfaceChoice as Consumer<InterfaceChoice>)
 		_eventBus.subscribe(ScriptCallbackEvent.class, this, this.&onScriptCallbackEvent as Consumer<ScriptCallbackEvent>)
 		_eventBus.subscribe(MenuOptionClicked.class, this, this::onMenuOptionClicked as Consumer<MenuOptionClicked>);
+		_eventBus.subscribe(MushroomTeleEvent.class, this, this::onMushroomTeleEvent as Consumer<MushroomTeleEvent>);
 		_eventBus.subscribe(MenuEntryAdded.class, this, this::onMenuEntryAdded as Consumer<MenuEntryAdded>);
 	}
 

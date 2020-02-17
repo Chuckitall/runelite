@@ -73,8 +73,9 @@ public class FredMenu
 
 	private final HashMap<Integer, _Request[]> cachedRequests = new HashMap<>();
 	private boolean latch = false;
+	private Widget latched1 = null;
+	private Widget latched2 = null;
 	private int qty = -1;
-	private static final Object MOC = new Object();
 
 	private void onTick(GameTick e)
 	{
@@ -93,9 +94,10 @@ public class FredMenu
 				this.qty = 0;
 			}
 		}
-		else if(entry0 == null && entry1 == null && entry2 != null)
+		else if(latched1 != null)
 		{
-			executor.submit(() -> this.click(client.getWidget(entry2.getParam1()).getBounds()));
+			click(latched1.getBounds());
+			latched1 = null;
 		}
 	}
 
@@ -155,7 +157,6 @@ public class FredMenu
 		}
 		if (MenuOpcode.CC_OP.getId() == event.getOpcode() && event.getOption().startsWith("W(") && event.getOption().endsWith(")") && event.getOpcode() == MenuOpcode.CC_OP.getId())
 		{
-			event.consume();
 			Widget owner = null;
 			try
 			{
@@ -198,82 +199,37 @@ public class FredMenu
 					event.setParam1(bankContainer.getId());
 					if (client.getVar(Varbits.BANK_NOTE_FLAG) != noted_temp)
 					{
-//						MenuAction|: Param0=-1 Param1=786454 Opcode=57 Id=1 MenuOption=Note MenuTarget= CanvasX=262 CanvasY=402 Authentic=true
-//						MenuAction|: Param0=-1 Param1=786452 Opcode=57 Id=1 MenuOption=Item MenuTarget= CanvasX=219 CanvasY=393 Authentic=true
-						entry1 = event;
-						if(noted_temp == 0)
-						{
-							entry0 = new MenuEntry("Item", "", 1, 57, -1, WidgetInfo.PACK(12, 20), false);
-							entry2 = new MenuEntry("Note", "", 1, 57, -1, WidgetInfo.PACK(12, 22), false);
-//							clientThread.invoke(() -> client.invokeMenuAction(-1, 786452, 57, 1, "Item", "", 0, 0));
-						}
-						else
-						{
-//							clientThread.invoke(() -> client.invokeMenuAction(-1, 786454, 57, 1, "Note", "", 0, 0));
-							entry0 = new MenuEntry("Note", "", 1, 57, -1, WidgetInfo.PACK(12, 22), false);
-							entry2 = new MenuEntry("Item", "", 1, 57, -1, WidgetInfo.PACK(12, 20), false);
-						}
-
-						eventBus.subscribe(MenuOptionClicked.class, MOC, this::moc);
-						executor.submit(() -> this.click(client.getWidget(entry0.getParam1()).getBounds()));
-					}
-					else
-					{
+//						if(noted_temp == 0)
+//						{
+//							dispatch(new MenuEntry("Item", "", 1, 57, -1, 786452, false));
+//						}
+//						else
+//						{
+//							dispatch(new MenuEntry("Note", "", 1, 57, -1, 786454, false));
+//						}
+						event.consume();
+						dispatch(new MenuEntry(noted_temp == 0 ? "Item" : "Note", "", 1, 57, -1, noted_temp == 0 ? 786452 : 786454, false));
 						dispatch(event);
-//						clientThread.invoke(() -> client.invokeMenuAction(event.getParam0(), event.getParam1(), event.getOpcode(), event.getIdentifier(), event.getOption(), event.getTarget(), 0, 0));
+						latched1 = client.getWidget(noted_temp == 1 ? 786452 : 786454);
+//						if(noted_temp == 1)
+//						{
+//							latched = client.getWidget(786452);
+//						}
+//						else
+//						{
+//							latched = client.getWidget(786454);
+//						}
 					}
 				}
 			}
 		}
 	}
 
-	private MenuEntry entry0 = null;
-	private MenuEntry entry1 = null;
-	private MenuEntry entry2 = null;
-
-	private void moc(MenuOptionClicked event)
-	{
-
-		if (entry0 == null && entry1 == null && entry2 == null)
-		{
-			eventBus.unregister(MOC);
-			return;
-		}
-
-		event.consume();
-
-		if(entry0 != null)
-		{
-			dispatch(entry0);
-			entry0 = null;
-			if(entry1 != null)
-			{
-				executor.submit(() -> this.click(client.getWidget(entry1.getParam1()).getBounds()));
-			}
-		}
-		else if(entry1 != null)
-		{
-			dispatch(entry1);
-			entry1 = null;
-		}
-		else if(entry2 != null)
-		{
-			dispatch(entry2);
-			entry2= null;
-		}
-
-		if (entry0 == null && entry1 == null && entry2 == null)
-		{
-			eventBus.unregister(MOC);
-		}
-	}
-
 	private void dispatch(MenuEntry entry)
 	{
-		clientThread.invoke(() ->
-		{
-			client.invokeMenuAction(entry.getParam0(), entry.getParam1(), entry.getOpcode(), entry.getIdentifier(), entry.getOption(), entry.getTarget(), 0, 0);
-		});
+		clientThread.invoke(() -> client.invokeMenuAction(
+			entry.getParam0(), entry.getParam1(), entry.getOpcode(), entry.getIdentifier(), entry.getOption(), entry.getTarget(), 0, 0
+		));
 	}
 
 	/**

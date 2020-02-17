@@ -213,7 +213,7 @@ public class TalkerPlugin extends Plugin
 		eventBus.subscribe(WidgetLoaded.class, this, this::onWidgetLoaded);
 		eventBus.subscribe(GameTick.class, this, this::onGameTick);
 		eventBus.subscribe(InteractingChanged.class, this, this::onInteractingChanged);
-		overlayManager.add(talkerOverlay);
+//		overlayManager.add(talkerOverlay);
 
 
 
@@ -227,7 +227,7 @@ public class TalkerPlugin extends Plugin
 		setClean();
 		stopFlexo();
 		eventBus.unregister(this);
-		overlayManager.remove(talkerOverlay);
+//		overlayManager.remove(talkerOverlay);
 	}
 
 	private void onWidgetLoaded(WidgetLoaded widgetLoaded)

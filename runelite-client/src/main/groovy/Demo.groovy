@@ -233,6 +233,13 @@ class Demo extends ScriptedPlugin
 				log(LogLevel.DEBUG, debugMsg);
 				break;
 			}
+			case "ChatboxMultiBuilt":
+			{
+				int[] ops = copyIntsFromStack(4);
+				String debugMsg = "291Callback: " + Arrays.toString(ops)
+				log(LogLevel.DEBUG, debugMsg);
+				break;
+			}
 		}
 	}
 

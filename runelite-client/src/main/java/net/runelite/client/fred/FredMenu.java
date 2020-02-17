@@ -73,8 +73,7 @@ public class FredMenu
 
 	private final HashMap<Integer, _Request[]> cachedRequests = new HashMap<>();
 	private boolean latch = false;
-	private Widget latched1 = null;
-	private Widget latched2 = null;
+	private Widget latched = null;
 	private int qty = -1;
 
 	private void onTick(GameTick e)
@@ -94,10 +93,10 @@ public class FredMenu
 				this.qty = 0;
 			}
 		}
-		else if(latched1 != null)
+		else if(latched != null)
 		{
-			click(latched1.getBounds());
-			latched1 = null;
+			click(latched.getBounds());
+			latched = null;
 		}
 	}
 
@@ -210,7 +209,7 @@ public class FredMenu
 						event.consume();
 						dispatch(new MenuEntry(noted_temp == 0 ? "Item" : "Note", "", 1, 57, -1, noted_temp == 0 ? 786452 : 786454, false));
 						dispatch(event);
-						latched1 = client.getWidget(noted_temp == 1 ? 786452 : 786454);
+						latched = client.getWidget(noted_temp == 1 ? 786452 : 786454);
 //						if(noted_temp == 1)
 //						{
 //							latched = client.getWidget(786452);

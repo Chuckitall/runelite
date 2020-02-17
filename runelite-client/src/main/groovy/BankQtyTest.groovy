@@ -28,10 +28,11 @@ class BankQtyTest extends ScriptedPlugin
 			event.requestQtyOption(60, true)
 		}
 		else if (event.getItemID() == BUCKET_OF_SAND) {
-			event.requestQtyOption(14, false)
+			event.requestQtyOption(14, true)
 		}
 		else if (event.getItemID() == UNPOWERED_ORB) {
 			event.requestQtyOption(24, false)
+			event.requestQtyOption(12, true)
 		}
 		else if (birdhouse_seeds.contains(event.getItemID())) {
 			event.requestQtyOption(40, false)

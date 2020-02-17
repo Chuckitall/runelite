@@ -654,7 +654,7 @@ LABEL593:
    if_icmpeq              RETURN
 HACK:
    iload                  13
-   sconst                 "SkillMulti_D1"
+   sconst                 "SkillMulti_D1"    ; old debugging callback. Not used
    runelite_callback
    get_varc_int           200
    cc_find

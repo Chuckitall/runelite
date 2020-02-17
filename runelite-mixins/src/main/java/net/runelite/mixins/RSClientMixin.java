@@ -76,6 +76,7 @@ import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.DraggingWidgetChanged;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GrandExchangeOfferChanged;
+import net.runelite.api.events.HiddenMenuOptionClicked;
 import net.runelite.api.events.Menu;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOpened;
@@ -1377,10 +1378,16 @@ public abstract class RSClientMixin implements RSClient
 	static void rl$menuAction(int param0, int param1, int opcode, int id, String menuOption, String menuTarget, int canvasX, int canvasY)
 	{
 		boolean authentic = true;
+		boolean hidden = false;
 		if (menuTarget != null && menuTarget.startsWith("!AUTHENTIC"))
 		{
 			authentic = false;
 			menuTarget = menuTarget.substring(10);
+		}
+		else if (menuTarget != null && menuTarget.startsWith("!HIDDEN"))
+		{
+			hidden = true;
+			menuTarget = menuTarget.substring(7);
 		}
 
 		if (printMenuActions && client.getLogger().isDebugEnabled())
@@ -1458,15 +1465,24 @@ public abstract class RSClientMixin implements RSClient
 			}
 		}
 
-		client.getCallbacks().post(MenuOptionClicked.class, menuOptionClicked);
-
-		if (menuOptionClicked.isConsumed())
+		if (!hidden)
 		{
-			return;
-		}
+			client.getCallbacks().post(MenuOptionClicked.class, menuOptionClicked);
 
-		rs$menuAction(menuOptionClicked.getParam0(), menuOptionClicked.getParam1(), menuOptionClicked.getOpcode(),
-			menuOptionClicked.getIdentifier(), menuOptionClicked.getOption(), menuOptionClicked.getTarget(), canvasX, canvasY);
+			if (menuOptionClicked.isConsumed())
+			{
+				return;
+			}
+			rs$menuAction(menuOptionClicked.getParam0(), menuOptionClicked.getParam1(), menuOptionClicked.getOpcode(),
+				menuOptionClicked.getIdentifier(), menuOptionClicked.getOption(), menuOptionClicked.getTarget(), canvasX, canvasY);
+		}
+		else
+		{
+			HiddenMenuOptionClicked evnt = new HiddenMenuOptionClicked(menuOptionClicked);
+			client.getCallbacks().post(HiddenMenuOptionClicked.class, evnt);
+			rs$menuAction(evnt.getParam0(), evnt.getParam1(), evnt.getOpcode(),
+				evnt.getIdentifier(), evnt.getOption(), evnt.getTarget(), canvasX, canvasY);
+		}
 	}
 
 	@Override
@@ -1474,6 +1490,13 @@ public abstract class RSClientMixin implements RSClient
 	public void invokeMenuAction(int param0, int param1, int opcode, int id, String menuOption, String menuTarget, int canvasX, int canvasY)
 	{
 		client.sendMenuAction(param0, param1, opcode, id, menuOption, "!AUTHENTIC" + menuTarget, canvasX, canvasY);
+	}
+
+	@Override
+	@Inject
+	public void invokeHiddenMenuAction(int param0, int param1, int opcode, int id, String menuOption, String menuTarget, int canvasX, int canvasY)
+	{
+		client.sendMenuAction(param0, param1, opcode, id, menuOption, "!HIDDEN" + menuTarget, canvasX, canvasY);
 	}
 
 	@FieldHook("Login_username")

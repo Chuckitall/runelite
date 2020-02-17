@@ -1856,6 +1856,7 @@ public interface Client extends GameShell
 	 * @param canvasY      Canvas Y Point
 	 */
 	void invokeMenuAction(int param0, int param1, int opcode, int id, String menuEntry, String targetString, int canvasX, int canvasY);
+	void invokeHiddenMenuAction(int param0, int param1, int opcode, int id, String menuEntry, String targetString, int canvasX, int canvasY);
 
 	MouseRecorder getMouseRecorder();
 

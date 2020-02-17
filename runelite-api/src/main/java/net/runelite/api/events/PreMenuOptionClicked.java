@@ -24,9 +24,7 @@
  */
 package net.runelite.api.events;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import net.runelite.api.MenuEntry;
 
 /**
@@ -41,20 +39,39 @@ import net.runelite.api.MenuEntry;
  * it seems that this event still triggers with the "Cancel" action.
  */
 @Getter
-public class HiddenMenuOptionClicked extends MenuOptionClicked
+public class PreMenuOptionClicked implements Event
 {
-	public HiddenMenuOptionClicked(String option, String target, int identifier, int opcode, int param0, int param1, boolean forceLeftClick)
+	private int cX;
+	private int cY;
+	public PreMenuOptionClicked(int canvasX, int canvasY)
 	{
-		super(option, target, identifier, opcode, param0, param1, forceLeftClick);
+		cX = canvasX;
+		cY = canvasY;
 	}
 
-	public HiddenMenuOptionClicked(String option, String target, int identifier, int opcode, int param0, int param1, boolean forceLeftClick, boolean authentic, int mouseButton)
-	{
-		super(option, target, identifier, opcode, param0, param1, forceLeftClick, authentic, mouseButton);
-	}
+	/**
+	 * Whether or not the event has been consumed by a subscriber.
+	 */
+	private boolean claimed = false;
 
-	public HiddenMenuOptionClicked(MenuOptionClicked source)
+	/**
+	 * The mouse button will be 1 if a non draggable widget was clicked,
+	 */
+	private MenuEntry requestedEntry = null;
+
+	/**
+	 * Marks the event as having been consumed.
+	 * <p>
+	 * Setting this state indicates that a plugin has processed the menu
+	 * option being clicked and that the event will not be passed on
+	 * for handling by vanilla client code.
+	 */
+	public void request(MenuEntry entry)
 	{
-		super(source.getOption(), source.getTarget(), source.getIdentifier(), source.getOpcode(), source.getParam0(), source.getParam1(), source.isForceLeftClick(), source.isAuthentic(), source.getMouseButton());
+		if (!claimed && entry != null)
+		{
+			this.requestedEntry = entry;
+			claimed = true;
+		}
 	}
 }

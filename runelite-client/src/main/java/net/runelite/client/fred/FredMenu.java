@@ -27,6 +27,7 @@ import net.runelite.api.Varbits;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.PreMenuOptionClicked;
 import net.runelite.api.events.ScriptCallbackEvent;
 import net.runelite.api.events.WidgetHiddenChanged;
 import net.runelite.api.events.WidgetLoaded;
@@ -62,6 +63,7 @@ public class FredMenu
 		this.executor = Executors.newSingleThreadExecutor();
 
 		eventBus.subscribe(GameTick.class, this, this::onTick);
+		eventBus.subscribe(PreMenuOptionClicked.class, this, this::preMenuClicked);
 		eventBus.subscribe(MenuEntryAdded.class, this, this::onMenuEntryAdded);
 		eventBus.subscribe(MenuOptionClicked.class, this, this::menuClickedHandler);
 	}
@@ -156,10 +158,20 @@ public class FredMenu
 				}
 			}
 		}
-		//if (latch)
 	}
 
-	private void onMenuEntryClicked(MenuOptionClicked event)
+	private Queue<T2<Rectangle, MenuEntry>> menuEntriesQueue = new ArrayDeque<>();
+
+	private void preMenuClicked(PreMenuOptionClicked event)
+	{
+		if (menuEntriesQueue.size() > 0)
+		{
+			event.request(menuEntriesQueue.remove().get_2());
+			log.debug("Size3: {}", menuEntriesQueue.size());
+		}
+	}
+
+	private void menuClickedHandler(MenuOptionClicked event)
 	{
 		Widget bankContainer = client.getWidget(WidgetInfo.BANK_ITEM_CONTAINER);
 		if(bankContainer == null || bankContainer.isHidden())
@@ -208,112 +220,24 @@ public class FredMenu
 					event.setIdentifier(6);
 					event.setOpcode(MenuOpcode.CC_OP_LOW_PRIORITY.getId());
 					event.setParam1(bankContainer.getId());
+					log.debug("Here");
 					if (client.getVar(Varbits.BANK_NOTE_FLAG) != noted_temp)
 					{
-//						if(noted_temp == 0)
-//						{
-//							dispatch(new MenuEntry("Item", "", 1, 57, -1, 786452, false));
-//						}
-//						else
-//						{
-//							dispatch(new MenuEntry("Note", "", 1, 57, -1, 786454, false));
-//						}
-						event.consume();
-						dispatch(new MenuEntry(noted_temp == 0 ? "Item" : "Note", "", 1, 57, -1, noted_temp == 0 ? 786452 : 786454, false));
-						dispatch(event);
-//						latched = client.getWidget(noted_temp == 1 ? 786452 : 786454);
-//						if(noted_temp == 1)
-//						{
-//							latched = client.getWidget(786452);
-//						}
-//						else
-//						{
-//							latched = client.getWidget(786454);
-//						}
+						menuEntriesQueue.add(Tuples.of(owner.getBounds(), new MenuEntry(event.getOption(), event.getTarget(), event.getIdentifier(), event.getOpcode(), event.getParam0(), event.getParam1(), false)));
+						event.setMenuEntry(new MenuEntry(noted_temp == 0 ? "Item" : "Note", "", 1, 57, -1, noted_temp == 0 ? 786452 : 786454, false));
+						menuEntriesQueue.add(Tuples.of(client.getWidget(noted_temp == 0 ? 786454 : 786452).getBounds(), new MenuEntry(noted_temp == 0 ? "Note" : "Item", "", 1, 57, -1, noted_temp == 0 ? 786454 : 786452, false)));
 					}
 				}
 			}
 		}
 	}
 
-	private Queue<T2<Rectangle, MenuEntry>> menuEntriesQueue = new ArrayDeque<>();
-	private void menuClickedHandler(MenuOptionClicked event)
-	{
-		if(menuEntriesQueue.size() == 0)
-		{
-			Widget bankContainer = client.getWidget(WidgetInfo.BANK_ITEM_CONTAINER);
-			if(bankContainer == null || bankContainer.isHidden())
-			{
-				return;
-			}
-			if (MenuOpcode.CC_OP.getId() == event.getOpcode() && event.getOption().startsWith("W(") && event.getOption().endsWith(")") && event.getOpcode() == MenuOpcode.CC_OP.getId())
-			{
-				Widget owner = null;
-				try
-				{
-					owner = bankContainer.getChild(event.getParam0());
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
-				if (owner != null)
-				{
-					String[] body = event.getOption().substring(2, event.getOption().length()-1).split("\\|");
-					String qty_ = body[0];
-					String noted_ = body[1];
-					int qty_temp = -1;
-					int noted_temp = -1;
-					try
-					{
-						qty_temp = Integer.parseInt(qty_);
-					}
-					catch (NumberFormatException ignored)
-					{
-
-					}
-					if (noted_.equalsIgnoreCase("noted"))
-					{
-						noted_temp = 1;
-					}
-					else if(noted_.equalsIgnoreCase("item"))
-					{
-						noted_temp = 0;
-					}
-					log.debug("qty {}, noted {}", qty_temp, noted_temp);
-					if (noted_temp > -1 && qty_temp > 0)
-					{
-						qty = qty_temp;
-						event.setOption("Withdraw-X");
-						event.setIdentifier(6);
-						event.setOpcode(MenuOpcode.CC_OP_LOW_PRIORITY.getId());
-						event.setParam1(bankContainer.getId());
-						log.debug("Here");
-						if (client.getVar(Varbits.BANK_NOTE_FLAG) != noted_temp)
-						{
-							menuEntriesQueue.add(Tuples.of(client.getWidget(noted_temp == 0 ? 786452 : 786454).getBounds(), new MenuEntry(noted_temp == 0 ? "Item" : "Note", "", 1, 57, -1, noted_temp == 0 ? 786452 : 786454, false)));
-							menuEntriesQueue.add(Tuples.of(owner.getBounds(), new MenuEntry(event.getOption(), event.getTarget(), event.getIdentifier(), event.getOpcode(), event.getParam0(), event.getParam1(), false)));
-							menuEntriesQueue.add(Tuples.of(client.getWidget(noted_temp == 0 ? 786454 : 786452).getBounds(), new MenuEntry(noted_temp == 0 ? "Note" : "Item", "", 1, 57, -1, noted_temp == 0 ? 786454 : 786452, false)));
-						}
-					}
-				}
-			}
-		}
-		if (menuEntriesQueue.size() > 0 && latch2)
-		{
-			event.consume();
-			dispatch(menuEntriesQueue.remove().get_2());
-			log.debug("Size3: {}", menuEntriesQueue.size());
-			latch2 = false;
-		}
-	}
-
-	private void dispatch(MenuEntry entry)
-	{
-		clientThread.invoke(() -> client.invokeHiddenMenuAction(
-			entry.getParam0(), entry.getParam1(), entry.getOpcode(), entry.getIdentifier(), entry.getOption(), entry.getTarget(), 0, 0
-		));
-	}
+//	private void dispatch(MenuEntry entry)
+//	{
+//		clientThread.invoke(() -> client.invokeHiddenMenuAction(
+//			entry.getParam0(), entry.getParam1(), entry.getOpcode(), entry.getIdentifier(), entry.getOption(), entry.getTarget(), 0, 0
+//		));
+//	}
 
 	/**
 	 * This method must be called on a new
@@ -346,12 +270,13 @@ public class FredMenu
 			final int x = (int) (p.getX() * scale);
 			final int y = (int) (p.getY() * scale);
 			final Point click = new Point(x, y);
-
+			log.debug("Click1: {}", click);
 			eventDispatcher(501, click);
 			eventDispatcher(502, click);
 			eventDispatcher(500, click);
 			return;
 		}
+		log.debug("Click2: {}", p);
 		eventDispatcher(501, p);
 		eventDispatcher(502, p);
 		eventDispatcher(500, p);

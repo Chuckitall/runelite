@@ -578,6 +578,13 @@ public abstract class RSClientMixin implements RSClient
 
 	@Inject
 	@Override
+	public Widget getWidget(int packedId)
+	{
+		return getWidget((packedId >>> 16), (packedId & 0xFFFF));
+	}
+
+	@Inject
+	@Override
 	public int getVar(VarPlayer varPlayer)
 	{
 		int[] varps = getVarps();

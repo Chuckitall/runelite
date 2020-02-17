@@ -1,10 +1,14 @@
 package net.runelite.client.fred;
 
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.Data;
@@ -13,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.MenuOpcode;
+import net.runelite.api.Point;
 import net.runelite.api.VarClientInt;
 import net.runelite.api.VarClientStr;
 import net.runelite.api.Varbits;
@@ -40,6 +45,7 @@ public class FredMenu
 	private final EventBus eventBus;
 
 	//Used to manage custom non-player menu options
+	private final ExecutorService executor;
 
 	@Inject
 	private FredMenu(Client client, ClientThread clientThread, EventBus eventBus)
@@ -47,6 +53,7 @@ public class FredMenu
 		this.client = client;
 		this.clientThread = clientThread;
 		this.eventBus = eventBus;
+		this.executor = Executors.newSingleThreadExecutor();
 
 		eventBus.subscribe(GameTick.class, this, this::onTick);
 		eventBus.subscribe(MenuEntryAdded.class, this, this::onMenuEntryAdded);
@@ -67,6 +74,7 @@ public class FredMenu
 	private final HashMap<Integer, _Request[]> cachedRequests = new HashMap<>();
 	private boolean latch = false;
 	private int qty = -1;
+	private static final Object MOC = new Object();
 
 	private void onTick(GameTick e)
 	{
@@ -82,11 +90,13 @@ public class FredMenu
 //
 				clientThread.invoke(() -> this.client.runScript(681, null));
 				clientThread.invoke(() -> this.client.runScript(299, 0, 0));
-
 				this.qty = 0;
 			}
 		}
-
+		else if(entry0 == null && entry1 == null && entry2 != null)
+		{
+			executor.submit(() -> this.click(client.getWidget(entry2.getParam1()).getBounds()));
+		}
 	}
 
 	private void onMenuEntryAdded(MenuEntryAdded event)
@@ -96,7 +106,6 @@ public class FredMenu
 			cachedRequests.clear();
 			latch = false;
 		}
-		//option=Withdraw-1, target=<col=ff9040>Pure essence</col>, identifier=1, opcode=57, param0=138, param1=786443, forceLeftClick=false
 		Widget bankContainer = client.getWidget(WidgetInfo.BANK_ITEM_CONTAINER);
 		if(bankContainer == null || bankContainer.isHidden())
 		{
@@ -136,7 +145,6 @@ public class FredMenu
 		}
 		//if (latch)
 	}
-
 
 	private void onMenuEntryClicked(MenuOptionClicked event)
 	{
@@ -180,11 +188,10 @@ public class FredMenu
 				{
 					noted_temp = 0;
 				}
-				log.debug("qty_temp {}, noted_temp {}", qty_temp, noted_temp);
+				log.debug("qty {}, noted {}", qty_temp, noted_temp);
 				if (noted_temp > -1 && qty_temp > 0)
 				{
-					qty = event.getParam1();
-					log.debug("qty {}, qty_temp {}, noted_temp {}", qty, qty_temp, noted_temp);
+					qty = qty_temp;
 					event.setOption("Withdraw-X");
 					event.setIdentifier(6);
 					event.setOpcode(MenuOpcode.CC_OP_LOW_PRIORITY.getId());
@@ -193,23 +200,145 @@ public class FredMenu
 					{
 //						MenuAction|: Param0=-1 Param1=786454 Opcode=57 Id=1 MenuOption=Note MenuTarget= CanvasX=262 CanvasY=402 Authentic=true
 //						MenuAction|: Param0=-1 Param1=786452 Opcode=57 Id=1 MenuOption=Item MenuTarget= CanvasX=219 CanvasY=393 Authentic=true
-						MenuEntry noteAction;
+						entry1 = event;
 						if(noted_temp == 0)
 						{
-							clientThread.invoke(() -> client.invokeMenuAction(-1, 786452, 57, 1, "Item", "", 0, 0));
+							entry0 = new MenuEntry("Item", "", 1, 57, -1, WidgetInfo.PACK(12, 20), false);
+							entry2 = new MenuEntry("Note", "", 1, 57, -1, WidgetInfo.PACK(12, 22), false);
+//							clientThread.invoke(() -> client.invokeMenuAction(-1, 786452, 57, 1, "Item", "", 0, 0));
 						}
 						else
 						{
-							clientThread.invoke(() -> client.invokeMenuAction(-1, 786454, 57, 1, "Note", "", 0, 0));
+//							clientThread.invoke(() -> client.invokeMenuAction(-1, 786454, 57, 1, "Note", "", 0, 0));
+							entry0 = new MenuEntry("Note", "", 1, 57, -1, WidgetInfo.PACK(12, 22), false);
+							entry2 = new MenuEntry("Item", "", 1, 57, -1, WidgetInfo.PACK(12, 20), false);
 						}
+
+						eventBus.subscribe(MenuOptionClicked.class, MOC, this::moc);
+						executor.submit(() -> this.click(client.getWidget(entry0.getParam1()).getBounds()));
 					}
-					clientThread.invoke(() -> client.invokeMenuAction(event.getParam0(), event.getParam1(), event.getOpcode(), event.getIdentifier(), event.getOption(), event.getTarget(), 0, 0));
+					else
+					{
+						dispatch(event);
+//						clientThread.invoke(() -> client.invokeMenuAction(event.getParam0(), event.getParam1(), event.getOpcode(), event.getIdentifier(), event.getOption(), event.getTarget(), 0, 0));
+					}
 				}
 			}
 		}
 	}
 
+	private MenuEntry entry0 = null;
+	private MenuEntry entry1 = null;
+	private MenuEntry entry2 = null;
+
+	private void moc(MenuOptionClicked event)
+	{
+
+		if (entry0 == null && entry1 == null && entry2 == null)
+		{
+			eventBus.unregister(MOC);
+			return;
+		}
+
+		event.consume();
+
+		if(entry0 != null)
+		{
+			dispatch(entry0);
+			entry0 = null;
+			if(entry1 != null)
+			{
+				executor.submit(() -> this.click(client.getWidget(entry1.getParam1()).getBounds()));
+			}
+		}
+		else if(entry1 != null)
+		{
+			dispatch(entry1);
+			entry1 = null;
+		}
+		else if(entry2 != null)
+		{
+			dispatch(entry2);
+			entry2= null;
+		}
+
+		if (entry0 == null && entry1 == null && entry2 == null)
+		{
+			eventBus.unregister(MOC);
+		}
+	}
+
+	private void dispatch(MenuEntry entry)
+	{
+		clientThread.invoke(() ->
+		{
+			client.invokeMenuAction(entry.getParam0(), entry.getParam1(), entry.getOpcode(), entry.getIdentifier(), entry.getOption(), entry.getTarget(), 0, 0);
+		});
+	}
+
 	/**
-	 * Managing withdraw qty/deposit qty
-	 **/
+	 * This method must be called on a new
+	 * thread, if you try to call it on
+	 * {@link net.runelite.client.callback.ClientThread}
+	 * it will result in a crash/desynced thread.
+	 */
+	public void click(Rectangle rectangle)
+	{
+		assert !client.isClientThread();
+
+		Point p = getClickPoint(rectangle);
+
+		if (p.getX() < 1 || p.getY() < 1)
+		{
+			return;
+		}
+
+		click(p);
+	}
+
+	public void click(Point p)
+	{
+		assert !client.isClientThread();
+
+		if (client.isStretchedEnabled())
+		{
+			double scale = client.getScalingFactor();
+			final int x = (int) (p.getX() * scale);
+			final int y = (int) (p.getY() * scale);
+			final Point click = new Point(x, y);
+
+			eventDispatcher(501, click);
+			eventDispatcher(502, click);
+			eventDispatcher(500, click);
+			return;
+		}
+		eventDispatcher(501, p);
+		eventDispatcher(502, p);
+		eventDispatcher(500, p);
+	}
+
+	public Point getClickPoint(Rectangle rect)
+	{
+		final int x = (int) (rect.getX() + getRandomIntBetweenRange((int) rect.getWidth() / 6 * -1, (int) rect.getWidth() / 6) + rect.getWidth() / 2);
+		final int y = (int) (rect.getY() + getRandomIntBetweenRange((int) rect.getHeight() / 6 * -1, (int) rect.getHeight() / 6) + rect.getHeight() / 2);
+
+		return new Point(x, y);
+	}
+
+	public int getRandomIntBetweenRange(int min, int max)
+	{
+		return (int) ((Math.random() * ((max - min) + 1)) + min);
+	}
+
+	private void eventDispatcher(int id, Point point)
+	{
+		MouseEvent e = new MouseEvent(
+			client.getCanvas(), id,
+			System.currentTimeMillis(),
+			0, point.getX(), point.getY(),
+			1, false, 1
+		);
+
+		client.getCanvas().dispatchEvent(e);
+	}
 }

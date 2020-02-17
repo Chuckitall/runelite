@@ -491,6 +491,8 @@ public interface Client extends GameShell
 	 */
 	Widget getWidget(int groupId, int childId);
 
+	Widget getWidget(int packedId);
+
 	/**
 	 * Gets an array containing the x-axis canvas positions
 	 * of all widgets.

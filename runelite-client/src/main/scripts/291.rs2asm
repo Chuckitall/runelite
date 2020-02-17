@@ -1,0 +1,38 @@
+.id                 291
+.int_stack_count    4
+.string_stack_count 0
+.int_var_count      4
+.string_var_count   0
+   iload                  0
+   iconst                 1
+   if_icmpne              LABEL4
+   jump                   LABEL5
+LABEL4:
+   return                
+LABEL5:
+   iload                  0
+   iload                  1
+   iload                  2
+   iload                  3
+   sconst                 "291Callback"  ;runelite callback
+   runelite_callback                     ;make sure to pop off the top int as well as 5 strings to ensure we dont overflow the stack.
+   pop_int
+   pop_int
+   pop_int
+   pop_int
+   get_varbit             3958
+   iload                  3
+   if_icmpne              LABEL9
+   jump                   LABEL15
+LABEL9:
+   iload                  3
+   set_varbit             3958
+   iconst                 2266
+   iconst                 1
+   iconst                 0
+   sound_synth           
+LABEL15:
+   iload                  1
+   iload                  2
+   invoke                 290
+   return                

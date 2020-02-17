@@ -15,6 +15,7 @@ import net.runelite.api.MenuEntry;
 import net.runelite.api.MenuOpcode;
 import net.runelite.api.VarClientInt;
 import net.runelite.api.VarClientStr;
+import net.runelite.api.Varbits;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOptionClicked;
@@ -50,16 +51,27 @@ public class FredMenu
 		eventBus.subscribe(GameTick.class, this, this::onTick);
 		eventBus.subscribe(MenuEntryAdded.class, this, this::onMenuEntryAdded);
 		eventBus.subscribe(MenuOptionClicked.class, this, this::onMenuEntryClicked);
-		eventBus.subscribe(WidgetHiddenChanged.class, this, this::onWidgetHiddenChanged);
 	}
 
-	private final HashMap<Integer, int[]> cachedRequests = new HashMap<>();
+	public static class _Request
+	{
+		public final int qty;
+		public final boolean noted;
+		public _Request(int qty, boolean noted)
+		{
+			this.qty = qty;
+			this.noted = noted;
+		}
+	}
+
+	private final HashMap<Integer, _Request[]> cachedRequests = new HashMap<>();
 	private boolean latch = false;
 	private int qty = -1;
 
 	private void onTick(GameTick e)
 	{
 		latch = true;
+
 		Widget widget = client.getWidget(162, 45);
 		if (widget != null && !widget.isHidden())
 		{
@@ -67,31 +79,14 @@ public class FredMenu
 			{
 				client.setVar(VarClientInt.INPUT_TYPE, 7);
 				client.setVar(VarClientStr.INPUT_TEXT, String.valueOf(qty));
+//
 				clientThread.invoke(() -> this.client.runScript(681, null));
 				clientThread.invoke(() -> this.client.runScript(299, 0, 0));
+
 				this.qty = 0;
 			}
 		}
-	}
 
-	private void onWidgetHiddenChanged(WidgetHiddenChanged event)
-	{
-		if (event.getWidget() == null)
-		{
-			return;
-		}
-		int group = WidgetInfo.TO_GROUP(event.getWidget().getId());
-		int child = WidgetInfo.TO_CHILD(event.getWidget().getId());
-		boolean wasHidden = event.isHidden();
-		if (group == 162 && child == 40 && !wasHidden)
-		{
-//			client.setVar(VarClientInt.INPUT_TYPE, 7);
-//			client.setVar(VarClientStr.INPUT_TEXT, String.valueOf(qty));
-//			clientThread.invoke(() -> { this.client.runScript(681, null); });
-//			clientThread.invoke(() -> this.client.runScript(299, 0, 0));
-//			this.qty = 0;
-			log.debug("WidgetHiddenChanged: [{}, {}] -> [isHidden: {}]",group, child, event.getWidget().isHidden());
-		}
 	}
 
 	private void onMenuEntryAdded(MenuEntryAdded event)
@@ -123,7 +118,7 @@ public class FredMenu
 				int itemID = owner.getItemId();
 				int qty = owner.getItemQuantity();
 				String name = Text.standardize(owner.getName());
-				if (!cachedRequests.containsKey(qty))
+				if (!cachedRequests.containsKey(itemID))
 				{
 					//we dont have a cached response, so build and send an event.
 					BankQtyInput toSend = new BankQtyInput(itemID, name, qty);
@@ -131,10 +126,11 @@ public class FredMenu
 					cachedRequests.put(itemID, toSend.getSortedQtyOps());
 				}
 
-				int[] response = cachedRequests.get(itemID);
-				for (int i : response)
+				_Request[] response = cachedRequests.get(itemID);
+				for (_Request i : response)
 				{
-					client.insertMenuItem("W(" + i + ")", event.getTarget(), event.getOpcode(), event.getIdentifier(), event.getParam0(), i, false);
+					String action = "W(" + i.qty + "|" + (i.noted ? "noted" : "item") + ")";
+					client.insertMenuItem(action, event.getTarget(), event.getOpcode(), event.getIdentifier(), event.getParam0(), i.qty, false);
 				}
 			}
 		}
@@ -151,6 +147,7 @@ public class FredMenu
 		}
 		if (MenuOpcode.CC_OP.getId() == event.getOpcode() && event.getOption().startsWith("W(") && event.getOption().endsWith(")") && event.getOpcode() == MenuOpcode.CC_OP.getId())
 		{
+			event.consume();
 			Widget owner = null;
 			try
 			{
@@ -162,11 +159,52 @@ public class FredMenu
 			}
 			if (owner != null)
 			{
-				qty = event.getParam1();
-				event.setOption("Withdraw-X");
-				event.setIdentifier(6);
-				event.setOpcode(MenuOpcode.CC_OP_LOW_PRIORITY.getId());
-				event.setParam1(bankContainer.getId());
+				String[] body = event.getOption().substring(2, event.getOption().length()-1).split("\\|");
+				String qty_ = body[0];
+				String noted_ = body[1];
+				int qty_temp = -1;
+				int noted_temp = -1;
+				try
+				{
+					qty_temp = Integer.parseInt(qty_);
+				}
+				catch (NumberFormatException ignored)
+				{
+
+				}
+				if (noted_.equalsIgnoreCase("noted"))
+				{
+					noted_temp = 1;
+				}
+				else if(noted_.equalsIgnoreCase("item"))
+				{
+					noted_temp = 0;
+				}
+				log.debug("qty_temp {}, noted_temp {}", qty_temp, noted_temp);
+				if (noted_temp > -1 && qty_temp > 0)
+				{
+					qty = event.getParam1();
+					log.debug("qty {}, qty_temp {}, noted_temp {}", qty, qty_temp, noted_temp);
+					event.setOption("Withdraw-X");
+					event.setIdentifier(6);
+					event.setOpcode(MenuOpcode.CC_OP_LOW_PRIORITY.getId());
+					event.setParam1(bankContainer.getId());
+					if (client.getVar(Varbits.BANK_NOTE_FLAG) != noted_temp)
+					{
+//						MenuAction|: Param0=-1 Param1=786454 Opcode=57 Id=1 MenuOption=Note MenuTarget= CanvasX=262 CanvasY=402 Authentic=true
+//						MenuAction|: Param0=-1 Param1=786452 Opcode=57 Id=1 MenuOption=Item MenuTarget= CanvasX=219 CanvasY=393 Authentic=true
+						MenuEntry noteAction;
+						if(noted_temp == 0)
+						{
+							clientThread.invoke(() -> client.invokeMenuAction(-1, 786452, 57, 1, "Item", "", 0, 0));
+						}
+						else
+						{
+							clientThread.invoke(() -> client.invokeMenuAction(-1, 786454, 57, 1, "Note", "", 0, 0));
+						}
+					}
+					clientThread.invoke(() -> client.invokeMenuAction(event.getParam0(), event.getParam1(), event.getOpcode(), event.getIdentifier(), event.getOption(), event.getTarget(), 0, 0));
+				}
 			}
 		}
 	}

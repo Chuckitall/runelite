@@ -17,15 +17,15 @@ class BankQtyTest extends ScriptedPlugin
 	{
 		if(event.getItemID() == FLAX)
 		{
-			event.requestQtyOption(60)
+			event.requestQtyOption(60, true)
 		}
 		else if(event.getItemID() == BUCKET_OF_SAND)
 		{
-			event.requestQtyOption(14)
+			event.requestQtyOption(14, false)
 		}
 		else if(event.getItemID() == UNPOWERED_ORB)
 		{
-			event.requestQtyOption(24)
+			event.requestQtyOption(24, false)
 		}
 	}
 

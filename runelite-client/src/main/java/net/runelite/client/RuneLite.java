@@ -62,6 +62,7 @@ import net.runelite.client.fred.Cs2Manager;
 import net.runelite.client.discord.DiscordService;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.fred.FredMenu;
+import net.runelite.client.events.ExternalPluginsLoaded;
 import net.runelite.client.game.ClanManager;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.LootManager;
@@ -406,30 +407,27 @@ public class RuneLite
 		// Tell the plugin manager if client is outdated or not
 		pluginManager.setOutdated(isOutdated);
 
-		// Initialize UI
-		RuneLiteSplashScreen.stage(.60, "Initialize UI");
-		clientUI.init(this);
-
-		// Load the plugins, but does not start them yet.
-		// This will initialize configuration
-		pluginManager.loadCorePlugins();
-
 		// Load external plugins
 		externalPluginManager.startExternalUpdateManager();
 		externalPluginManager.startExternalPluginManager();
 
-		RuneLiteSplashScreen.stage(.75, "Finalizing configuration");
+
+		RuneLiteSplashScreen.stage(.59, "Updating external plugins");
+		externalPluginManager.update();
+
+		// Load the plugins, but does not start them yet.
+		// This will initialize configuration
+		pluginManager.loadCorePlugins();
+		externalPluginManager.loadPlugins();
+
+		// Load external plugins
+		pluginManager.loadExternalPlugins();
+
+		RuneLiteSplashScreen.stage(.76, "Finalizing configuration");
 
 		// Plugins have provided their config, so set default config
 		// to main settings
 		pluginManager.loadDefaultPluginConfiguration();
-
-
-		RuneLiteSplashScreen.stage(.77, "Updating external plugins");
-		externalPluginManager.update();
-
-		// Load external plugins
-		pluginManager.loadExternalPlugins();
 
 		// Start client session
 		RuneLiteSplashScreen.stage(.80, "Starting core interface");
@@ -438,6 +436,10 @@ public class RuneLite
 		//Set the world if specified via CLI args - will not work until clientUI.init is called
 		Optional<Integer> worldArg = Optional.ofNullable(System.getProperty("cli.world")).map(Integer::parseInt);
 		worldArg.ifPresent(this::setWorld);
+
+		// Initialize UI
+		RuneLiteSplashScreen.stage(.77, "Initialize UI");
+		clientUI.init(this);
 
 		// Initialize Discord service
 		discordService.init();
@@ -474,8 +476,8 @@ public class RuneLite
 		}
 
 		// Start plugins
-		pluginManager.startCorePlugins();
-		externalPluginManager.loadPlugins();
+		pluginManager.startPlugins();
+		eventBus.post(ExternalPluginsLoaded.class, new ExternalPluginsLoaded());
 
 		// Register additional schedulers
 		if (this.client != null)

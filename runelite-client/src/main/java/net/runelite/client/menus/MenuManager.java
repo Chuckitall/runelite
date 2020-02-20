@@ -64,6 +64,8 @@ import net.runelite.api.events.WidgetPressed;
 import net.runelite.api.util.Text;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.fred.events.SortMenusEvent;
+
 import static net.runelite.client.menus.ComparableEntries.newBaseComparableEntry;
 
 @Singleton
@@ -315,14 +317,17 @@ public class MenuManager
 			indexSwapEntries(entries, menuOptionCount);
 		}
 
-
 		if (leftClickEntry == null)
 		{
 			// stop being null smh
 			leftClickEntry = entries[menuOptionCount - 1];
 		}
-
-		client.setMenuEntries(entries);
+		SortMenusEvent sme = new SortMenusEvent(Arrays.asList(entries), leftClickEntry);
+		log.debug("before {}", sme);
+		eventBus.post(SortMenusEvent.class, sme);
+		log.debug("after {}", sme);
+		leftClickEntry = sme.getLeftClickEntry();
+		client.setMenuEntries(sme.getEntries().toArray(MenuEntry[]::new));
 	}
 
 	public void addPlayerMenuItem(String menuText)

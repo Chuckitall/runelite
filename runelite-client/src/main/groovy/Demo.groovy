@@ -2,6 +2,7 @@ import groovy.transform.CompileStatic;
 import groovy.transform.InheritConstructors
 import io.reactivex.functions.Consumer
 import net.runelite.api.MenuOpcode
+import net.runelite.api.events.PreMenuEntryAdded
 import net.runelite.api.events.ScriptCallbackEvent
 import net.runelite.api.events.MenuEntryAdded
 import net.runelite.api.events.MenuOptionClicked
@@ -175,7 +176,7 @@ class Demo extends ScriptedPlugin
 				{
 					_client.insertMenuItem(GamesNecklaceOptions[a], e.getTarget(), e.getOpcode(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
 				}
-			}//stroke / check time options for kitten should be added here.
+			}
 			else if (DigsiteNecklaceID.any {int it -> e.getIdentifier() == it})
 			{
 				for (int a = 0; a < DigsiteNecklaceOptions.length; a++)
@@ -192,12 +193,6 @@ class Demo extends ScriptedPlugin
 				_client.insertMenuItem(s, e.getTarget(), e.getOpcode(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
 			}
 		}
-		else if ((e.getOpcode() > MenuOpcode.MENU_ACTION_DEPRIORITIZE_OFFSET ? MenuOpcode.of(e.getOpcode()-MenuOpcode.MENU_ACTION_DEPRIORITIZE_OFFSET) : e.getMenuOpcode()) == MenuOpcode.NPC_FIFTH_OPTION && e.getOption().equalsIgnoreCase("Interact") && Text.standardize(e.getTarget()).equalsIgnoreCase("Kitten"))
-		{
-			_client.insertMenuItem("Guess age", e.getTarget(), MenuOpcode.NPC_FIFTH_OPTION.getId(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
-			_client.insertMenuItem("Stroke", e.getTarget(), MenuOpcode.NPC_FIFTH_OPTION.getId(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
-		}
-		//Param0=0 Param1=0 Opcode=2013 Id=28927 MenuOption=Interact MenuTarget=<col=ffff00>Kitten CanvasX=464 CanvasY=347 Authentic=true
 	}
 
 	void onMenuOptionClicked(MenuOptionClicked e)
@@ -215,11 +210,6 @@ class Demo extends ScriptedPlugin
 		{
 			targetWord = e.getOption();
 			e.setOption("Use");
-		}
-		else if (e.getMenuOpcode() == MenuOpcode.NPC_FIFTH_OPTION && (e.getOption().equalsIgnoreCase("Stroke") || e.getOption().equalsIgnoreCase("Guess age")) && Text.standardize(e.getTarget()).equalsIgnoreCase("Kitten"))
-		{
-			targetWord = e.getOption().toLowerCase();
-			e.setOption("Interact")
 		}
 		log(LogLevel.DEBUG, e.toString());
 	}

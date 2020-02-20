@@ -175,7 +175,7 @@ class Demo extends ScriptedPlugin
 				{
 					_client.insertMenuItem(GamesNecklaceOptions[a], e.getTarget(), e.getOpcode(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
 				}
-			}
+			}//stroke / check time options for kitten should be added here.
 			else if (DigsiteNecklaceID.any {int it -> e.getIdentifier() == it} )
 			{
 				for(int a = 0; a < DigsiteNecklaceOptions.length; a++)

@@ -18,12 +18,10 @@ class Alch extends ScriptedPlugin {
 		ItemID.WATER_BATTLESTAFF, ItemID.EARTH_BATTLESTAFF, ItemID.AIR_BATTLESTAFF, ItemID.FIRE_BATTLESTAFF,
 		ItemID.MAPLE_LONGBOW, ItemID.YEW_SHORTBOW, ItemID.YEW_LONGBOW
 	];
-//	Map<Integer, List<Integer>> items_to_enchant = [
-//		0: ,
-//		1: [ItemID.EMERALD_RING, ItemID.EMERALD_AMULET, ItemID.EMERALD_NECKLACE, ItemID.EMERALD_BRACELET],
-//		2: [ItemID.RUBY_RING, ItemID.RUBY_AMULET, ItemID.RUBY_NECKLACE, ItemID.RUBY_BRACELET],
-//		3: [ItemID.DIAMOND_RING, ItemID.DIAMOND_AMULET, ItemID.DIAMOND_NECKLACE, ItemID.DIAMOND_BRACELET],
-//	];
+
+	int[] items_to_superheat = [
+		ItemID.IRON_ORE
+	];
 
 	List<Tuple3<WidgetInfo, String, List<Integer>>> items_to_enchant = [
 		new Tuple3<>(WidgetInfo.SPELL_LVL_1_ENCHANT, "Lvl-1 Enchant", [ItemID.SAPPHIRE_RING, ItemID.SAPPHIRE_AMULET, ItemID.SAPPHIRE_NECKLACE, ItemID.SAPPHIRE_BRACELET]),
@@ -45,7 +43,14 @@ class Alch extends ScriptedPlugin {
 			_client.setSelectedSpellName("<col=00ff00>High Level Alchemy</col>");
 			_client.setSelectedSpellWidget(WidgetInfo.SPELL_HIGH_LEVEL_ALCHEMY.getId());
 			latch = true;
-		} else if(e.getTarget().contains("Enchant")) {
+		}
+		else if (e.getTarget().contains("Superheat"))
+		{
+			_client.setSelectedSpellName("<col=00ff00>Superheat Item</col>");
+			_client.setSelectedSpellWidget(WidgetInfo.SPELL_SUPERHEAT_ITEM.getId());
+			latch = true;
+		}
+		else if(e.getTarget().contains("Enchant")) {
 			Tuple3<WidgetInfo, String, List<Integer>> selected = items_to_enchant.stream().filter(f -> e.getTarget().contains(f.getV2())).findFirst().orElse(null);
 			if(selected != null)
 			{
@@ -58,11 +63,17 @@ class Alch extends ScriptedPlugin {
 	}
 
 	void onMenuAdded(MenuEntryAdded e) {
-		if (e.getOpcode() != MenuOpcode.ITEM_USE.getId()) {
+		if (e.getOpcode() != MenuOpcode.ITEM_USE.getId())
+		{
 			return;
 		}
-		if (items_to_alch.contains(e.getIdentifier()) || items_to_alch.contains(e.getIdentifier()-1)) {
+		if (items_to_alch.contains(e.getIdentifier()) || items_to_alch.contains(e.getIdentifier()-1))
+		{
 			_client.insertMenuItem("<col=0000ff>Cast", "<col=00ff00>High Level Alchemy</col><col=ffffff> -> <col=ff9040>${_client.getItemDefinition(e.getIdentifier()).getName()}", MenuOpcode.ITEM_USE_ON_WIDGET.getId(), e.getIdentifier(), e.param0, e.param1, false);
+		}
+		else if (items_to_superheat.contains(e.getIdentifier()))
+		{
+			_client.insertMenuItem("<col=0000ff>Cast", "<col=00ff00>Superheat Item</col><col=ffffff> -> <col=ff9040>${_client.getItemDefinition(e.getIdentifier()).getName()}", MenuOpcode.ITEM_USE_ON_WIDGET.getId(), e.getIdentifier(), e.param0, e.param1, false);
 		}
 		for (int i = 0; i < items_to_enchant.size(); i++)
 		{

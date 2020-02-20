@@ -162,37 +162,42 @@ class Demo extends ScriptedPlugin
 	{
 		if (WidgetID.INVENTORY_GROUP_ID == WidgetInfo.TO_GROUP(e.getParam1()) && e.getOpcode() == MenuOpcode.ITEM_FOURTH_OPTION.getId() && e.getOption().contains("Rub")) //check item is in inventory
 		{
-			if (RingOfDuelingID.any {int it -> e.getIdentifier() == it} )
+			if (RingOfDuelingID.any {int it -> e.getIdentifier() == it})
 			{
-				for(int a = 0; a < RingOfDuelingOptions.length; a++)
+				for (int a = 0; a < RingOfDuelingOptions.length; a++)
 				{
 					_client.insertMenuItem(RingOfDuelingOptions[a], e.getTarget(), e.getOpcode(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
 				}
 			}
-			else if (GamesNecklaceID.any {int it -> e.getIdentifier() == it} )
+			else if (GamesNecklaceID.any {int it -> e.getIdentifier() == it})
 			{
-				for(int a = 0; a < GamesNecklaceOptions.length; a++)
+				for (int a = 0; a < GamesNecklaceOptions.length; a++)
 				{
 					_client.insertMenuItem(GamesNecklaceOptions[a], e.getTarget(), e.getOpcode(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
 				}
 			}//stroke / check time options for kitten should be added here.
-			else if (DigsiteNecklaceID.any {int it -> e.getIdentifier() == it} )
+			else if (DigsiteNecklaceID.any {int it -> e.getIdentifier() == it})
 			{
-				for(int a = 0; a < DigsiteNecklaceOptions.length; a++)
+				for (int a = 0; a < DigsiteNecklaceOptions.length; a++)
 				{
 					_client.insertMenuItem(DigsiteNecklaceOptions[a], e.getTarget(), e.getOpcode(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
 				}
 			}
 		}
-		else if(e.getMenuOpcode() == MenuOpcode.GAME_OBJECT_FIRST_OPTION && e.getOption().equalsIgnoreCase("Use") && Text.standardize(e.getTarget()).equalsIgnoreCase("Magic Mushtree"))
-		{
+		else if (e.getMenuOpcode() == MenuOpcode.GAME_OBJECT_FIRST_OPTION && e.getOption().equalsIgnoreCase("Use") && Text.standardize(e.getTarget()).equalsIgnoreCase("Magic Mushtree")) {
 
 			//Param0=52 Param1=56 Opcode=3 Id=30920 MenuOption=Use MenuTarget=<col=ffff>Magic Mushtree CanvasX=461 CanvasY=278 Authentic=true
-			for(String s : MushtreeOptions)
+			for (String s : MushtreeOptions)
 			{
 				_client.insertMenuItem(s, e.getTarget(), e.getOpcode(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
 			}
 		}
+		else if ((e.getOpcode() > MenuOpcode.MENU_ACTION_DEPRIORITIZE_OFFSET ? MenuOpcode.of(e.getOpcode()-MenuOpcode.MENU_ACTION_DEPRIORITIZE_OFFSET) : e.getMenuOpcode()) == MenuOpcode.NPC_FIFTH_OPTION && e.getOption().equalsIgnoreCase("Interact") && Text.standardize(e.getTarget()).equalsIgnoreCase("Kitten"))
+		{
+			_client.insertMenuItem("Guess age", e.getTarget(), MenuOpcode.NPC_FIFTH_OPTION.getId(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
+			_client.insertMenuItem("Stroke", e.getTarget(), MenuOpcode.NPC_FIFTH_OPTION.getId(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
+		}
+		//Param0=0 Param1=0 Opcode=2013 Id=28927 MenuOption=Interact MenuTarget=<col=ffff00>Kitten CanvasX=464 CanvasY=347 Authentic=true
 	}
 
 	void onMenuOptionClicked(MenuOptionClicked e)
@@ -210,6 +215,11 @@ class Demo extends ScriptedPlugin
 		{
 			targetWord = e.getOption();
 			e.setOption("Use");
+		}
+		else if (e.getMenuOpcode() == MenuOpcode.NPC_FIFTH_OPTION && (e.getOption().equalsIgnoreCase("Stroke") || e.getOption().equalsIgnoreCase("Guess age")) && Text.standardize(e.getTarget()).equalsIgnoreCase("Kitten"))
+		{
+			targetWord = e.getOption().toLowerCase();
+			e.setOption("Interact")
 		}
 		log(LogLevel.DEBUG, e.toString());
 	}

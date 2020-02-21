@@ -322,22 +322,13 @@ public class MenuManager
 			// stop being null smh
 			leftClickEntry = entries[menuOptionCount - 1];
 		}
-		SortMenusEvent sme = new SortMenusEvent(Arrays.asList(entries), leftClickEntry);
+		SortMenusEvent sme = new SortMenusEvent(entries, leftClickEntry);
 		eventBus.post(SortMenusEvent.class, sme);
-		boolean changed = false;
-		for (int i = 0; i < entries.length && !changed; i++)
+		if(sme.isTouched())
 		{
-			if (entries[i] != sme.getEntries().get(i))
-			{
-				log.debug("Entry[{}] changed from {} to {}", i, entries[i], sme.getEntries().get(i));
-				changed = true;
-			}
-		}
-		if(changed)
-		{
-			log.debug("before {}, {}", sme.getEntries().size(), sme.getLeftClickEntry());
+			log.debug("{}, {}", sme.getEntries().length, sme.getLeftClickEntry());
 			leftClickEntry = sme.getLeftClickEntry();
-			client.setMenuEntries(sme.getEntries().toArray(MenuEntry[]::new));
+			client.setMenuEntries(sme.getEntries());
 		}
 		else
 		{

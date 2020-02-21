@@ -323,10 +323,26 @@ public class MenuManager
 			leftClickEntry = entries[menuOptionCount - 1];
 		}
 		SortMenusEvent sme = new SortMenusEvent(Arrays.asList(entries), leftClickEntry);
-		log.debug("before {}, {}",sme.getEntries().size(), sme.getLeftClickEntry());
 		eventBus.post(SortMenusEvent.class, sme);
-		leftClickEntry = sme.getLeftClickEntry();
-		client.setMenuEntries(sme.getEntries().toArray(MenuEntry[]::new));
+		boolean changed = false;
+		for (int i = 0; i < entries.length && !changed; i++)
+		{
+			if (entries[i] != sme.getEntries().get(i))
+			{
+				log.debug("Entry[{}] changed from {} to {}", i, entries[i], sme.getEntries().get(i));
+				changed = true;
+			}
+		}
+		if(changed)
+		{
+			log.debug("before {}, {}", sme.getEntries().size(), sme.getLeftClickEntry());
+			leftClickEntry = sme.getLeftClickEntry();
+			client.setMenuEntries(sme.getEntries().toArray(MenuEntry[]::new));
+		}
+		else
+		{
+			client.setMenuEntries(entries);
+		}
 	}
 
 	public void addPlayerMenuItem(String menuText)

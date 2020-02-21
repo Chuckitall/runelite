@@ -323,9 +323,8 @@ public class MenuManager
 			leftClickEntry = entries[menuOptionCount - 1];
 		}
 		SortMenusEvent sme = new SortMenusEvent(Arrays.asList(entries), leftClickEntry);
-		log.debug("before {}", sme);
+		log.debug("before {}, {}",sme.getEntries().size(), sme.getLeftClickEntry());
 		eventBus.post(SortMenusEvent.class, sme);
-		log.debug("after {}", sme);
 		leftClickEntry = sme.getLeftClickEntry();
 		client.setMenuEntries(sme.getEntries().toArray(MenuEntry[]::new));
 	}

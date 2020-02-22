@@ -4,7 +4,10 @@ import net.runelite.api.MenuOpcode
 import net.runelite.api.events.GameTick
 import net.runelite.api.events.MenuEntryAdded
 import net.runelite.api.events.MenuOptionClicked
+import net.runelite.api.events.SoundEffectPlayed
+import net.runelite.api.events.VolumeChanged
 import net.runelite.api.util.Text
+import net.runelite.client.events.ConfigChanged
 import net.runelite.client.fred.InterfaceChoice
 import net.runelite.client.fred.events.SortMenusEvent
 import net.runelite.client.plugins.groovy.debugger.DebuggerWindow.LogLevel
@@ -79,6 +82,19 @@ class Cat extends ScriptedPlugin
 		//Param0=0 Param1=0 Opcode=2013 Id=28927 MenuOption=Interact MenuTarget=<col=ffff00>Kitten CanvasX=464 CanvasY=347 Authentic=true
 	}
 
+	void onSoundEffectPlayed(SoundEffectPlayed event)
+	{
+		if(event.getSoundId() == 547 || event.getSoundId() == 550 || event.getSoundId() == 2500)
+		{
+			log(LogLevel.DEBUG, "Muting sound: " + event.getSoundId())
+			event.consume();
+		}
+		if(!event.isConsumed())
+		{
+			log(LogLevel.DEBUG, "sound effect played -> <id: " + event.getSoundId() + ", delay: " + event.getDelay() + ", npcID: " + event.getNpcid() + ", source: " + event.getSource() + ">");
+		}
+	}
+
 	void onMenuOptionClicked(MenuOptionClicked e)
 	{
 		if ((e.getOpcode() > MenuOpcode.MENU_ACTION_DEPRIORITIZE_OFFSET ? MenuOpcode.of(e.getOpcode()-MenuOpcode.MENU_ACTION_DEPRIORITIZE_OFFSET) : e.getMenuOpcode()) == MenuOpcode.NPC_FIFTH_OPTION && (e.getOption().equalsIgnoreCase("Stroke") || e.getOption().equalsIgnoreCase("Guess age")) && Text.standardize(e.getTarget()).equalsIgnoreCase("Kitten"))
@@ -100,9 +116,19 @@ class Cat extends ScriptedPlugin
 		subbed = false;
 	}
 
+	void onVolumeChanged(VolumeChanged event)
+	{
+		int volume = event.getType() == VolumeChanged.Type.AREA ? _client.getAreaSoundEffectVolume() : (event.getType() == VolumeChanged.Type.EFFECTS ? _client.getSoundEffectVolume() : _client.getMusicVolume())
+		log(LogLevel.DEBUG, "Volume " + event.getType().toString() + " changed to " + volume)
+	}
+
 	void startup()
 	{
 		_eventBus.subscribe(MenuEntryAdded.class, this, this::onMenuEntryAdded as Consumer<MenuEntryAdded>);
+		_eventBus.subscribe(SoundEffectPlayed.class, this, this::onSoundEffectPlayed as Consumer<SoundEffectPlayed>);
+		_eventBus.subscribe(VolumeChanged.class, this, this::onVolumeChanged as Consumer<VolumeChanged>);
+		log(LogLevel.DEBUG, "Sound effect volume: " + _client.getSoundEffectVolume())
+
 	}
 
 	void shutdown() {

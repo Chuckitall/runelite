@@ -147,6 +147,15 @@ class Demo extends ScriptedPlugin
 				new Tuple2<String, String>("Pay 200 coins to have your tree chopped down?", "yes."),
 				// new Tuple2<String, String>("Select an Option", "Clockwork mechanism"),
 				new Tuple2<String, String>("How many would you like to deposit?", "All"),
+				/**
+				 * Wizards Mind bombs from Fally pub
+				 */
+				//InterfaceChoice(source=DIALOG_OPTION, headerText=Select an Option, options=[What ales are you serving?, What can you tell me about dwarves and ale?], requestedOp=0)
+				new Tuple2<String, String>("Select an Option", "What ales are you serving?"),
+				new Tuple2<String, String>("Select an Option", "Can I have a Dwarven Stout?"),
+				/**
+				 * Stew from seers pub
+				 */
 				// new Tuple2<String, String>("Select an Option", "What do you have?"),
 				// new Tuple2<String, String>("Select an Option", "Could i have some stew please?"),
 				new Tuple2<String, String>("Pay one basket of oranges?", "yes."),

@@ -1430,7 +1430,7 @@ public abstract class RSClientMixin implements RSClient
 			client.getMouseCurrentButton()
 		);
 
-		PreMenuOptionClicked preMenuActionClicked = new PreMenuOptionClicked(canvasX, canvasY);
+		final PreMenuOptionClicked preMenuActionClicked = new PreMenuOptionClicked(menuOptionClicked, canvasX, canvasY);
 		client.getCallbacks().post(PreMenuOptionClicked.class, preMenuActionClicked);
 		if (preMenuActionClicked.isClaimed())
 		{

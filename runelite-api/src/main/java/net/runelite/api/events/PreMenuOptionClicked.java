@@ -43,8 +43,10 @@ public class PreMenuOptionClicked implements Event
 {
 	private int cX;
 	private int cY;
-	public PreMenuOptionClicked(int canvasX, int canvasY)
+	private MenuOptionClicked menuOptionClicked;
+	public PreMenuOptionClicked(MenuOptionClicked menuOptionClicked, int canvasX, int canvasY)
 	{
+		this.menuOptionClicked = menuOptionClicked;
 		cX = canvasX;
 		cY = canvasY;
 	}

@@ -1,21 +1,14 @@
 package net.runelite.client.fred;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Queue;
-import java.util.Stack;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import lombok.Data;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.MenuEntry;
@@ -24,28 +17,23 @@ import net.runelite.api.Point;
 import net.runelite.api.VarClientInt;
 import net.runelite.api.VarClientStr;
 import net.runelite.api.Varbits;
-import net.runelite.api.events.BeforeRender;
+import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.PreMenuOptionClicked;
-import net.runelite.api.events.ScriptCallbackEvent;
-import net.runelite.api.events.WidgetHiddenChanged;
-import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.util.Text;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.fred.events.BankQtyInput;
-import net.runelite.client.plugins.Plugin;
+import net.runelite.client.menus.AbstractComparableEntry;
 import net.runelite.client.plugins.fred.api.other.Tuples;
 import net.runelite.client.plugins.fred.api.other.Tuples.T2;
-import net.runelite.http.api.worlds.World;
 
-@Singleton
 @Slf4j
+@Singleton
 public class FredMenu
 {
 	private final Client client;
@@ -55,8 +43,10 @@ public class FredMenu
 	//Used to manage custom non-player menu options
 	private final ExecutorService executor;
 
+	private boolean processClicks = true;
+
 	@Inject
-	private FredMenu(Client client, ClientThread clientThread, EventBus eventBus)
+	FredMenu(Client client, ClientThread clientThread, EventBus eventBus)
 	{
 		this.client = client;
 		this.clientThread = clientThread;
@@ -82,13 +72,23 @@ public class FredMenu
 
 	private final HashMap<Integer, _Request[]> cachedRequests = new HashMap<>();
 	private boolean latch = false;
-	private boolean latch2 = false;
 	private int qty = -1;
+
+	void doProcessClick()
+	{
+		if (menuEntriesQueue.size() > 0)
+		{
+			executor.submit(() -> click(menuEntriesQueue.peek().get_1()));
+			if (menuEntriesQueue.peek().get_2().getOption().equalsIgnoreCase("Withdraw-X"))
+			{
+				processClicks = false;
+			}
+		}
+	}
 
 	private void onTick(GameTick e)
 	{
 		latch = true;
-		latch2 = true;
 
 		Widget widget = client.getWidget(162, 45);
 		if (widget != null && !widget.isHidden())
@@ -101,12 +101,13 @@ public class FredMenu
 				clientThread.invoke(() -> this.client.runScript(681, null));
 				clientThread.invoke(() -> this.client.runScript(299, 0, 0));
 				this.qty = 0;
+				processClicks = true;
 			}
 		}
-		//log.debug("queue: {}", menuEntriesQueue.size());
-		if (menuEntriesQueue.size() > 0)
+
+		if (processClicks)
 		{
-			executor.submit(() -> click(menuEntriesQueue.peek().get_1()));
+			doProcessClick();
 		}
 	}
 
@@ -212,17 +213,19 @@ public class FredMenu
 				if (noted_temp > -1 && qty_temp > 0)
 				{
 					qty = qty_temp;
-					event.setOption("Withdraw-X");
-					event.setIdentifier(6);
-					event.setOpcode(MenuOpcode.CC_OP_LOW_PRIORITY.getId());
-					event.setParam1(bankContainer.getId());
+					MenuEntry withX = new MenuEntry("Withdraw-X", event.getTarget(), 6, MenuOpcode.CC_OP_LOW_PRIORITY.getId(), event.getParam0(), bankContainer.getId(), false);
 					log.debug("Here");
 					if (client.getVar(Varbits.BANK_NOTE_FLAG) != noted_temp)
 					{
-						menuEntriesQueue.add(Tuples.of(owner.getBounds(), new MenuEntry(event.getOption(), event.getTarget(), event.getIdentifier(), event.getOpcode(), event.getParam0(), event.getParam1(), false)));
-						event.setMenuEntry(new MenuEntry(noted_temp == 0 ? "Item" : "Note", "", 1, 57, -1, noted_temp == 0 ? 786452 : 786454, false));
+						menuEntriesQueue.add(Tuples.of(client.getWidget(noted_temp == 0 ? 786452 : 786454).getBounds(), new MenuEntry(noted_temp == 0 ? "Item" : "Note", "", 1, 57, -1, noted_temp == 0 ? 786452 : 786454, false)));
+						menuEntriesQueue.add(Tuples.of(owner.getBounds(), withX));
 						menuEntriesQueue.add(Tuples.of(client.getWidget(noted_temp == 0 ? 786454 : 786452).getBounds(), new MenuEntry(noted_temp == 0 ? "Note" : "Item", "", 1, 57, -1, noted_temp == 0 ? 786454 : 786452, false)));
 					}
+					else
+					{
+						menuEntriesQueue.add(Tuples.of(owner.getBounds(), withX));
+					}
+					event.consume();
 				}
 			}
 		}

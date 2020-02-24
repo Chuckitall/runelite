@@ -10,7 +10,6 @@ import net.runelite.api.util.Text
 import net.runelite.api.widgets.WidgetID
 import net.runelite.api.widgets.WidgetInfo
 import net.runelite.client.fred.events.InterfaceChoice
-import net.runelite.client.fred.events.MushroomTeleEvent
 import net.runelite.client.plugins.groovy.debugger.DebuggerWindow.LogLevel
 import net.runelite.client.plugins.groovy.script.ScriptedPlugin
 
@@ -260,34 +259,34 @@ class Demo extends ScriptedPlugin
 			case "ChatboxMultiBuilt":
 			{
 				int[] ops = copyIntsFromStack(4);
-				String debugMsg = "291Callback: " + Arrays.toString(ops)
+				String debugMsg = "ChatboxMultiBuilt: " + Arrays.toString(ops)
 				log(LogLevel.DEBUG, debugMsg);
 				break;
 			}
 		}
 	}
 
-	void onMushroomTeleEvent(MushroomTeleEvent event)
-	{
-		log(LogLevel.DEBUG, event.toString());
-		for(int i = 0; i < event.getOptions().length; i++)
-		{
-			if(event.getOptions()[i].equalsIgnoreCase(targetWord))
-			{
-				event.requestOption(i);
-				targetWord = "";
-			}
-		}
-//		event.requestOption();
+//	void onMushroomTeleEvent(MushroomTeleEvent event)
+//	{
 //		log(LogLevel.DEBUG, event.toString());
-	}
+//		for(int i = 0; i < event.getOptions().length; i++)
+//		{
+//			if(event.getOptions()[i].equalsIgnoreCase(targetWord))
+//			{
+//				event.requestOption(i);
+//				targetWord = "";
+//			}
+//		}
+////		event.requestOption();
+////		log(LogLevel.DEBUG, event.toString());
+//	}
 
 	void startup()
 	{
 		_eventBus.subscribe(InterfaceChoice.class, this, this.&onInterfaceChoice as Consumer<InterfaceChoice>)
 		_eventBus.subscribe(ScriptCallbackEvent.class, this, this.&onScriptCallbackEvent as Consumer<ScriptCallbackEvent>)
 		_eventBus.subscribe(MenuOptionClicked.class, this, this::onMenuOptionClicked as Consumer<MenuOptionClicked>);
-		_eventBus.subscribe(MushroomTeleEvent.class, this, this::onMushroomTeleEvent as Consumer<MushroomTeleEvent>);
+//		_eventBus.subscribe(MushroomTeleEvent.class, this, this::onMushroomTeleEvent as Consumer<MushroomTeleEvent>);
 		_eventBus.subscribe(MenuEntryAdded.class, this, this::onMenuEntryAdded as Consumer<MenuEntryAdded>);
 	}
 

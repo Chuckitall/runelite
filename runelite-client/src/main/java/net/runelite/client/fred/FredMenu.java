@@ -108,11 +108,6 @@ public class FredMenu
 		{
 			executor.submit(() -> click(menuEntriesQueue.peek().get_1()));
 		}
-//		else if(latched != null)
-//		{
-//			click(latched.getBounds());
-//			latched = null;
-//		}
 	}
 
 	private void onMenuEntryAdded(MenuEntryAdded event)
@@ -232,13 +227,6 @@ public class FredMenu
 			}
 		}
 	}
-
-//	private void dispatch(MenuEntry entry)
-//	{
-//		clientThread.invoke(() -> client.invokeHiddenMenuAction(
-//			entry.getParam0(), entry.getParam1(), entry.getOpcode(), entry.getIdentifier(), entry.getOption(), entry.getTarget(), 0, 0
-//		));
-//	}
 
 	/**
 	 * This method must be called on a new

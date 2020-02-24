@@ -9,7 +9,7 @@ import net.runelite.api.events.MenuOptionClicked
 import net.runelite.api.util.Text
 import net.runelite.api.widgets.WidgetID
 import net.runelite.api.widgets.WidgetInfo
-import net.runelite.client.fred.InterfaceChoice
+import net.runelite.client.fred.events.InterfaceChoice
 import net.runelite.client.fred.events.MushroomTeleEvent
 import net.runelite.client.plugins.groovy.debugger.DebuggerWindow.LogLevel
 import net.runelite.client.plugins.groovy.script.ScriptedPlugin

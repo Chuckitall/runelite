@@ -24,6 +24,8 @@
  */
 package net.runelite.api.widgets;
 
+import net.runelite.api.widgets.WidgetID.FossilMushroomTeleport;
+
 /**
  * Represents a group-child {@link Widget} relationship.
  * <p>
@@ -562,6 +564,11 @@ public enum WidgetInfo
 	WORLD_SWITCHER_LIST(WidgetID.WORLD_SWITCHER_GROUP_ID, WidgetID.WorldSwitcher.WORLD_LIST),
 
 	FOSSIL_ISLAND_OXYGENBAR(WidgetID.FOSSIL_ISLAND_OXYGENBAR_ID, WidgetID.FossilOxygen.FOSSIL_ISLAND_OXYGEN_BAR),
+	FOSSIL_MUSHROOM_TELEPORT(WidgetID.FOSSIL_ISLAND_MUSHROOM_TELE_GROUP_ID, FossilMushroomTeleport.ROOT),
+	FOSSIL_MUSHROOM_HOUSE(WidgetID.FOSSIL_ISLAND_MUSHROOM_TELE_GROUP_ID, FossilMushroomTeleport.HOUSE_ON_HILL),
+	FOSSIL_MUSHROOM_VALLEY(WidgetID.FOSSIL_ISLAND_MUSHROOM_TELE_GROUP_ID, FossilMushroomTeleport.VERDANT_VALLEY),
+	FOSSIL_MUSHROOM_SWAMP(WidgetID.FOSSIL_ISLAND_MUSHROOM_TELE_GROUP_ID, FossilMushroomTeleport.SWAMP),
+	FOSSIL_MUSHROOM_MEADOW(WidgetID.FOSSIL_ISLAND_MUSHROOM_TELE_GROUP_ID, FossilMushroomTeleport.MUSHROOM_MEADOW),
 
 	MINIGAME_TELEPORT_BUTTON(WidgetID.MINIGAME_TAB_ID, WidgetID.Minigames.TELEPORT_BUTTON),
 

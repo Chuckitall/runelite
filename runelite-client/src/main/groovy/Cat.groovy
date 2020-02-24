@@ -8,7 +8,7 @@ import net.runelite.api.events.SoundEffectPlayed
 import net.runelite.api.events.VolumeChanged
 import net.runelite.api.util.Text
 import net.runelite.client.events.ConfigChanged
-import net.runelite.client.fred.InterfaceChoice
+import net.runelite.client.fred.events.InterfaceChoice
 import net.runelite.client.fred.events.SortMenusEvent
 import net.runelite.client.plugins.groovy.debugger.DebuggerWindow.LogLevel
 import net.runelite.client.plugins.groovy.script.ScriptedPlugin

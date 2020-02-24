@@ -1,4 +1,4 @@
-package net.runelite.client.fred;
+package net.runelite.client.fred.events;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

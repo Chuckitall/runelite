@@ -27,7 +27,7 @@ object ProjectVersions {
     const val launcherVersion = "2.0.4"
     const val rlVersion = "1.6.7"
 
-    const val openosrsVersion = "3.0.4"
+    const val openosrsVersion = "3.0.5"
 
     const val rsversion = 188
     const val cacheversion = 165
@@ -103,7 +103,6 @@ object Libraries {
     const val apacheCommonsCompress = "org.apache.commons:commons-compress:${Versions.apacheCommonsCompress}"
     const val apacheCommonsCsv = "org.apache.commons:commons-csv:${Versions.apacheCommonsCsv}"
     const val apacheCommonsText = "org.apache.commons:commons-text:${Versions.apacheCommonsText}"
-    const val apacheCommonsLang = "org.apache.commons:commons-lang3:${Versions.apacheCommonsLang}"
     const val asmAll = "org.ow2.asm:asm:${Versions.asm}"
     const val asmUtil = "org.ow2.asm:asm-util:${Versions.asm}"
     const val commonsCli = "commons-cli:commons-cli:${Versions.commonsCli}"

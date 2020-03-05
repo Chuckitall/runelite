@@ -66,6 +66,7 @@ dependencies {
     implementation(Libraries.jooqCodegen)
     implementation(Libraries.jooqMeta)
     implementation(Libraries.sentry)
+    implementation(Libraries.semver)
     implementation(Libraries.slf4jApi)
     implementation(Libraries.pf4j) {
         exclude(group = "org.slf4j")
@@ -111,16 +112,8 @@ fun formatDate(date: Date?) = with(date ?: Date()) {
     SimpleDateFormat("MM-dd-yyyy").format(this)
 }
 
-fun launcherVersion(): String {
-    if (project.hasProperty("releaseBuild")) {
-        return ProjectVersions.launcherVersion
-    }
-    return "-1"
-}
-
 fun pluginPath(): String {
     if (project.hasProperty("pluginPath")) {
-        print(project.property("pluginPath").toString())
         return project.property("pluginPath").toString()
     }
     return ""
@@ -141,7 +134,6 @@ tasks {
                 "rs.version" to ProjectVersions.rsversion.toString(),
                 "open.osrs.version" to ProjectVersions.openosrsVersion,
                 "open.osrs.builddate" to formatDate(Date()),
-                "launcher.version" to launcherVersion(),
                 "plugin.path" to pluginPath()
         )
 

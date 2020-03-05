@@ -87,6 +87,7 @@ import net.runelite.client.ui.overlay.arrow.ArrowWorldOverlay;
 import net.runelite.client.ui.overlay.infobox.InfoBoxOverlay;
 import net.runelite.client.ui.overlay.tooltip.TooltipOverlay;
 import net.runelite.client.ui.overlay.worldmap.WorldMapOverlay;
+import net.runelite.client.util.AppLock;
 import net.runelite.client.util.WorldUtil;
 import net.runelite.client.ws.PartyService;
 import net.runelite.http.api.worlds.World;
@@ -219,6 +220,9 @@ public class RuneLite
 
 	@Inject
 	private Scheduler scheduler;
+
+	@Inject
+	private AppLock appLock;
 
 	public static void main(String[] args) throws Exception
 	{
@@ -411,9 +415,11 @@ public class RuneLite
 		externalPluginManager.startExternalUpdateManager();
 		externalPluginManager.startExternalPluginManager();
 
-
-		RuneLiteSplashScreen.stage(.59, "Updating external plugins");
-		externalPluginManager.update();
+		if (appLock.lock(this.getClass().getName()))
+		{
+			RuneLiteSplashScreen.stage(.59, "Updating external plugins");
+			externalPluginManager.update();
+		}
 
 		// Load the plugins, but does not start them yet.
 		// This will initialize configuration
@@ -535,5 +541,6 @@ public class RuneLite
 		configManager.sendConfig();
 		clientSessionManager.shutdown();
 		discordService.close();
+		appLock.release();
 	}
 }

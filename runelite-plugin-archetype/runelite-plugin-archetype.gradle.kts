@@ -24,3 +24,9 @@
  */
 
 description = "RuneLite Plugin Archetype"
+
+tasks {
+    withType<Jar> {
+        archiveBaseName.set("openosrs-plugin-archtype")
+    }
+}

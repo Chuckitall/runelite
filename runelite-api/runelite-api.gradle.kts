@@ -37,3 +37,9 @@ dependencies {
 
     testImplementation(Libraries.junit)
 }
+
+tasks {
+    withType<Jar> {
+        archiveBaseName.set("openosrs-runelite-api")
+    }
+}

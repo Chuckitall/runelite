@@ -114,6 +114,10 @@ fun pluginPath(): String {
 }
 
 tasks {
+    withType<Jar> {
+        archiveBaseName.set("openosrs-client")
+    }
+
     build {
         finalizedBy("shadowJar")
     }

@@ -24,3 +24,9 @@
  */
 description = "Injection/Mapping annotations"
 version = "1.0"
+
+tasks {
+    withType<Jar> {
+        archiveBaseName.set("openosrs-injection-annotations")
+    }
+}

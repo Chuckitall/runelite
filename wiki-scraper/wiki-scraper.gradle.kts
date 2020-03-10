@@ -44,6 +44,10 @@ dependencies {
 }
 
 tasks {
+    withType<Jar> {
+        archiveBaseName.set("openosrs-wiki-scraper")
+    }
+
     register<JavaExec>("npcStatsScrape") {
         group = "openosrs"
 

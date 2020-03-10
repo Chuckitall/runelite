@@ -35,6 +35,10 @@ dependencies {
 }
 
 tasks {
+    withType<Jar> {
+        archiveBaseName.set("openosrs-runescape-client")
+    }
+
     java {
         // Needs 1.8 because of lambdas in reflection
         sourceCompatibility = JavaVersion.VERSION_1_8

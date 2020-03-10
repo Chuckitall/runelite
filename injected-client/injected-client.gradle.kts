@@ -71,6 +71,10 @@ sourceSets {
 
 // keep the sourcesets etc but remove useless tasks
 tasks {
+    withType<Jar> {
+        archiveBaseName.set("openosrs-injected-client")
+    }
+
     inject {
         dependsOn(configurations["combined"])
     }

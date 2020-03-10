@@ -38,6 +38,10 @@ dependencies {
 }
 
 tasks {
+    withType<Jar> {
+        archiveBaseName.set("openosrs-script-assembler-plugin")
+    }
+
     register<JavaExec>("assembleMojo") {
         classpath = project.sourceSets.main.get().runtimeClasspath
         main = "net.runelite.script.AssembleMojo"

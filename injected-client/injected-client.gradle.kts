@@ -77,6 +77,7 @@ tasks {
 
     inject {
         dependsOn(configurations["combined"])
+        output.set(project.file("${project.buildDir}/libs/openosrs-injected-client-${project.version}.jar"))
     }
     classes {
         enabled = false

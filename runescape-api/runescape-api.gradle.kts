@@ -30,3 +30,9 @@ dependencies {
     api(project(":runelite-api"))
     api(project(":injection-annotations"))
 }
+
+tasks {
+    withType<Jar> {
+        archiveBaseName.set("openosrs-runescape-api")
+    }
+}

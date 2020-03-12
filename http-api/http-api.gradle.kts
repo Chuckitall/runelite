@@ -47,6 +47,10 @@ dependencies {
 }
 
 tasks {
+    withType<Jar> {
+        archiveBaseName.set("openosrs-http-api")
+    }
+
     processResources {
         finalizedBy("filterResources")
     }

@@ -1,6 +1,8 @@
 package net.runelite.client.plugins.fred.api.lua.library.craftingInterface;
 
-
+import com.google.inject.Inject;
+import java.util.Optional;
+import net.runelite.api.Client;
 import net.runelite.api.QueryResults;
 import net.runelite.api.queries.DialogQuery;
 import net.runelite.api.widgets.WidgetItem;

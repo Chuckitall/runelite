@@ -77,7 +77,6 @@ import org.apache.commons.lang3.StringUtils;
 public class ConfigManager
 {
 	private static final String STANDARD_SETTINGS_FILE_NAME = "settings.properties";
-	private static final File SETTINGS_FILE = new File(RuneLite.LOCAL_DIR, STANDARD_SETTINGS_FILE_NAME);
 	private static final File STANDARD_SETTINGS_FILE = new File(RuneLite.RUNELITE_DIR, STANDARD_SETTINGS_FILE_NAME);
 	private final ConfigInvocationHandler handler = new ConfigInvocationHandler(this);
 	private final Properties properties = new Properties();

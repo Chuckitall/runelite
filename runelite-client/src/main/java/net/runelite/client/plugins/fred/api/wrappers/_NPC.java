@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.fred.api.wrappers;
 
+import com.google.inject.Inject;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

@@ -119,6 +119,8 @@ public class RuneLite
 	@Getter
 	private static Injector injector;
 
+	private static Client _client;
+
 	@Inject
 	public DiscordService discordService;
 
@@ -372,6 +374,7 @@ public class RuneLite
 		{
 			// Inject members into client
 			injector.injectMembers(client);
+			_client = client;
 		}
 
 		// Load user configuration
@@ -470,6 +473,11 @@ public class RuneLite
 		RuneLiteSplashScreen.close();
 
 		clientUI.show();
+	}
+
+	public static Optional<Client> getClient()
+	{
+		return Optional.ofNullable(_client);
 	}
 
 	private void setWorld(int cliWorld)

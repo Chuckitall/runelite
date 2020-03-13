@@ -116,11 +116,6 @@ public class RuneLite
 	public static final Locale SYSTEM_LOCALE = Locale.getDefault();
 	public static boolean allowPrivateServer = false;
 
-	public static final File LOCAL_ROOT = new File(RUNELITE_DIR, "local");
-	public static File LOCAL_DIR = null;
-	public static String password = "";
-	public static String local_profile = null;
-
 	@Getter
 	private static Injector injector;
 
@@ -214,12 +209,6 @@ public class RuneLite
 	@Nullable
 	private Client client;
 
-	private static Client _client;
-	public static Optional<Client> getClient()
-	{
-		return Optional.ofNullable(_client);
-	}
-
 	@Inject
 	private Provider<ModelOutlineRenderer> modelOutlineRenderer;
 
@@ -247,19 +236,6 @@ public class RuneLite
 			.withRequiredArg()
 			.withValuesConvertedBy(new ConfigFileConverter())
 			.defaultsTo(DEFAULT_CONFIG_FILE);
-
-
-		final ArgumentAcceptingOptionSpec<String> localOption = parser
-			.accepts("local", "Local Folder to use")
-			.withRequiredArg()
-			.ofType(String.class)
-			.defaultsTo("000");
-
-		final ArgumentAcceptingOptionSpec<String> accountPasswordOption = parser
-			.accepts("pass", "Password to unlock profiles")
-			.withRequiredArg()
-			.ofType(String.class)
-			.defaultsTo("");
 
 		final ArgumentAcceptingOptionSpec<ClientUpdateCheckMode> updateMode = parser
 			.accepts("rs", "Select client type")
@@ -368,12 +344,6 @@ public class RuneLite
 
 		PROFILES_DIR.mkdirs();
 
-
-		password = options.valueOf(accountPasswordOption);
-		local_profile = options.valueOf(localOption);
-		LOCAL_DIR = new File(LOCAL_ROOT, local_profile);
-		LOCAL_DIR.mkdirs();
-
 		final long start = System.currentTimeMillis();
 
 		injector = Guice.createInjector(new RuneLiteModule(
@@ -402,11 +372,6 @@ public class RuneLite
 		{
 			// Inject members into client
 			injector.injectMembers(client);
-		}
-
-		if (RuneLite._client == null)
-		{
-			RuneLite._client = client;
 		}
 
 		// Load user configuration

@@ -291,11 +291,6 @@ public enum Varbits
 	TITHE_FARM_POINTS(4893),
 
 	/**
-	 * Artifact Stealing
-	 */
-	ARTIFACT_STATE(4903),
-
-	/**
 	 * Blast Mine
 	 */
 	BLAST_MINE_COAL(4924),
@@ -410,6 +405,15 @@ public enum Varbits
 	 */
 	KINGDOM_FAVOR(72),
 	KINGDOM_COFFER(74),
+	KINGDOM_WORKERS_WOOD(81),
+	KINGDOM_WORKERS_HERBS(82),
+	KINGDOM_WORKERS_FISHING(83),
+	KINGDOM_WORKERS_MINING(84),
+	KINGDOM_WORKERS_FISH_COOKED_BUTTON(135), // 0 - Raw, 1 - Cooked
+	KINGDOM_WORKERS_HARDWOOD(2131),
+	KINGDOM_WORKERS_FARM(2132),
+	KINGDOM_WORKERS_HARDWOOD_BUTTON(2133), // 0 - Mahogany, 1 - Teak, 2 - Both
+	KINGDOM_WORKERS_HERBS_BUTTON(2134), // 0 - Herbs, 1 - Flax
 
 	/**
 	 * The Hand in the Sand quest status
@@ -529,12 +533,6 @@ public enum Varbits
 	 * 3 = arrceus
 	 **/
 	SPELLBOOK(4070),
-
-	/**
-	 * Bank settings/flags
-	 **/
-	BANK_NOTE_FLAG(3958),
-
 
 	/**
 	 * Amount of items in each bank tab

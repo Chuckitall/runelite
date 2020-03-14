@@ -31,11 +31,11 @@
 	</appender>
 
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${user.home}/.runeliteplus/logs/client.log</file>
+		<file>${user.home}/.runelite/logs/client.log</file>
 
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!-- daily rollover -->
-			<fileNamePattern>${user.home}/.runeliteplus/logs/client_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<fileNamePattern>${user.home}/.runelite/logs/client_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
 
 			<!-- when file size is larger than defined, roll to new file -->
 			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
@@ -51,9 +51,21 @@
 		</encoder>
 	</appender>
 
+	<!-- Configure the Sentry appender, overriding the logging threshold to the WARN level -->
+	<appender name="Sentry" class="io.sentry.logback.SentryAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>ERROR</level>
+		</filter>
+		<!-- Optionally add an encoder -->
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
 	<root level="INFO">
 		<appender-ref ref="STDOUT"/>
 		<appender-ref ref="FILE"/>
+		<appender-ref ref="Sentry" />
 	</root>
 
 	<logger name="org.pf4j.AbstractPluginManager" level="OFF"/>

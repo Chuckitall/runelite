@@ -41,6 +41,8 @@ dependencies {
     annotationProcessor(Libraries.lombok)
     annotationProcessor(Libraries.pf4j)
 
+    api(project(":runelite-api"))
+
     compileOnly(Libraries.javax)
     compileOnly(Libraries.lombok)
     compileOnly(Libraries.orangeExtensions)
@@ -73,9 +75,6 @@ dependencies {
     }
     implementation(Libraries.pf4jUpdate)
     implementation(project(":http-api"))
-    implementation(project(":runelite-api"))
-    implementation(Libraries.naturalMouse)
-//  implementation(Libraries.apacheCommonsLang)
     implementation(Libraries.luaJ)
     implementation(Libraries.groovy)
     implementation(Libraries.fifesoft_rsyntaxtextarea)
@@ -120,10 +119,6 @@ fun pluginPath(): String {
 }
 
 tasks {
-    withType<Jar> {
-        archiveBaseName.set("openosrs-client")
-    }
-
     build {
         finalizedBy("shadowJar")
     }
@@ -145,6 +140,7 @@ tasks {
 
         from("src/main/resources") {
             include("open.osrs.properties")
+            include("sentry.properties")
         }
         into("${buildDir}/resources/main")
 

@@ -58,7 +58,7 @@ fun isNonStable(version: String): Boolean {
 
 allprojects {
     group = "com.openosrs"
-    version = ProjectVersions.rlVersion
+    version = ProjectVersions.openosrsVersion
     apply<MavenPublishPlugin>()
 }
 
@@ -67,8 +67,8 @@ subprojects {
         if (System.getenv("JITPACK") != null)
             mavenLocal()
         jcenter()
-        maven(url = "https://mvnrepository.com/artifact")
         maven(url = "https://jitpack.io")
+        maven(url = "https://mvnrepository.com/artifact")
 
         exclusiveContent {
             forRepository {
@@ -90,6 +90,7 @@ subprojects {
             }
             filter {
                 includeModule("net.runelite", "fernflower")
+                includeModule("com.openosrs.rxrelay3", "rxrelay")
             }
         }
     }
@@ -155,6 +156,7 @@ tasks {
             this.args((project.property("arg") as String).split(","))
         }
         group = "openosrs"
+
         classpath = project(":runelite-client").sourceSets.main.get().runtimeClasspath
     }
 

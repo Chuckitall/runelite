@@ -30,10 +30,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import io.reactivex.Completable;
-import io.reactivex.schedulers.Schedulers;
-import io.sentry.Sentry;
-import io.sentry.SentryClient;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
@@ -62,6 +60,7 @@ import net.runelite.client.callback.Hooks;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.CommandManager;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.config.OpenOSRSConfig;
 import net.runelite.client.discord.DiscordService;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.fred.FredManager;
@@ -126,6 +125,7 @@ public class RuneLite
 
 	@Inject
 	private WorldService worldService;
+
 	@Inject
 	private PluginManager pluginManager;
 
@@ -210,6 +210,9 @@ public class RuneLite
 	@Inject
 	@Nullable
 	private Client client;
+
+	@Inject
+	private OpenOSRSConfig openOSRSConfig;
 
 	@Inject
 	private Provider<ModelOutlineRenderer> modelOutlineRenderer;
@@ -315,9 +318,6 @@ public class RuneLite
 			System.setProperty("cli.world", String.valueOf(world));
 		}
 
-		SentryClient client = Sentry.init("https://fa31d674e44247fa93966c69a903770f@sentry.io/1811856");
-		client.setRelease(RuneLiteProperties.getPlusVersion());
-
 		final ClientLoader clientLoader = new ClientLoader(options.valueOf(updateMode));
 		Completable.fromAction(clientLoader::get)
 			.subscribeOn(Schedulers.computation())
@@ -377,6 +377,12 @@ public class RuneLite
 			_client = client;
 		}
 
+		if (RuneLiteProperties.getLauncherVersion() == null || !openOSRSConfig.shareLogs())
+		{
+			final Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+			logger.detachAppender("Sentry");
+		}
+
 		// Load user configuration
 		RuneLiteSplashScreen.stage(.57, "Loading user config");
 		configManager.load();
@@ -413,7 +419,7 @@ public class RuneLite
 		pluginManager.loadDefaultPluginConfiguration();
 
 		// Start client session
-		RuneLiteSplashScreen.stage(.80, "Starting core interface");
+		RuneLiteSplashScreen.stage(.77, "Starting core interface");
 		clientSessionManager.start();
 
 		//Set the world if specified via CLI args - will not work until clientUI.init is called
@@ -421,7 +427,7 @@ public class RuneLite
 		worldArg.ifPresent(this::setWorld);
 
 		// Initialize UI
-		RuneLiteSplashScreen.stage(.77, "Initialize UI");
+		RuneLiteSplashScreen.stage(.80, "Initialize UI");
 		clientUI.init(this);
 
 		// Initialize Discord service

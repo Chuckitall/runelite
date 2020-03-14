@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Adam <Adam@sigterm.info>
+ * Copyright (c) 2018, Shingyx <https://github.com/Shingyx>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,47 +22,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.util;
+package net.runelite.client.ui.components;
 
-import io.reactivex.rxjava3.annotations.NonNull;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.api.events.Event;
-import net.runelite.client.eventbus.EventBus;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import javax.swing.JPopupMenu;
 
-@Singleton
-public class DeferredEventBus extends EventBus
+/**
+ * Represents a UI component which has a popup menu, to be used on child components inside DragAndDropReorderPane.
+ * This is because using setComponentPopupMenu consumes the MouseEvents required for drag and drop reordering.
+ */
+public interface PopupMenuOwner
 {
-	private final EventBus eventBus;
-	private final Queue<Pair<Class, Event>> pendingEvents = new ConcurrentLinkedQueue<>();
-
-	@Inject
-	private DeferredEventBus(EventBus eventBus)
-	{
-		this.eventBus = eventBus;
-	}
-
-	@Override
-	public <T extends Event> void post(Class<? extends T> eventClass, @NonNull T event)
-	{
-		pendingEvents.add(new ImmutablePair<>(eventClass, event));
-	}
-
-	@SuppressWarnings("unchecked")
-	public void replay()
-	{
-		int size = pendingEvents.size();
-		while (size-- > 0)
-		{
-			Pair<Class, Event> eventPair = pendingEvents.poll();
-			if (eventPair != null)
-			{
-				eventBus.post(eventPair.getKey(), eventPair.getValue());
-			}
-		}
-	}
+	JPopupMenu getPopupMenu();
 }

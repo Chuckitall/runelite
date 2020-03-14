@@ -78,7 +78,7 @@ object Libraries {
         const val junit = "4.13"
         const val jupiter = "5.6.0-M1"
         const val logback = "1.2.3"
-        const val lombok = "1.18.10"
+        const val lombok = "1.18.12"
         const val mavenPluginAnnotations = "3.6.0"
         const val mavenPluginApi = "3.6.3"
         const val mockito = "3.2.4"

@@ -75,6 +75,7 @@ dependencies {
     }
     implementation(Libraries.pf4jUpdate)
     implementation(project(":http-api"))
+    implementation(Libraries.naturalMouse)
     implementation(Libraries.luaJ)
     implementation(Libraries.groovy)
     implementation(Libraries.fifesoft_rsyntaxtextarea)

@@ -1,8 +1,9 @@
 import groovy.transform.CompileStatic;
 import groovy.transform.InheritConstructors
-import io.reactivex.functions.Consumer
+import io.reactivex.rxjava3.functions.Consumer;
 import net.runelite.api.ItemID
 import net.runelite.api.MenuOpcode
+import net.runelite.api.events.Event
 import net.runelite.api.events.MenuEntryAdded
 import net.runelite.api.events.MenuOptionClicked
 import net.runelite.api.events.ScriptCallbackEvent;

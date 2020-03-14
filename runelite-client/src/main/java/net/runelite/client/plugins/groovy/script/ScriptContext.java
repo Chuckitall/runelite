@@ -1,11 +1,8 @@
 package net.runelite.client.plugins.groovy.script;
 
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Consumer;
 import lombok.AccessLevel;
 import lombok.Getter;
 import net.runelite.api.Client;
-import net.runelite.api.events.Event;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.menus.MenuManager;

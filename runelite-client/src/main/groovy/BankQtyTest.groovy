@@ -1,5 +1,5 @@
 import groovy.transform.InheritConstructors
-import io.reactivex.functions.Consumer
+import io.reactivex.rxjava3.functions.Consumer;
 import net.runelite.api.ItemID
 import net.runelite.api.Varbits
 import net.runelite.client.fred.events.BankQtyInput

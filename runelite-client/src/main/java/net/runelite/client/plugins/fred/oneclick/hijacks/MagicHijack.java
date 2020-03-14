@@ -1,10 +1,10 @@
 package net.runelite.client.plugins.fred.oneclick.hijacks;
 
 import com.google.common.collect.ImmutableSet;
-import io.reactivex.annotations.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import javax.inject.Singleton;
 import lombok.Builder;
 import lombok.Data;

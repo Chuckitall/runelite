@@ -10,8 +10,9 @@ import net.runelite.client.plugins.groovy.script.ScriptedPlugin;
 @InheritConstructors
 class BattleStaffs extends ScriptedPlugin {
 	void onMenuOptionClicked(MenuOptionClicked e) {
-		if (e.getOption().equalsIgnoreCase("<col=0000ff>Cast")) {
+		if (e.getOption().equalsIgnoreCase("<col=0000ff>Cast") && e.getTarget().containsIgnoreCase("<col=00ff00>Charge Earth Orb</col>")) {
 			e.setOption("Cast");
+			_client.setSelectedSpellChildIndex(-1);
 			_client.setSelectedSpellName("<col=00ff00>Charge Earth Orb</col>");
 			_client.setSelectedSpellWidget(WidgetInfo.SPELL_CHARGE_EARTH_ORB.getId());
 			log(LogLevel.TRACE, "Clicked menu\n\t$e");
@@ -24,7 +25,7 @@ class BattleStaffs extends ScriptedPlugin {
 		}
 		if (Text.standardize(e.getTarget()).equalsIgnoreCase("obelisk of earth") && e.getOpcode() == 1002) {
 //			log(LogLevel.INFO, "Added Menu after seeing\n\t$e");
-			_client.insertMenuItem("<col=0000ff>Cast", "<col=00ff00>Charge Earth Orb</col><col=ffffff> -> <col=ffff>Obelisk of Eartg", MenuOpcode.SPELL_CAST_ON_GAME_OBJECT.getId(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
+			_client.insertMenuItem("<col=0000ff>Cast", "<col=00ff00>Charge Earth Orb</col><col=ffffff> -> <col=ffff>Obelisk of Earth", MenuOpcode.SPELL_CAST_ON_GAME_OBJECT.getId(), e.getIdentifier(), e.getParam0(), e.getParam1(), false);
 		}
 	}
 

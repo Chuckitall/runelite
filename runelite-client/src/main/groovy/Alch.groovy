@@ -34,33 +34,49 @@ class Alch extends ScriptedPlugin {
 	boolean latch = false;
 
 	void onMenuClicked(MenuOptionClicked e) {
-		if (!e.getOption().equalsIgnoreCase("<col=0000ff>Cast")) {
+		if (!e.getOption().equalsIgnoreCase("<col=0000ff>Cast") || !(e.getTarget().containsIgnoreCase("High Level Alchemy") || e.getTarget().containsIgnoreCase("Superheat") || e.getTarget().containsIgnoreCase("Enchant"))) {
 			return;
 		}
-		e.setOption("Cast");
-		_client.setSelectedSpellChildIndex(-1);
-		log(LogLevel.DEBUG, "fuck me");
+		log(LogLevel.TRACE, "\"${_client.getSelectedSpellChildIndex()}\"|\"${_client.getSelectedSpellName()}\"|\"${_client.getSelectedSpellWidget()}\"")
 		if(e.getTarget().contains("High Level Alchemy")) {
+			e.setOption("Cast");
+			_client.setSelectedSpellChildIndex(-1);
+			log(LogLevel.DEBUG, "High Level Alchemy");
 			_client.setSelectedSpellName("<col=00ff00>High Level Alchemy</col>");
 			_client.setSelectedSpellWidget(WidgetInfo.SPELL_HIGH_LEVEL_ALCHEMY.getId());
 			latch = true;
 		}
 		else if (e.getTarget().contains("Superheat"))
 		{
+			e.setOption("Cast");
+			_client.setSelectedSpellChildIndex(-1);
+			log(LogLevel.DEBUG, "Superheat");
 			_client.setSelectedSpellName("<col=00ff00>Superheat Item</col>");
 			_client.setSelectedSpellWidget(WidgetInfo.SPELL_SUPERHEAT_ITEM.getId());
 			latch = true;
 		}
-		else if(e.getTarget().contains("Enchant")) {
+		else if(e.getTarget().contains("Enchant"))
+		{
 			Tuple3<WidgetInfo, String, List<Integer>> selected = items_to_enchant.stream().filter(f -> e.getTarget().contains(f.getV2())).findFirst().orElse(null);
 			if(selected != null)
 			{
+				e.setOption("Cast");
+				_client.setSelectedSpellChildIndex(-1);
+				log(LogLevel.DEBUG, "Enchant");
 				_client.setSelectedSpellName("<col=00ff00>${selected.getV2()}</col>");
 				_client.setSelectedSpellWidget(selected.getV1().getId());
 				latch = true;
 			}
 		}
+		else
+		{
+			return;
+		}
 		log(LogLevel.DEBUG, "menu hijacked -> ${e.getOption()}");
+		log(LogLevel.WARN, "${_client.getSelectedSpellChildIndex()}|${_client.getSelectedSpellName()}|${_client.getSelectedSpellWidget()}")
+//		_client.getSelectedSpellChildIndex();
+//		_client.getSelectedSpellName();
+//		_client.getSelectedSpellWidget();
 	}
 
 	void onMenuAdded(MenuEntryAdded e) {

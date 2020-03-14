@@ -219,7 +219,7 @@ class Demo extends ScriptedPlugin
 			targetWord = e.getOption();
 			e.setOption("Use");
 		}
-		log(LogLevel.DEBUG, e.toString());
+		log(LogLevel.TRACE, e.toString());
 	}
 
 	int copyIntFromStack(int i)

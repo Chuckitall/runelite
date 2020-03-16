@@ -2,6 +2,8 @@ package net.runelite.client.plugins.fred.npctalker;
 
 import com.google.inject.Inject;
 import com.google.inject.Provides;
+import java.awt.Color;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -14,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Actor;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.NPC;
@@ -30,11 +33,13 @@ import static java.awt.event.KeyEvent.VK_3;
 import static java.awt.event.KeyEvent.VK_4;
 import static java.awt.event.KeyEvent.VK_5;
 import static java.awt.event.KeyEvent.VK_SPACE;
-import static net.runelite.api.NpcID.ALI_MORRISANE;
-import static net.runelite.api.NpcID.CAPTAIN_KHALED_6972;
 import static net.runelite.api.widgets.WidgetID.*;
 import static net.runelite.api.widgets.WidgetInfo.*;
 
+import net.runelite.client.chat.ChatColorType;
+import net.runelite.client.chat.ChatMessageBuilder;
+import net.runelite.client.chat.ChatMessageManager;
+import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.flexo.Flexo;
@@ -86,6 +91,9 @@ public class TalkerPlugin extends Plugin
 	private ConfigManager configManager;
 
 	@Inject
+	private ChatMessageManager chatMessageManager;
+
+	@Inject
 	@Getter(AccessLevel.PACKAGE)
 	private TalkerOverlay talkerOverlay;
 
@@ -109,7 +117,7 @@ public class TalkerPlugin extends Plugin
 	private boolean dirty_DIALOG_PLAYER = false;
 
 	@Getter(AccessLevel.PACKAGE)
-	private boolean dirty_DIALOG_OPTION = false;
+	private boolean dirty_DIALOG_NOTIFICATION = false;
 
 	@Getter(AccessLevel.PACKAGE)
 	private NPC interactingWith = null;
@@ -133,48 +141,20 @@ public class TalkerPlugin extends Plugin
 	@Contract(pure = true)
 	private boolean stateInvalid()
 	{
-		return (flexo == null || !loggedIn || !config.speedThroughDialog());
+		return (flexo == null || !loggedIn);
 	}
 
 	@Contract(pure = true)
 	private boolean isDirty()
 	{
-		return dirty_DIALOG_NPC || dirty_DIALOG_PLAYER || dirty_DIALOG_OPTION;
+		return dirty_DIALOG_NPC || dirty_DIALOG_PLAYER || dirty_DIALOG_NOTIFICATION;
 	}
 
 	private void setClean()
 	{
 		dirty_DIALOG_PLAYER = false;
 		dirty_DIALOG_NPC = false;
-		dirty_DIALOG_OPTION = false;
-	}
-
-	private FLEXO_CHAT_KEY getOptionToChoose(Widget parent)
-	{
-		int group = parent != null ? TO_GROUP(parent.getId()) : -1;
-		log.debug("Get option w/ widget group {}", group);
-		if (parent == null || group != DIALOG_OPTION_GROUP_ID) return FLEXO_CHAT_KEY.NULL;
-		Widget[] dChild = parent.getDynamicChildren();
-		if (interactingWith != null && interactingWith.getId() == ALI_MORRISANE)
-		{
-			if (dChild.length > 1 && dChild[1] != null && dChild[1].getText().equalsIgnoreCase("I would like to have a look at your selection of runes."))
-				return FLEXO_CHAT_KEY.ONE;
-			else if (dChild.length > 4 && dChild[4] != null && dChild[4].getText().equalsIgnoreCase("Buy other runes."))
-				return FLEXO_CHAT_KEY.FOUR;
-		}
-		else if(interactingWith != null && interactingWith.getId() == CAPTAIN_KHALED_6972)
-		{
-			if (dChild.length > 1 && dChild[1] != null && dChild[1].getText().equalsIgnoreCase("I have what it takes."))
-			{
-				return FLEXO_CHAT_KEY.ONE;
-			}
-			else if (dChild.length > 2 && dChild[2] != null && dChild[2].getText().equalsIgnoreCase("Looking for any help?"))
-			{
-				return FLEXO_CHAT_KEY.TWO;
-			}
-		}
-		//hooks for talking to beanshell plugin
-		return FLEXO_CHAT_KEY.NULL;
+		dirty_DIALOG_NOTIFICATION = false;
 	}
 
 	@Provides
@@ -238,8 +218,7 @@ public class TalkerPlugin extends Plugin
 		//log.debug("WidgetLoaded -> {}, {}", widgetLoaded.toString(), widgetLoaded.getGroupId());
 		dirty_DIALOG_NPC = dirty_DIALOG_NPC || (g == DIALOG_NPC_GROUP_ID);
 		dirty_DIALOG_PLAYER = dirty_DIALOG_PLAYER || (g == DIALOG_PLAYER_GROUP_ID);
-		dirty_DIALOG_OPTION = dirty_DIALOG_OPTION || (g == DIALOG_OPTION_GROUP_ID);
-		dirty_DIALOG_NPC = dirty_DIALOG_NPC || (g == DIALOG_NOTIFICATION_GROUP_ID);
+		dirty_DIALOG_NOTIFICATION = dirty_DIALOG_NOTIFICATION || (g == DIALOG_NOTIFICATION_GROUP_ID);
 		//dirty quest action dialog
 	}
 
@@ -250,19 +229,73 @@ public class TalkerPlugin extends Plugin
 		//log.debug("Game Tick!");
 		//if (dirty_DIALOG_PLAYER) debugWidget(client.getWidget(DIALOG_PLAYER));
 		//if (dirty_DIALOG_NPC)    debugWidget(client.getWidget(DIALOG_NPC));
-		if (dirty_DIALOG_OPTION) debugWidget(client.getWidget(DIALOG_OPTION).getParent());
 
-		final FLEXO_CHAT_KEY key = (dirty_DIALOG_PLAYER || dirty_DIALOG_NPC) ? FLEXO_CHAT_KEY.SPACE : (dirty_DIALOG_OPTION ? getOptionToChoose(client.getWidget(DIALOG_OPTION).getParent()) : FLEXO_CHAT_KEY.NULL);
-		log.debug("Pressing {} in response to widget!", key.name());
-		if (key != FLEXO_CHAT_KEY.NULL)
+		if (config.logDialogs())
+		{
+
+			String name = "NULL";
+			String body = "NULL";
+			Color color = Color.BLACK;
+			if (dirty_DIALOG_NPC)
+			{
+				Widget npc_text = client.getWidget(DIALOG_NPC_TEXT);
+				Widget npc_name = client.getWidget(DIALOG_NPC_NAME);
+				color = config.npcColor();
+				if (npc_text != null)
+				{
+					body = npc_text.getText();
+				}
+				if (npc_name != null)
+				{
+					name = npc_name.getText();
+				}
+			}
+			else if (dirty_DIALOG_PLAYER)
+			{
+				Widget player_text = client.getWidget(DIALOG_PLAYER_TEXT);
+				Widget player_name = client.getWidget(DIALOG_PLAYER_NAME);
+				color = config.playerColor();
+				if (player_text != null)
+				{
+					body = player_text.getText();
+				}
+				if (player_name != null)
+				{
+					name = player_name.getText();
+				}
+			}
+			else if (dirty_DIALOG_NOTIFICATION)
+			{
+				Widget notification_text = client.getWidget(DIALOG_NOTIFICATION_TEXT);
+				color = config.notificationColor();
+				if (notification_text != null)
+				{
+					body = notification_text.getText();
+				}
+				name = "";
+			}
+
+			final String formattedMessage = new ChatMessageBuilder()
+				.append(ChatColorType.NORMAL)
+				.append(color, body)
+				.build();
+
+			chatMessageManager.queue(QueuedMessage.builder()
+				.type(ChatMessageType.PUBLICCHAT)
+				.sender("talker")
+				.name(name)
+				.runeLiteFormattedMessage(formattedMessage)
+				.build());
+		}
+
+		if (!config.speedThroughDialog())
 		{
 			executorService.submit(() ->
 			{
 				flexo.delay((int) getMillis());
-				flexo.holdKey(key.keycode, r.nextInt(35) + (r.nextInt(3) * r.nextInt(10)));
+				flexo.holdKey(FLEXO_CHAT_KEY.SPACE.keycode, r.nextInt(35) + (r.nextInt(3) * r.nextInt(10)));
 			});
 		}
-
 		setClean();
 	}
 

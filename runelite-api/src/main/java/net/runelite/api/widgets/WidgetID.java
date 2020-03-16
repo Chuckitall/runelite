@@ -206,10 +206,10 @@ public class WidgetID
 
 	static class DialogPlayer
 	{
-		static final int HEAD_MODEL = 0;
-		static final int NAME = 1;
-		static final int CONTINUE = 2;
-		static final int TEXT = 3;
+		static final int HEAD_MODEL = 1;
+		static final int NAME = 2;
+		static final int CONTINUE = 3;
+		static final int TEXT = 4;
 	}
 
 	static class DialogNotification

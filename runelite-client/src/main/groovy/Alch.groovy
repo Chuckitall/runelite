@@ -2,9 +2,11 @@ import groovy.transform.InheritConstructors
 import io.reactivex.rxjava3.functions.Consumer;
 import net.runelite.api.ItemID
 import net.runelite.api.MenuOpcode
+import net.runelite.api.events.ChatMessage
 import net.runelite.api.events.MenuEntryAdded
 import net.runelite.api.events.MenuOptionClicked
-import net.runelite.api.events.ScriptCallbackEvent;
+import net.runelite.api.events.ScriptCallbackEvent
+import net.runelite.api.util.Text;
 import net.runelite.api.vars.InterfaceTab
 import net.runelite.api.widgets.WidgetInfo
 import net.runelite.client.plugins.groovy.debugger.DebuggerWindow.LogLevel
@@ -117,12 +119,26 @@ class Alch extends ScriptedPlugin {
 			int[] stack = _scriptStackTools.copyIntsFromStack((e.getEventName().containsIgnoreCase("return")) ? 2 : 4);
 			log((e.getEventName().containsIgnoreCase("return")) ? LogLevel.DEBUG: LogLevel.TRACE, "${e.getEventName()} -> ${stack}");
 		}
+		else if (e.getEventName().containsIgnoreCase("1478_callback"))
+		{
+			int[] stack = _scriptStackTools.copyIntsFromStack(3);
+			log(LogLevel.DEBUG, "${e.getEventName()} -> ${stack}");
+		}
+	}
+
+	void onChatMessage(ChatMessage e)
+	{
+		if (Text.standardize(e.getMessage()).containsIgnoreCase("stash"))
+		{
+			log(LogLevel.WARN, e.toString());
+		}
 	}
 
 	void startup() {
 		_eventBus.subscribe(MenuOptionClicked.class, this, this.&onMenuClicked as Consumer<MenuOptionClicked>);
 		_eventBus.subscribe(MenuEntryAdded.class, this, this.&onMenuAdded as Consumer<MenuEntryAdded>);
 		_eventBus.subscribe(ScriptCallbackEvent.class, this, this.&onScriptCallbackEvent as Consumer<ScriptCallbackEvent>);
+		_eventBus.subscribe(ChatMessage.class, this, this.&onChatMessage as Consumer<ChatMessage>);
 		log(LogLevel.DEBUG, "Starting Up");
 	}
 

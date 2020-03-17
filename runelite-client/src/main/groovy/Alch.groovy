@@ -1,9 +1,7 @@
-import groovy.transform.CompileStatic;
 import groovy.transform.InheritConstructors
 import io.reactivex.rxjava3.functions.Consumer;
 import net.runelite.api.ItemID
 import net.runelite.api.MenuOpcode
-import net.runelite.api.events.Event
 import net.runelite.api.events.MenuEntryAdded
 import net.runelite.api.events.MenuOptionClicked
 import net.runelite.api.events.ScriptCallbackEvent;
@@ -14,7 +12,6 @@ import net.runelite.client.plugins.groovy.script.ScriptedPlugin
 
 @InheritConstructors
 class Alch extends ScriptedPlugin {
-
 	int[] items_to_alch = [
 		ItemID.WATER_BATTLESTAFF, ItemID.EARTH_BATTLESTAFF, ItemID.AIR_BATTLESTAFF, ItemID.FIRE_BATTLESTAFF,
 		ItemID.MAPLE_LONGBOW, ItemID.YEW_SHORTBOW, ItemID.YEW_LONGBOW
@@ -114,6 +111,11 @@ class Alch extends ScriptedPlugin {
 				log(LogLevel.WARN, "intStack = ${intStack}");
 				latch = false;
 			}
+		}
+		else if (e.getEventName().containsIgnoreCase("watson"))
+		{
+			int[] stack = _scriptStackTools.copyIntsFromStack((e.getEventName().containsIgnoreCase("return")) ? 2 : 4);
+			log((e.getEventName().containsIgnoreCase("return")) ? LogLevel.DEBUG: LogLevel.TRACE, "${e.getEventName()} -> ${stack}");
 		}
 	}
 

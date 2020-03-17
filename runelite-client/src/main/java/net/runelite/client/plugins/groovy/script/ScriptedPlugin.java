@@ -3,6 +3,7 @@ package net.runelite.client.plugins.groovy.script;
 import net.runelite.api.Client;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.fred.ScriptStackTools;
 import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.groovy.debugger.DebuggerWindow.LogLevel;
 import net.runelite.client.plugins.groovy.debugger.GroovyLogEvent;
@@ -15,6 +16,7 @@ public abstract class ScriptedPlugin
 	public MenuManager _menuManager;
 	public OverlayManager _overlayManager;
 	public ClientThread _clientThread;
+	public ScriptStackTools _scriptStackTools;
 
 	protected void log(LogLevel lvl, String message)
 	{
@@ -28,6 +30,7 @@ public abstract class ScriptedPlugin
 		_menuManager = ctx.getMenuManager();
 		_overlayManager = ctx.getOverlayManager();
 		_clientThread = ctx.getClientThread();
+		_scriptStackTools = ctx.getScriptStackTools();
 	}
 
 	public abstract void startup();

@@ -25,24 +25,34 @@
 package net.runelite.client.plugins.stash;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
+import net.runelite.api.Client;
 import net.runelite.api.NullObjectID;
+import net.runelite.api.ScriptID;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.fred.api.other.Tuples;
+import net.runelite.client.plugins.fred.api.other.Tuples.T2;
+import net.runelite.client.plugins.fred.api.other.Tuples.T3;
 
 import static net.runelite.api.ItemID.*;
+import static net.runelite.client.plugins.stash.StashSet.set;
+import static net.runelite.client.plugins.stash.StashItem.item;
 
 @Getter(AccessLevel.PUBLIC)
-public enum STASHUnit
+public enum StashUnit
 {
 	//beginner
-	GYPSY_TENT_ENTRANCE(0, I(GOLD_RING, GOLD_NECKLACE), NullObjectID.NULL_34736, new WorldPoint(3206, 3422, 0)),
-	FINE_CLOTHES_ENTRANCE(0, I(CHEFS_HAT, RED_CAPE), NullObjectID.NULL_34737, new WorldPoint(3209, 3416, 0)),
-	BOB_AXES_ENTRANCE(0, I(LEATHER_BOOTS, BRONZE_AXE), NullObjectID.NULL_34738, new WorldPoint(3233, 3200, 0)),
+	GYPSY_TENT_ENTRANCE(0, NullObjectID.NULL_34736, set(GOLD_RING, GOLD_NECKLACE), new WorldPoint(3206, 3422, 0)),
+	FINE_CLOTHES_ENTRANCE(0, NullObjectID.NULL_34737, set(CHEFS_HAT, RED_CAPE), new WorldPoint(3209, 3416, 0)),
+	BOB_AXES_ENTRANCE(0, NullObjectID.NULL_34738, set(LEATHER_BOOTS, BRONZE_AXE), new WorldPoint(3233, 3200, 0)),
 
 	//easy
-	NEAR_A_SHED_IN_LUMBRIDGE_SWAMP(1, new int [] {BRONZE_DAGGER, IRON_FULL_HELM, GOLD_RING}, NullObjectID.NULL_28958, new WorldPoint(3201, 3171, 0)),
-	ON_THE_BRIDGE_TO_THE_MISTHALIN_WIZARDS_TOWER(1, new int[] {IRON_MED_HELM, EMERALD_RING, WHITE_APRON}, NullObjectID.NULL_28959, new WorldPoint(3115, 3194, 0)),
+	NEAR_A_SHED_IN_LUMBRIDGE_SWAMP(1, NullObjectID.NULL_28958, set(BRONZE_DAGGER, IRON_FULL_HELM, GOLD_RING), new WorldPoint(3201, 3171, 0)),
+	ON_THE_BRIDGE_TO_THE_MISTHALIN_WIZARDS_TOWER(1, NullObjectID.NULL_28959, set(IRON_MED_HELM, EMERALD_RING, WHITE_APRON), new WorldPoint(3115, 3194, 0)),
+	MUBARIZS_ROOM_AT_THE_DUEL_ARENA(1, NullObjectID.NULL_28982, set(IRON_CHAINBODY, LEATHER_CHAPS, COIF), new WorldPoint(3316, 3242, 0)),
 
 	//easy?
 //	DRAYNOR_VILLAGE_MARKET(NullObjectID.NULL_28960, new WorldPoint(3083, 3254, 0)),
@@ -67,7 +77,6 @@ public enum STASHUnit
 //	ROAD_JUNCTION_SOUTH_OF_SINCLAIR_MANSION(NullObjectID.NULL_28979, new WorldPoint(2735, 3534, 0)),
 //	OUTSIDE_THE_DIGSITE_EXAM_CENTRE(NullObjectID.NULL_28980, new WorldPoint(3353, 3343, 0)),
 //	NEAR_THE_SAWMILL_OPERATORS_BOOTH(NullObjectID.NULL_28981, new WorldPoint(3298, 3490, 0)),
-//	MUBARIZS_ROOM_AT_THE_DUEL_ARENA(NullObjectID.NULL_28982, new WorldPoint(3316, 3242, 0)),
 //	OUTSIDE_VARROCK_PALACE_COURTYARD(NullObjectID.NULL_28983, new WorldPoint(3211, 3456, 0)),
 //	NEAR_HERQUINS_SHOP_IN_FALADOR(NullObjectID.NULL_28984, new WorldPoint(2941, 3339, 0)),
 //	SOUTH_OF_THE_GRAND_EXCHANGE(NullObjectID.NULL_28985, new WorldPoint(3159, 3464, 0)),
@@ -155,33 +164,41 @@ public enum STASHUnit
 //	NORTH_OF_MOUNT_KARUULM(NullObjectID.NULL_34647, new WorldPoint(1308, 3840, 0)),
 
 	//master
-	CRYSTALLINE_MAPLE_TREES(5, I(BRYOPHYTAS_STAFF, NATURE_TIARA), NullObjectID.NULL_34953, new WorldPoint(2213, 3427, 0));
-
-	private static int[] I(Integer... items)
-	{
-		return Arrays.stream(items).mapToInt(f -> f).toArray();
-	}
+	CRYSTALLINE_MAPLE_TREES(5, NullObjectID.NULL_34953, set(item(BRYOPHYTAS_STAFF_UNCHARGED, BRYOPHYTAS_STAFF), item(NATURE_TIARA)), new WorldPoint(2213, 3427, 0));
 
 	private final int tier; //-1 is uncatalogued, 0 is beginner, 1 is easy, 2 is med, 3 is hard, 4 is elite, 5 is master?
-	private final int[] itemsStored;
 	private final int objectId;
+	private final StashSet stashSet;
 	private final WorldPoint[] worldPoints;
 
 	private final String location;
 
-	STASHUnit(int objectId, WorldPoint... wps)
+	StashUnit(int objectId, WorldPoint... wps)
 	{
-		this(-1, new int[] {}, objectId, wps);
+		this(-1, objectId, StashSet.empty(), wps);
 	}
 
-	STASHUnit(int tier, int[] items, int objectId, WorldPoint... wp)
+	StashUnit(int tier, int objectId, StashSet stashSet, WorldPoint... wp)
 	{
 		String temp = this.name().replace('_', ' ').toLowerCase();
 		this.location = (""+ temp.charAt(0)).toUpperCase() + temp.subSequence(1, temp.length());
 
 		this.tier = tier;
-		this.itemsStored = items;
 		this.objectId = objectId;
+		this.stashSet = stashSet;
 		this.worldPoints = wp;
+	}
+
+	public static List<StashUnit> getTier(int t)
+	{
+		return Arrays.stream(StashUnit.values()).filter(f->f.getTier() == t).collect(Collectors.toUnmodifiableList());
+	}
+
+	public T3<Boolean, Integer, Integer> check(Client client)
+	{
+		client.runScript(ScriptID.WATSON_STASH_UNIT_CHECK, this.getObjectId(), 0, 0, 0);
+		int[] intStack = client.getIntStack();
+		boolean stashUnitBuilt = intStack[0] == 1;
+		return Tuples.of(stashUnitBuilt, intStack[0], intStack[1]);
 	}
 }

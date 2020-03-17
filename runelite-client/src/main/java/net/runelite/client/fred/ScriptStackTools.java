@@ -13,7 +13,7 @@ public class ScriptStackTools
 		this.client = client;
 	}
 
-	String popStringOffStack()
+	public String popStringOffStack()
 	{
 		int stringStackSize = client.getStringStackSize();
 		String string = client.getStringStack()[--stringStackSize];
@@ -21,7 +21,7 @@ public class ScriptStackTools
 		return string;
 	}
 
-	int popIntOffStack()
+	public int popIntOffStack()
 	{
 		int intStackSize = client.getIntStackSize();
 		int i = client.getIntStack()[--intStackSize];
@@ -29,7 +29,7 @@ public class ScriptStackTools
 		return i;
 	}
 
-	String[] slurpStringsFromStack(int toSlurp)
+	public String[] slurpStringsFromStack(int toSlurp)
 	{
 		String[] toRet = new String[toSlurp];
 		for(int i = toSlurp-1; i >= 0; i--)
@@ -39,7 +39,7 @@ public class ScriptStackTools
 		return toRet;
 	}
 
-	int[] slurpIntsFromStack(int toSlurp)
+	public int[] slurpIntsFromStack(int toSlurp)
 	{
 		int[] toRet = new int[toSlurp];
 		for(int i = toSlurp-1; i >= 0; i--)
@@ -49,13 +49,13 @@ public class ScriptStackTools
 		return toRet;
 	}
 
-	String copyStringFromStack(int i)
+	public String copyStringFromStack(int i)
 	{
 		int stringStackSize = client.getStringStackSize();
 		return client.getStringStack()[stringStackSize-1-i];
 	}
 
-	String[] copyStringsFromStack(int toSlurp)
+	public String[] copyStringsFromStack(int toSlurp)
 	{
 		String[] toRet = new String[toSlurp];
 		for(int i = toSlurp-1; i >= 0; i--)
@@ -65,13 +65,13 @@ public class ScriptStackTools
 		return toRet;
 	}
 
-	int copyIntFromStack(int i)
+	public int copyIntFromStack(int i)
 	{
 		int intStackSize = client.getIntStackSize();
 		return client.getIntStack()[intStackSize-1-i];
 	}
 
-	int[] copyIntsFromStack(int toSlurp)
+	public int[] copyIntsFromStack(int toSlurp)
 	{
 		int[] toRet = new int[toSlurp];
 		for(int i = toSlurp-1; i >= 0; i--)
@@ -81,13 +81,13 @@ public class ScriptStackTools
 		return toRet;
 	}
 
-	void pasteStringToStack(int i, String value)
+	public void pasteStringToStack(int i, String value)
 	{
 		int strStackSize = client.getStringStackSize();
 		client.getStringStack()[strStackSize-1-i] = value;
 	}
 
-	void pasteIntToStack(int i, int value)
+	public void pasteIntToStack(int i, int value)
 	{
 		int intStackSize = client.getIntStackSize();
 		client.getIntStack()[intStackSize-1-i] = value;

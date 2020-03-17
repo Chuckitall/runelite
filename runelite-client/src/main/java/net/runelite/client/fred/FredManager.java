@@ -2,6 +2,8 @@ package net.runelite.client.fred;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.eventbus.EventBus;
@@ -12,6 +14,7 @@ import net.runelite.client.eventbus.EventBus;
 public class FredManager
 {
 	private final EventBus eventBus;
+	@Getter(AccessLevel.PUBLIC)
 	private final ScriptStackTools stackTools;
 	private final InterfaceChoiceGenerator interfaceChoiceGenerator;
 

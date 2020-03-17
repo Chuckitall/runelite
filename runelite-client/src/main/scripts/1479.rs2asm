@@ -1,0 +1,267 @@
+.id                 1479
+.int_stack_count    4
+.string_stack_count 0
+.int_var_count      9
+.string_var_count   0
+   iconst                 108
+   iconst                 99
+   iconst                 1368
+   iload                  0
+   sconst                 "watson_check" ;
+   runelite_callback                     ;
+   enum
+   istore                 4
+   iload                  4
+   iconst                 -1
+   if_icmpeq              LABEL10
+   jump                   LABEL13
+LABEL10:
+   iconst                 0
+   iconst                 0
+   sconst                 "watson_return" ;
+   runelite_callback                      ;
+   return
+LABEL13:
+   iload                  4
+   coordx
+   istore                 5
+   iload                  4
+   coordy
+   istore                 6
+   iconst                 0
+   istore                 7
+   iload                  5
+   iconst                 1
+   if_icmpeq              LABEL25
+   jump                   LABEL28
+LABEL25:
+   get_varp               1365
+   istore                 7
+   jump                   LABEL66
+LABEL28:
+   iload                  5
+   iconst                 2
+   if_icmpeq              LABEL32
+   jump                   LABEL35
+LABEL32:
+   get_varp               1366
+   istore                 7
+   jump                   LABEL66
+LABEL35:
+   iload                  5
+   iconst                 3
+   if_icmpeq              LABEL39
+   jump                   LABEL42
+LABEL39:
+   get_varp               1367
+   istore                 7
+   jump                   LABEL66
+LABEL42:
+   iload                  5
+   iconst                 4
+   if_icmpeq              LABEL46
+   jump                   LABEL49
+LABEL46:
+   get_varp               1368
+   istore                 7
+   jump                   LABEL66
+LABEL49:
+   iload                  5
+   iconst                 5
+   if_icmpeq              LABEL53
+   jump                   LABEL56
+LABEL53:
+   get_varp               1369
+   istore                 7
+   jump                   LABEL66
+LABEL56:
+   iload                  5
+   iconst                 6
+   if_icmpeq              LABEL60
+   jump                   LABEL63
+LABEL60:
+   get_varp               2202
+   istore                 7
+   jump                   LABEL66
+LABEL63:
+   iconst                 0
+   iconst                 0
+   sconst                 "watson_return" ;
+   runelite_callback                      ;
+   return
+LABEL66:
+   iload                  7
+   iload                  6
+   testbit
+   iconst                 0
+   if_icmpeq              LABEL72
+   jump                   LABEL75
+LABEL72:
+   iconst                 0
+   iconst                 0
+   sconst                 "watson_return" ;
+   runelite_callback                      ;
+   return
+LABEL75:
+   iconst                 108
+   iconst                 99
+   iconst                 1525
+   iload                  0
+   sconst                 "watson_check" ;
+   runelite_callback                     ;
+   enum
+   istore                 8
+   iload                  8
+   iconst                 -1
+   if_icmpne              LABEL85
+   jump                   LABEL111
+LABEL85:
+   iconst                 576
+   iload                  8
+   coordx
+   inv_getobj
+   iconst                 -1
+   if_icmpne              LABEL92
+   jump                   LABEL95
+LABEL92:
+   iconst                 1
+   iconst                 1
+   sconst                 "watson_return" ;
+   runelite_callback                      ;
+   return
+LABEL95:
+   iload                  0
+   iconst                 29032
+   if_icmpeq              LABEL99
+   jump                   LABEL108
+LABEL99:
+   iload                  2
+   iconst                 31
+   testbit
+   iconst                 1
+   if_icmpeq              LABEL105
+   jump                   LABEL108
+LABEL105:
+   iconst                 1
+   iconst                 1
+   sconst                 "watson_return" ;
+   runelite_callback                      ;
+   return
+LABEL108:
+   iconst                 1
+   iconst                 0
+   sconst                 "watson_return" ;
+   runelite_callback                      ;
+   return
+LABEL111:
+   iconst                 108
+   iconst                 99
+   iconst                 1440
+   iload                  0
+   sconst                 "watson_check"   ;
+   runelite_callback                      ;
+   enum
+   istore                 8
+   iload                  8
+   iconst                 -1
+   if_icmpne              LABEL121
+   jump                   LABEL163
+LABEL121:
+   iload                  8
+   coordx
+   iload                  8
+   coordy
+   istore                 6
+   istore                 5
+   iload                  5
+   iconst                 1
+   if_icmpeq              LABEL131
+   jump                   LABEL134
+LABEL131:
+   iload                  1
+   istore                 7
+   jump                   LABEL151
+LABEL134:
+   iload                  5
+   iconst                 2
+   if_icmpeq              LABEL138
+   jump                   LABEL141
+LABEL138:
+   iload                  2
+   istore                 7
+   jump                   LABEL151
+LABEL141:
+   iload                  5
+   iconst                 3
+   if_icmpeq              LABEL145
+   jump                   LABEL148
+LABEL145:
+   iload                  3
+   istore                 7
+   jump                   LABEL151
+LABEL148:
+   iconst                 0
+   iconst                 0
+   sconst                 "watson_return" ;
+   runelite_callback                      ;
+   return
+LABEL151:
+   iload                  7
+   iload                  6
+   testbit
+   iconst                 1
+   if_icmpeq              LABEL157
+   jump                   LABEL160
+LABEL157:
+   iconst                 1
+   iconst                 1
+   sconst                 "watson_return" ;
+   runelite_callback                      ;
+   return
+LABEL160:
+   iconst                 1
+   iconst                 0
+   sconst                 "watson_return" ;
+   runelite_callback                      ;
+   return
+LABEL163:
+   iload                  0
+   iconst                 29057
+   if_icmpeq              LABEL167
+   jump                   LABEL185
+LABEL167:
+   iload                  3
+   iconst                 10
+   testbit
+   iconst                 1
+   if_icmpeq              LABEL178
+   iload                  3
+   iconst                 12
+   testbit
+   iconst                 1
+   if_icmpeq              LABEL178
+   jump                   LABEL182
+LABEL178:
+   iconst                 1
+   iconst                 1
+   sconst                 "watson_return" ;
+   runelite_callback                      ;
+   return
+   jump                   LABEL185
+LABEL182:
+   iconst                 1
+   iconst                 0
+   sconst                 "watson_return" ;
+   runelite_callback                      ;
+   return
+LABEL185:
+   iconst                 0
+   iconst                 0
+   sconst                 "watson_return" ;
+   runelite_callback                      ;
+   return
+   iconst                 -1
+   iconst                 -1
+   sconst                 "watson_return" ;
+   runelite_callback                      ;
+   return

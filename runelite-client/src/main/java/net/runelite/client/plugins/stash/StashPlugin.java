@@ -57,50 +57,7 @@ public class StashPlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
-		List<StashUnit> units;
-		if(config.showBeginner())
-		{
-			units = StashUnit.getTier(0);
-			log.debug("beginner has {} entries", units.size());
-			units.forEach(f -> log.debug("stash: {} -> {}", f.getLocation(), f.check(client)));
-		}
-
-		if(config.showEasy())
-		{
-			units = StashUnit.getTier(1);
-			log.debug("easy has {} entries", units.size());
-			units.forEach(f -> log.debug("stash: {} -> {}", f.getLocation(), f.check(client)));
-		}
-
-		if(config.showMedium())
-		{
-			units = StashUnit.getTier(2);
-			log.debug("medium has {} entries", units.size());
-			units.forEach(f -> log.debug("stash: {} -> {}", f.getLocation(), f.check(client)));
-		}
-
-		if(config.showHard())
-		{
-			units = StashUnit.getTier(3);
-			log.debug("hard has {} entries", units.size());
-			units.forEach(f -> log.debug("stash: {} -> {}", f.getLocation(), f.check(client)));
-		}
-
-		if(config.showElite())
-		{
-			units = StashUnit.getTier(4);
-			log.debug("elite has {} entries", units.size());
-			units.forEach(f -> log.debug("stash: {} -> {}", f.getLocation(), f.check(client)));
-		}
-
-		if(config.showMaster())
-		{
-			units = StashUnit.getTier(5);
-			log.debug("master has {} entries", units.size());
-			units.forEach(f -> log.debug("stash: {} -> {}", f.getLocation(), f.check(client)));
-		}
-//		overlayManager.add(stashOverlay);
-		//
+		//overlayManager.add(stashOverlay);
 	}
 
 	@Override

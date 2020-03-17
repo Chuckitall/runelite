@@ -5,6 +5,7 @@ import com.google.inject.Provides;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -128,24 +129,25 @@ public class StashPlugin extends Plugin
 
 		if (client.getGameState().getState() == GameState.LOGGED_IN.getState())
 		{
-			String group = CONFIG_CACHE_GROUP + "." + client.getLocalPlayer().getName();
-			List<String> cacheKeys = configManager.getConfigurationKeys(group);
-			for(int i = 0; i < cacheKeys.size(); i++)
+			//String group = CONFIG_CACHE_GROUP + "." + client.getLocalPlayer().getName() + "." + unit.name();
+			String keyName = client.getLocalPlayer().getName()+"."+unit.name();
+			RecordState record;
+			try
 			{
-				log.debug("cacheKeys[{}] -> {}", i, cacheKeys.get(i));
+				record = RecordState.decode(Integer.parseInt(configManager.getConfiguration(CONFIG_CACHE_GROUP, keyName)));
+			}
+			catch(Exception ignored)
+			{
+				record = RecordState.INVALID;
 			}
 
-//			configManager.getConfigurationKeys(group).stream().map(item -> item.replace(group, "")))
-//			return (cacheKeys.stream().map(f->f.substring(group.length())).anyMatch(f -> f.equalsIgnoreCase(unit.name())));
-			if (cacheKeys.stream().map(f->f.replace(group, "")).anyMatch(f -> f.equalsIgnoreCase("." + unit.name())))
+			if (!record.equals(RecordState.INVALID)) //we found it if its not null,
 			{
-				log.error("hey1");
-				Integer loadedValue = configManager.getConfiguration(group, unit.name(), int.class);
-				toReturn = RecordState.decode(loadedValue);
+				toReturn = record;
+//				log.trace("hey1: {}", toReturn.name());
 			}
 			else
 			{
-				log.error("hey2");
 				client.runScript(ScriptID.WATSON_STASH_UNIT_CHECK, unit.getObjectId(), 0, 0, 0);
 				int[] intStack = client.getIntStack();
 				toReturn = (intStack[0] == 1) ? RecordState.BUILT_MAYBE_FILLED : RecordState.NOT_BUILT;
@@ -173,7 +175,7 @@ public class StashPlugin extends Plugin
 	{
 		if (client.getGameState().getState() == GameState.LOGGED_IN.getState())
 		{
-			String group = CONFIG_CACHE_GROUP + "." + client.getLocalPlayer().getName();
+			//String group = CONFIG_CACHE_GROUP + "." + client.getLocalPlayer().getName();
 			RecordState old = null;
 			if (recordExists(unit))
 			{
@@ -183,7 +185,7 @@ public class StashPlugin extends Plugin
 			{
 				return true;//short out
 			}
-			configManager.setConfiguration(group, unit.name(), record.getValue());
+			configManager.setConfiguration(CONFIG_CACHE_GROUP, client.getLocalPlayer().getName()+"."+unit.name(), record.getValue());
 			log.debug("unit: {} -> old: {} | new: {}", unit.name(), old, record);
 			return true;
 		}

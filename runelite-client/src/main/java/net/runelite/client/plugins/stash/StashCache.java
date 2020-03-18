@@ -172,7 +172,7 @@ class StashCache
 			}
 			if (old.equals(updated))
 			{
-				log.trace("old {} == updated {}, so no change is needed.", old, updated);
+				log.debug("old {} == updated {}, so no change is needed.", old, updated);
 				return true;//record is up to date
 			}
 			configManager.setConfiguration(cacheGroup, unit.name(), updated.getValue() + "");
@@ -182,7 +182,7 @@ class StashCache
 			}
 			else
 			{
-				log.trace("created key {}.{} with value {}", cacheGroup, unit.name(), updated.name());
+				log.debug("created key {}.{} with value {}", cacheGroup, unit.name(), updated.name());
 			}
 			return true;
 		}
@@ -207,7 +207,7 @@ class StashCache
 
 	private void onMenuClicked(MenuOptionClicked event)
 	{
-		if ((event.getOption().equalsIgnoreCase("Search") && event.getTarget().contains("STASH")) && (event.getOption().equalsIgnoreCase("Build") && event.getTarget().contains("Inconspicuous")))
+		if ((event.getOption().equalsIgnoreCase("Search") && event.getTarget().contains("STASH")) || (event.getOption().equalsIgnoreCase("Build") && event.getTarget().contains("Inconspicuous")))
 		{
 			Optional<STASHUnit> clicked = Arrays.stream(STASHUnit.values()).filter(f -> f.getObjectId() == event.getIdentifier()).findFirst();
 			if (clicked.isPresent())

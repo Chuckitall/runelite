@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.stash;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import java.util.Arrays;
@@ -9,23 +11,39 @@ import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.api.Experience;
 import net.runelite.api.GameState;
+import net.runelite.api.Player;
 import net.runelite.api.ScriptID;
+import net.runelite.api.Skill;
 import net.runelite.api.events.ChatMessage;
+import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.StatChanged;
+import net.runelite.api.events.VarbitChanged;
+import net.runelite.api.kit.KitType;
 import net.runelite.api.util.Text;
+import net.runelite.client.chat.ChatCommandManager;
+import net.runelite.client.chat.ChatMessageBuilder;
+import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.fred.api.other.Tuples;
-import net.runelite.client.plugins.fred.api.other.Tuples.T2;
+import net.runelite.client.plugins.stash.StashCache.RecordState;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.util.MiscUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.LoggerFactory;
+
+import static java.lang.Math.min;
 
 /**
  * Created by npruff on 9/2/2019.
@@ -41,7 +59,6 @@ import org.apache.commons.lang3.ArrayUtils;
 public class StashPlugin extends Plugin
 {
 	static final String CONFIG_GROUP = "Stash";
-	static final String CONFIG_CACHE_GROUP = "StashCache";
 
 	@Getter(AccessLevel.PACKAGE)
 	@Inject
@@ -63,7 +80,9 @@ public class StashPlugin extends Plugin
 	@Getter(AccessLevel.PUBLIC)
 	private ConfigManager configManager;
 
-//	private final Map<STASHUnit, StashRecord> stashCache = new HashMap<STASHUnit, StashRecord>();
+	@Inject
+	@Getter(AccessLevel.PUBLIC)
+	private StashCache cache;
 
 	@Provides
 	StashConfig getConfig(ConfigManager configManager)
@@ -71,214 +90,80 @@ public class StashPlugin extends Plugin
 		return configManager.getConfig(StashConfig.class);
 	}
 
-	//all the loading/saving/updating cache is done here
-	//format for group -> CONFIG_CACHE_GROUP+"."+client.getLocalPlayer().getName();
-	//format for key is STASHUnit.name();
-	//format for value is {0 -> not built/not filled, 1 -> built/??? filled, 2 -> built/not filled, 4 -> built/filled}
-	public enum RecordState
+	private void onGameStateChanged(GameStateChanged event)
 	{
-		INVALID(-1),//not logged in or something?
-		NOT_BUILT(0),//not built/not filled
-		BUILT_MAYBE_FILLED(1),//built/??? filled
-		BUILT_NOT_FILLED(2),//built/not filled
-		BUILT_FILLED(3);//built/filled
-
-		@Getter(AccessLevel.PUBLIC)
-		private int value;
-
-		RecordState(int value)
+		if(event.getGameState().equals(GameState.LOGGED_IN))
 		{
-			this.value = value;
+			cache.setCache(client.getUsername());
+		}
+		else if(event.getGameState().equals(GameState.LOGIN_SCREEN))
+		{
+			cache.setCache(null);
+		}
+	}
+
+	private void onCommandExecuted(CommandExecuted commandExecuted)
+	{
+		if (!commandExecuted.getCommand().equals("stash"))
+		{
+			return;
+		}
+		String[] args_ = commandExecuted.getArguments();
+		String command = "";
+		String[] args;
+		if (args_.length > 0)
+		{
+			command = args_[0];
+			args = ArrayUtils.remove(args_, 0);
+		}
+		else
+		{
+			args = new String[] {};
 		}
 
-		public boolean isBuilt()
+		if (command.equals(""))
 		{
-			return this.value > 0;
+			Arrays.stream(cache.getCached()).forEach(j -> client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", j.name(), null));
 		}
-
-		public boolean isFilled()
+		else if (command.equals("isBuilt") && args.length > 0)
 		{
-			return this.value == 3;
-		}
-
-		public boolean isAccurate()
-		{
-			return this.value == 1;
-		}
-
-		static RecordState decode(Integer value)
-		{
-			if (value == null || value <= INVALID.getValue() || value > BUILT_FILLED.getValue())
-			{
-				return INVALID;
-			}
-			for (RecordState r : RecordState.values())
-			{
-				if (r.getValue() == value)
+			Arrays.stream(STASHUnit.values()).filter(f -> Arrays.stream(args).anyMatch(a -> a.equals(f.getObjectId()+""))).forEach(
+				unit ->
 				{
-					return r;
+					RecordState isBuilt = cache.getRecord(unit);
+					if (isBuilt.equals(RecordState.INVALID))
+					{
+						client.runScript(ScriptID.WATSON_STASH_UNIT_CHECK, unit.getObjectId(), 0, 0, 0);
+						int[] intStack = client.getIntStack();
+						isBuilt = (intStack[0] == 1) ? RecordState.BUILT_MAYBE_FILLED : RecordState.NOT_BUILT;
+					}
+					log.debug("unit {} -> state {}", unit.name(), isBuilt.name());
+					cache.updateRecord(unit, isBuilt);
 				}
-			}
-			return INVALID;
-		}
-	}
-
-	private RecordState getOrCreateRecord(STASHUnit unit)
-	{
-		RecordState toReturn = RecordState.INVALID;
-
-		if (client.getGameState().getState() == GameState.LOGGED_IN.getState())
-		{
-			//String group = CONFIG_CACHE_GROUP + "." + client.getLocalPlayer().getName() + "." + unit.name();
-			String keyName = client.getLocalPlayer().getName()+"."+unit.name();
-			RecordState record;
-			try
-			{
-				record = RecordState.decode(Integer.parseInt(configManager.getConfiguration(CONFIG_CACHE_GROUP, keyName)));
-			}
-			catch(Exception ignored)
-			{
-				record = RecordState.INVALID;
-			}
-
-			if (!record.equals(RecordState.INVALID)) //we found it if its not null,
-			{
-				toReturn = record;
-//				log.trace("hey1: {}", toReturn.name());
-			}
-			else
-			{
-				client.runScript(ScriptID.WATSON_STASH_UNIT_CHECK, unit.getObjectId(), 0, 0, 0);
-				int[] intStack = client.getIntStack();
-				toReturn = (intStack[0] == 1) ? RecordState.BUILT_MAYBE_FILLED : RecordState.NOT_BUILT;
-				updateRecord(unit, toReturn);
-			}
-		}
-
-		return toReturn;
-	}
-
-	private boolean recordExists(STASHUnit unit)
-	{
-		boolean toReturn = false;
-
-		if (client.getGameState().getState() == GameState.LOGGED_IN.getState())
-		{
-			String group = CONFIG_CACHE_GROUP + "." + client.getLocalPlayer().getName();
-			List<String> cacheKeys = configManager.getConfigurationKeys(group);
-			return (cacheKeys.stream().map(f->f.replace(group, "")).anyMatch(f -> f.equalsIgnoreCase("." + unit.name())));
-		}
-		return toReturn;
-	}
-
-	private boolean updateRecord(STASHUnit unit, RecordState record)
-	{
-		if (client.getGameState().getState() == GameState.LOGGED_IN.getState())
-		{
-			//String group = CONFIG_CACHE_GROUP + "." + client.getLocalPlayer().getName();
-			RecordState old = null;
-			if (recordExists(unit))
-			{
-				old = getOrCreateRecord(unit);
-			}
-			if (old != null && old == record)
-			{
-				return true;//short out
-			}
-			configManager.setConfiguration(CONFIG_CACHE_GROUP, client.getLocalPlayer().getName()+"."+unit.name(), record.getValue());
-			log.debug("unit: {} -> old: {} | new: {}", unit.name(), old, record);
-			return true;
-		}
-		return false;
-	}
-
-	STASHUnit lastClickedStashUnit = null;
-
-	boolean firstRun = true;
-	boolean latched = false;
-	private void onGameTick(GameTick tick)
-	{
-		if (client.getGameState().equals(GameState.LOGIN_SCREEN) && latched)
-		{
-			latched = false;
-		}
-		else if (!latched && client.getGameState().equals(GameState.LOGGED_IN))
-		{
-			if(firstRun)
-			{
-				Arrays.stream(STASHUnit.values()).filter(
-					this::recordExists
-				).map(f -> Tuples.of(f, this.getOrCreateRecord(f))).forEach(f -> log.warn("unit: {} -> {}", f.get_1().name(), f.get_2().name()));
-				firstRun = false;
-			}
-
-			latched = true;
-			Arrays.stream(STASHUnit.values()).forEach(
-				this::getOrCreateRecord
 			);
-		}
-	}
 
-	private void onMenuClicked(MenuOptionClicked event)
-	{
-		if (event.getOption().equalsIgnoreCase("Search") && event.getTarget().contains("STASH"))
-		{
-			Optional<STASHUnit> clicked = Arrays.stream(STASHUnit.values()).filter(f -> f.getObjectId() == event.getIdentifier()).findFirst();
-			if (clicked.isPresent())
-			{
-				lastClickedStashUnit = clicked.get();
-				log.debug("Clicked stash w/ id: {} and named: {}", lastClickedStashUnit.getObjectId(), lastClickedStashUnit.name());
-			}
-			else
-			{
-				lastClickedStashUnit = null;
-				log.error("No stash w/ id: {} was found from click {}", event.getIdentifier(), event);
-			}
-		}
-	}
-
-	private void onChatMessage(ChatMessage event)
-	{
-		if (lastClickedStashUnit != null && Text.standardize(event.getMessage()).contains("stash"))
-		{
-			RecordState newState = RecordState.INVALID;
-			if(Text.standardize(event.getMessage()).contains("deposit"))
-			{
-				newState = RecordState.BUILT_FILLED;
-			}
-			else if(Text.standardize(event.getMessage()).contains("withdraw") || Text.standardize(event.getMessage()).contains("build"))
-			{
-				newState = RecordState.BUILT_NOT_FILLED;
-			}
-
-			if (newState != RecordState.INVALID)
-			{
-				boolean worked = updateRecord(lastClickedStashUnit, newState);
-				log.debug("update {} on chat message {}", worked ? "worked" : "failed", event);
-			}
-			else
-			{
-				log.warn("chat message {} on {}", event, lastClickedStashUnit.name());
-			}
-			lastClickedStashUnit = null;
 		}
 	}
 
 	@Override
 	protected void startUp()
 	{
-		latched = false;
-		firstRun = true;
-		eventBus.subscribe(GameTick.class, this, this::onGameTick);
-		eventBus.subscribe(MenuOptionClicked.class, this, this::onMenuClicked);
-		eventBus.subscribe(ChatMessage.class, this, this::onChatMessage);
+		if(client.getGameState().equals(GameState.LOGGED_IN))
+		{
+			cache.setCache(client.getUsername());
+		}
+		else
+		{
+			cache.setCache(null);
+		}
+		eventBus.subscribe(GameStateChanged.class, this, this::onGameStateChanged);
+		eventBus.subscribe(CommandExecuted.class, this, this::onCommandExecuted);
 	}
 
 	@Override
 	protected void shutDown()
 	{
+		cache.setCache(null);
 		eventBus.unregister(this);
-		latched = false;
-		firstRun = true;
 	}
 }

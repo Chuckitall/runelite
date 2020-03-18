@@ -207,7 +207,7 @@ class StashCache
 
 	private void onMenuClicked(MenuOptionClicked event)
 	{
-		if (event.getOption().equalsIgnoreCase("Search") && event.getTarget().contains("STASH"))
+		if ((event.getOption().equalsIgnoreCase("Search") && event.getTarget().contains("STASH")) && (event.getOption().equalsIgnoreCase("Build") && event.getTarget().contains("Inconspicuous")))
 		{
 			Optional<STASHUnit> clicked = Arrays.stream(STASHUnit.values()).filter(f -> f.getObjectId() == event.getIdentifier()).findFirst();
 			if (clicked.isPresent())

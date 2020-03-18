@@ -114,16 +114,16 @@ class Alch extends ScriptedPlugin {
 				latch = false;
 			}
 		}
-		else if (e.getEventName().containsIgnoreCase("watson"))
-		{
-			int[] stack = _scriptStackTools.copyIntsFromStack((e.getEventName().containsIgnoreCase("return")) ? 2 : 4);
-			log((e.getEventName().containsIgnoreCase("return")) ? LogLevel.DEBUG: LogLevel.TRACE, "${e.getEventName()} -> ${stack}");
-		}
-		else if (e.getEventName().containsIgnoreCase("1478_callback"))
-		{
-			int[] stack = _scriptStackTools.copyIntsFromStack(3);
-			log(LogLevel.DEBUG, "${e.getEventName()} -> ${stack}");
-		}
+//		else if (e.getEventName().containsIgnoreCase("watson"))
+//		{
+//			int[] stack = _scriptStackTools.copyIntsFromStack((e.getEventName().containsIgnoreCase("return")) ? 2 : 4);
+//			log((e.getEventName().containsIgnoreCase("return")) ? LogLevel.DEBUG: LogLevel.TRACE, "${e.getEventName()} -> ${stack}");
+//		}
+//		else if (e.getEventName().containsIgnoreCase("1478_callback"))
+//		{
+//			int[] stack = _scriptStackTools.copyIntsFromStack(3);
+//			log(LogLevel.DEBUG, "${e.getEventName()} -> ${stack}");
+//		}
 	}
 
 	void onChatMessage(ChatMessage e)

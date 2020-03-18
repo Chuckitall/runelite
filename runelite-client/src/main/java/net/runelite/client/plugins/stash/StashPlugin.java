@@ -94,7 +94,7 @@ public class StashPlugin extends Plugin
 	{
 		if(event.getGameState().equals(GameState.LOGGED_IN))
 		{
-			cache.setCache(client.getUsername());
+			cache.setCache(client.getLocalPlayer().getName());
 		}
 		else if(event.getGameState().equals(GameState.LOGIN_SCREEN))
 		{
@@ -150,7 +150,7 @@ public class StashPlugin extends Plugin
 	{
 		if(client.getGameState().equals(GameState.LOGGED_IN))
 		{
-			cache.setCache(client.getUsername());
+			cache.setCache(client.getLocalPlayer().getName());
 		}
 		else
 		{

@@ -1099,6 +1099,30 @@ public class WidgetID
 		// ARCEUUS SPELLS
 		static final int ARCEUUS_HOME_TELEPORT = 144;
 		static final int BATTLEFRONT_TELEPORT = 179;
+		// HEADS
+		static final int REANIMATE_GOBLIN = 145;
+		static final int REANIMATE_MONKEY = 147;
+		static final int REANIMATE_IMP = 148;
+		static final int REANIMATE_MINOTAUR = 149;
+		static final int REANIMATE_SCORPION = 151;
+		static final int REANIMATE_BEAR = 152;
+		static final int REANIMATE_UNICORN = 153;
+		static final int REANIMATE_DOG = 154;
+		static final int REANIMATE_CHAOS_DRUID = 156;
+		static final int REANIMATE_GIANT = 158;
+		static final int REANIMATE_OGRE = 160;
+		static final int REANIMATE_ELF = 161;
+		static final int REANIMATE_TROLL = 162;
+		static final int REANIMATE_HORROR = 164;
+		static final int REANIMATE_KALPHITE = 165;
+		static final int REANIMATE_DAGANNOTH = 167;
+		static final int REANIMATE_BLOODVELD = 168;
+		static final int REANIMATE_TZHAAR = 170;
+		static final int REANIMATE_DEMON = 172;
+		static final int REANIMATE_AVIANSIE = 173;
+		static final int REANIMATE_ABYSSAL = 176;
+		static final int REANIMATE_DRAGON = 178;
+
 	}
 
 	static class StandardSpellBook

@@ -2,6 +2,7 @@ import groovy.transform.InheritConstructors
 import io.reactivex.rxjava3.functions.Consumer;
 import net.runelite.api.ItemID
 import net.runelite.api.MenuOpcode
+import net.runelite.api.Varbits
 import net.runelite.api.events.ChatMessage
 import net.runelite.api.events.MenuEntryAdded
 import net.runelite.api.events.MenuOptionClicked
@@ -55,16 +56,17 @@ class Alch extends ScriptedPlugin {
 		new Tuple3<>(WidgetInfo.SPELL_REANIMATE_DRAGON, "Reanimate Dragon", ItemID.ENSOULED_DRAGON_HEAD_13511)
 	];
 
+	String[] validTargetFragments = ["High Level Alchemy", "Superheat", "Enchant", "Reanimate"];
+
 	boolean latch = false;
 
 	void onMenuClicked(MenuOptionClicked e) {
-		if (!e.getOption().equalsIgnoreCase("<col=0000ff>Cast") || !(e.getTarget().containsIgnoreCase("High Level Alchemy") || e.getTarget().containsIgnoreCase("Superheat") || e.getTarget().containsIgnoreCase("Enchant") || e.getTarget().containsIgnoreCase("Reanimate"))) {
+		if (!e.getOption().equalsIgnoreCase("<col=0000ff>Cast") || !validTargetFragments.any {f -> e.getTarget().containsIgnoreCase(f)}) {
 			return;
 		}
-		//log(LogLevel.TRACE, "\"${_client.getSelectedSpellChildIndex()}\"|\"${_client.getSelectedSpellName()}\"|\"${_client.getSelectedSpellWidget()}\"")
 		if(e.getTarget().contains("High Level Alchemy")) {
 			e.setOption("Cast");
-			_client.setSelectedSpellChildIndex(-1);
+//			_client.setSelectedSpellChildIndex(-1);
 			log(LogLevel.DEBUG, "High Level Alchemy");
 			_client.setSelectedSpellName("<col=00ff00>High Level Alchemy</col>");
 			_client.setSelectedSpellWidget(WidgetInfo.SPELL_HIGH_LEVEL_ALCHEMY.getId());
@@ -73,7 +75,7 @@ class Alch extends ScriptedPlugin {
 		else if (e.getTarget().contains("Superheat"))
 		{
 			e.setOption("Cast");
-			_client.setSelectedSpellChildIndex(-1);
+//			_client.setSelectedSpellChildIndex(-1);
 			log(LogLevel.DEBUG, "Superheat");
 			_client.setSelectedSpellName("<col=00ff00>Superheat Item</col>");
 			_client.setSelectedSpellWidget(WidgetInfo.SPELL_SUPERHEAT_ITEM.getId());
@@ -85,7 +87,7 @@ class Alch extends ScriptedPlugin {
 			if(selected != null)
 			{
 				e.setOption("Cast");
-				_client.setSelectedSpellChildIndex(-1);
+//				_client.setSelectedSpellChildIndex(-1);
 				log(LogLevel.DEBUG, "Enchant");
 				_client.setSelectedSpellName("<col=00ff00>${selected.getV2()}</col>");
 				_client.setSelectedSpellWidget(selected.getV1().getId());
@@ -98,7 +100,7 @@ class Alch extends ScriptedPlugin {
 			if(selected != null)
 			{
 				e.setOption("Reanimate");
-				_client.setSelectedSpellChildIndex(-1);
+//				_client.setSelectedSpellChildIndex(-1);
 				log(LogLevel.DEBUG, "Head");
 				_client.setSelectedSpellName("<col=00ff00>${selected.getV2()}</col>");
 				_client.setSelectedSpellWidget(selected.getV1().getId());
@@ -121,32 +123,47 @@ class Alch extends ScriptedPlugin {
 		{
 			return;
 		}
-		if (items_to_alch.contains(e.getIdentifier()) || items_to_alch.contains(e.getIdentifier()-1))
-		{
-			_client.insertMenuItem("<col=0000ff>Cast", "<col=00ff00>High Level Alchemy</col><col=ffffff> -> <col=ff9040>${_client.getItemDefinition(e.getIdentifier()).getName()}", MenuOpcode.ITEM_USE_ON_WIDGET.getId(), e.getIdentifier(), e.param0, e.param1, false);
-			return;
-		}
-		else if (items_to_superheat.contains(e.getIdentifier()))
-		{
-			_client.insertMenuItem("<col=0000ff>Cast", "<col=00ff00>Superheat Item</col><col=ffffff> -> <col=ff9040>${_client.getItemDefinition(e.getIdentifier()).getName()}", MenuOpcode.ITEM_USE_ON_WIDGET.getId(), e.getIdentifier(), e.param0, e.param1, false);
-			return;
-		}
 
-		for (int i = 0; i < items_to_enchant.size(); i++)
+		int spellbook = _client.getVar(Varbits.SPELLBOOK);
+
+		if (spellbook == 0) //standard
 		{
-			if (items_to_enchant[i].getV3().contains(e.getIdentifier()))
+			if (items_to_alch.contains(e.getIdentifier()) || items_to_alch.contains(e.getIdentifier()-1))
 			{
-				_client.insertMenuItem("<col=0000ff>Cast", "<col=00ff00>${items_to_enchant[i].getV2()}</col><col=ffffff> -> <col=ff9040>${_client.getItemDefinition(e.getIdentifier()).getName()}", MenuOpcode.ITEM_USE_ON_WIDGET.getId(), e.getIdentifier(), e.param0, e.param1, false);
+				_client.insertMenuItem("<col=0000ff>Cast", "<col=00ff00>High Level Alchemy</col><col=ffffff> -> <col=ff9040>${_client.getItemDefinition(e.getIdentifier()).getName()}", MenuOpcode.ITEM_USE_ON_WIDGET.getId(), e.getIdentifier(), e.param0, e.param1, false);
 				return;
 			}
-		}
-
-		for (int i = 0; i < heads.size(); i++)
-		{
-			if (heads[i].getV3().intValue() == e.getIdentifier())
+			else if (items_to_superheat.contains(e.getIdentifier()))
 			{
-				_client.insertMenuItem("<col=0000ff>Cast", "<col=00ff00>${heads[i].getV2()}</col><col=ffffff> -> <col=ff9040>${_client.getItemDefinition(e.getIdentifier()).getName()}", MenuOpcode.ITEM_USE_ON_WIDGET.getId(), e.getIdentifier(), e.param0, e.param1, false);
+				_client.insertMenuItem("<col=0000ff>Cast", "<col=00ff00>Superheat Item</col><col=ffffff> -> <col=ff9040>${_client.getItemDefinition(e.getIdentifier()).getName()}", MenuOpcode.ITEM_USE_ON_WIDGET.getId(), e.getIdentifier(), e.param0, e.param1, false);
 				return;
+			}
+			for (int i = 0; i < items_to_enchant.size(); i++)
+			{
+				if (items_to_enchant[i].getV3().contains(e.getIdentifier()))
+				{
+					_client.insertMenuItem("<col=0000ff>Cast", "<col=00ff00>${items_to_enchant[i].getV2()}</col><col=ffffff> -> <col=ff9040>${_client.getItemDefinition(e.getIdentifier()).getName()}", MenuOpcode.ITEM_USE_ON_WIDGET.getId(), e.getIdentifier(), e.param0, e.param1, false);
+					return;
+				}
+			}
+		}
+//		else if (spellbook == 1) //ancients
+//		{
+//
+//		}
+//		else if (spellbook == 2) //lunar
+//		{
+//
+//		}
+		else if (spellbook == 3) //arrceus
+		{
+			for (int i = 0; i < heads.size(); i++)
+			{
+				if (heads[i].getV3().intValue() == e.getIdentifier())
+				{
+					_client.insertMenuItem("<col=0000ff>Cast", "<col=00ff00>${heads[i].getV2()}</col><col=ffffff> -> <col=ff9040>${_client.getItemDefinition(e.getIdentifier()).getName()}", MenuOpcode.ITEM_USE_ON_WIDGET.getId(), e.getIdentifier(), e.param0, e.param1, false);
+					return;
+				}
 			}
 		}
 	}

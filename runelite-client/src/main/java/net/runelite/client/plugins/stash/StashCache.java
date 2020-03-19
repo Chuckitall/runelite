@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.ChatMessage;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.util.Text;
 import net.runelite.client.config.ConfigManager;
@@ -91,6 +92,7 @@ class StashCache
 	private String username = null;
 	private String cacheGroup = null;
 	private STASHUnit lastClickedStashUnit = null;
+	private int lastClickedCountDown = 0;
 
 	private boolean isValidState()
 	{
@@ -105,13 +107,6 @@ class StashCache
 		return this.username != null && this.cacheGroup != null;
 	}
 
-//	private T2<String, String> getCacheGroupAndKey(STASHUnit unit)
-//	{
-//		assert isValidState();
-//		assert unit != null;
-//		return Tuples.of(StashPlugin.CONFIG_GROUP + ".CACHE." + username, unit.name());
-//	}
-
 	public void setCache(String username)
 	{
 		if (this.username != null && !this.username.equalsIgnoreCase(username))
@@ -120,11 +115,12 @@ class StashCache
 			this.username = null;
 			isValidState();
 		}
-		if(username != null && this.username == null)
+		if (username != null && this.username == null)
 		{
 			this.username = username.toLowerCase();
-			eventBus.subscribe(MenuOptionClicked .class, this.username, this::onMenuClicked);
-			eventBus.subscribe(ChatMessage .class, this.username, this::onChatMessage);
+			eventBus.subscribe(MenuOptionClicked.class, this.username, this::onMenuClicked);
+			eventBus.subscribe(GameTick.class, this.username, this::onGameTick);
+			eventBus.subscribe(ChatMessage.class, this.username, this::onChatMessage);
 			isValidState();
 		}
 	}
@@ -153,7 +149,7 @@ class StashCache
 
 	public boolean recordExists(STASHUnit unit)
 	{
-		if(isValidState())
+		if (isValidState())
 		{
 			String value = configManager.getConfiguration(cacheGroup, unit.name());
 			return (!Strings.isNullOrEmpty(value));
@@ -176,7 +172,7 @@ class StashCache
 				return true;//record is up to date
 			}
 			configManager.setConfiguration(cacheGroup, unit.name(), updated.getValue() + "");
-			if(old != RecordState.INVALID)
+			if (old != RecordState.INVALID)
 			{
 				log.debug("updated key {}.{} from {} to {}", cacheGroup, unit.name(), old.name(), updated.name());
 			}
@@ -189,20 +185,45 @@ class StashCache
 		return false;
 	}
 
-//	public STASHUnit[] getCached(RecordState filter)
-//	{
-//
-//	}
-
 	public STASHUnit[] getCached()
 	{
 		if (isValidState())
 		{
-			String temp = cacheGroup+".";
+			String temp = cacheGroup + ".";
 			List<String> keys = configManager.getConfigurationKeys(cacheGroup);
-			keys.forEach(k -> log.debug("{}|{}|{}",cacheGroup, k, k.replace(temp, "")));
+			keys.forEach(k -> log.debug("{}|{}|{}", cacheGroup, k, k.replace(temp, "")));
 		}
-		return new STASHUnit[] {};
+		return new STASHUnit[]{};
+	}
+
+	private void setLastClickedStash(STASHUnit unit)
+	{
+		if (unit != null)
+		{
+			lastClickedCountDown = 25;
+		}
+		else
+		{
+			lastClickedCountDown = 0;
+		}
+		lastClickedStashUnit = unit;
+	}
+
+	private Optional<STASHUnit> getLastClickedStash()
+	{
+		if (lastClickedCountDown > 0)
+		{
+			return Optional.ofNullable(lastClickedStashUnit);
+		}
+		return Optional.empty();
+	}
+
+	private void onGameTick(GameTick event)
+	{
+		if (lastClickedCountDown > 0)
+		{
+			lastClickedCountDown--;
+		}
 	}
 
 	private void onMenuClicked(MenuOptionClicked event)
@@ -212,12 +233,12 @@ class StashCache
 			Optional<STASHUnit> clicked = Arrays.stream(STASHUnit.values()).filter(f -> f.getObjectId() == event.getIdentifier()).findFirst();
 			if (clicked.isPresent())
 			{
-				lastClickedStashUnit = clicked.get();
-				log.debug("Clicked stash w/ id: {} and named: {}", lastClickedStashUnit.getObjectId(), lastClickedStashUnit.name());
+				setLastClickedStash(clicked.get());
+				log.debug("Clicked stash w/ id: {} and named: {}", getLastClickedStash().map(STASHUnit::getObjectId).orElse(-1),  getLastClickedStash().map(STASHUnit::name).orElse("NULL"));
 			}
 			else
 			{
-				lastClickedStashUnit = null;
+				setLastClickedStash(null);
 				log.error("No stash w/ id: {} was found from click {}", event.getIdentifier(), event);
 			}
 		}
@@ -225,8 +246,10 @@ class StashCache
 
 	private void onChatMessage(ChatMessage event)
 	{
-		if (lastClickedStashUnit != null && Text.standardize(event.getMessage()).contains("stash"))
+
+		if (getLastClickedStash().isPresent() && Text.standardize(event.getMessage()).contains("stash"))
 		{
+			STASHUnit unit = getLastClickedStash().get();
 			RecordState newState = RecordState.INVALID;
 			if(Text.standardize(event.getMessage()).contains("deposit"))
 			{
@@ -239,14 +262,14 @@ class StashCache
 
 			if (!newState.equals(RecordState.INVALID))
 			{
-				boolean worked = updateRecord(lastClickedStashUnit, newState);
+				boolean worked = updateRecord(unit, newState);
 				log.debug("update {} on chat message {}", worked ? "worked" : "failed", event);
 			}
 			else
 			{
-				log.warn("chat message {} on {}", event, lastClickedStashUnit.name());
+				log.warn("chat message {} on {}", event, unit);
 			}
-			lastClickedStashUnit = null;
+			setLastClickedStash(null);
 		}
 	}
 }

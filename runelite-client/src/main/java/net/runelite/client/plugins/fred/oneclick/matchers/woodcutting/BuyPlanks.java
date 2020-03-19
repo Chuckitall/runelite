@@ -218,11 +218,21 @@ public class BuyPlanks extends MenuEntryMatcher
 	@Override
 	public void onGameTick()
 	{
-		final NPCQuery sawmillOperatorQ = new NPCQuery().idEquals(5422);
+		final NPCQuery sawmillOperatorQ = new NPCQuery().idEquals(3101);
 		final GameObjectQuery depBoxQ = new GameObjectQuery().idEquals(26254);
 		final GameObjectQuery tree = new GameObjectQuery().idEquals(OAK_10820).isWithinArea(LocalPoint.fromWorld(client, 1620, 3506), 1024);
-		operator = sawmillOperatorQ.result(client).nearestTo(client.getLocalPlayer());
-		depBox = depBoxQ.result(client).nearestTo(client.getLocalPlayer());
-		oakTree = tree.result(client).nearestTo(client.getLocalPlayer());
+
+		try
+		{
+			operator = sawmillOperatorQ.result(client).nearestTo(client.getLocalPlayer());
+			depBox = depBoxQ.result(client).nearestTo(client.getLocalPlayer());
+			oakTree = tree.result(client).nearestTo(client.getLocalPlayer());
+		}
+		catch(Exception ignored)
+		{
+			operator = null;
+			depBox = null;
+			oakTree = null;
+		}
 	}
 }

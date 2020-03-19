@@ -158,7 +158,7 @@ LABEL111:
    iconst                 99
    iconst                 1440
    iload                  0
-   sconst                 "watson_check"   ;
+   sconst                 "watson_check"  ;
    runelite_callback                      ;
    enum
    istore                 8

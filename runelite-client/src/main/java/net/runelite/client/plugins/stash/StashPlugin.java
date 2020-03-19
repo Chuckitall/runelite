@@ -27,6 +27,7 @@ import net.runelite.api.events.StatChanged;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.kit.KitType;
 import net.runelite.api.util.Text;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatCommandManager;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.QueuedMessage;
@@ -81,6 +82,9 @@ public class StashPlugin extends Plugin
 	private ConfigManager configManager;
 
 	@Inject
+	private ClientThread clientThread;
+
+	@Inject
 	@Getter(AccessLevel.PUBLIC)
 	private StashCache cache;
 
@@ -127,20 +131,22 @@ public class StashPlugin extends Plugin
 		}
 		else if (command.equals("isBuilt") && args.length > 0)
 		{
-			Arrays.stream(STASHUnit.values()).filter(f -> Arrays.stream(args).anyMatch(a -> a.equals(f.getObjectId()+""))).forEach(
-				unit ->
-				{
-					RecordState isBuilt = cache.getRecord(unit);
-					if (isBuilt.equals(RecordState.INVALID))
+			clientThread.invokeLater(() ->
+			{
+				Arrays.stream(STASHUnit.values()).filter(f -> Arrays.stream(args).anyMatch(a -> a.equals(f.getObjectId()+""))).forEach(
+					unit ->
 					{
-						client.runScript(ScriptID.WATSON_STASH_UNIT_CHECK, unit.getObjectId(), 0, 0, 0);
-						int[] intStack = client.getIntStack();
-						isBuilt = (intStack[0] == 1) ? RecordState.BUILT_MAYBE_FILLED : RecordState.NOT_BUILT;
-					}
-					log.debug("unit {} -> state {}", unit.name(), isBuilt.name());
-					cache.updateRecord(unit, isBuilt);
-				}
-			);
+						RecordState isBuilt = cache.getRecord(unit);
+						if (isBuilt.equals(RecordState.INVALID))
+						{
+							client.runScript(ScriptID.WATSON_STASH_UNIT_CHECK, unit.getObjectId(), 0, 0, 0);
+							int[] intStack = client.getIntStack();
+							isBuilt = (intStack[0] == 1) ? RecordState.BUILT_MAYBE_FILLED : RecordState.NOT_BUILT;
+						}
+						log.debug("unit {} -> state {}", unit.name(), isBuilt.name());
+						cache.updateRecord(unit, isBuilt);
+					});
+			});
 
 		}
 	}

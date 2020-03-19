@@ -58,10 +58,10 @@ class Alch extends ScriptedPlugin {
 	boolean latch = false;
 
 	void onMenuClicked(MenuOptionClicked e) {
-		if (!e.getOption().equalsIgnoreCase("<col=0000ff>Cast") || !(e.getTarget().containsIgnoreCase("High Level Alchemy") || e.getTarget().containsIgnoreCase("Superheat") || e.getTarget().containsIgnoreCase("Enchant"))) {
+		if (!e.getOption().equalsIgnoreCase("<col=0000ff>Cast") || !(e.getTarget().containsIgnoreCase("High Level Alchemy") || e.getTarget().containsIgnoreCase("Superheat") || e.getTarget().containsIgnoreCase("Enchant") || e.getTarget().containsIgnoreCase("Reanimate"))) {
 			return;
 		}
-		log(LogLevel.TRACE, "\"${_client.getSelectedSpellChildIndex()}\"|\"${_client.getSelectedSpellName()}\"|\"${_client.getSelectedSpellWidget()}\"")
+		//log(LogLevel.TRACE, "\"${_client.getSelectedSpellChildIndex()}\"|\"${_client.getSelectedSpellName()}\"|\"${_client.getSelectedSpellWidget()}\"")
 		if(e.getTarget().contains("High Level Alchemy")) {
 			e.setOption("Cast");
 			_client.setSelectedSpellChildIndex(-1);
@@ -156,12 +156,12 @@ class Alch extends ScriptedPlugin {
 		if (e.getEventName().equalsIgnoreCase("OnSwitchTopLevel2"))
 		{
 			int[] intStack = _client.getIntStack();
-			log(LogLevel.ERROR, "Latch: ${latch}");
+			//log(LogLevel.ERROR, "Latch: ${latch}");
 			if(latch)
 			{
-				log(LogLevel.DEBUG, "intStack = ${intStack}");
+				//log(LogLevel.DEBUG, "intStack = ${intStack}");
 				intStack[0] = InterfaceTab.INVENTORY.id;
-				log(LogLevel.WARN, "intStack = ${intStack}");
+				//log(LogLevel.WARN, "intStack = ${intStack}");
 				latch = false;
 			}
 		}

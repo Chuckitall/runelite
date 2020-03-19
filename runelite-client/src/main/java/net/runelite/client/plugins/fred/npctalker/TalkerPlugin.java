@@ -288,7 +288,7 @@ public class TalkerPlugin extends Plugin
 				.build());
 		}
 
-		if (!config.speedThroughDialog())
+		if (config.speedThroughDialog())
 		{
 			executorService.submit(() ->
 			{

@@ -1,5 +1,6 @@
 import groovy.transform.InheritConstructors
 import io.reactivex.rxjava3.functions.Consumer
+import net.runelite.api.InventoryID
 import net.runelite.api.ScriptID
 import net.runelite.api.events.Event
 import net.runelite.api.events.ItemContainerChanged
@@ -14,6 +15,10 @@ class Cat extends ScriptedPlugin
 {
 	void onInventoryContainerChanged(ItemContainerChanged e)
 	{
+		if (InventoryID.values().any {f -> e.getContainerId() == f.getId()})
+		{
+			return;
+		}
 		log(LogLevel.WARN, "ContainerID ${e.getContainerId()} has ${e.getItemContainer().getItems().length} items in it.");
 		e.getItemContainer().getItems().collect {i -> "${i.getId()}x${i.getQuantity()}"}.withIndex().collect(i -> "items[${i.v2}] = ${i.v1}").forEach(i -> log(LogLevel.TRACE, i));
 	}

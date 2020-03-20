@@ -3,7 +3,9 @@ package net.runelite.client.plugins.stash;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ import net.runelite.client.fred.FredManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
+import net.runelite.client.plugins.fred.api.other.Tuples.T2;
 import net.runelite.client.plugins.stash.StashCache.RecordState;
 import net.runelite.client.ui.overlay.OverlayManager;
 import org.apache.commons.lang3.ArrayUtils;
@@ -175,6 +178,31 @@ public class StashPlugin extends Plugin
 				boolean result = cache.updateRecord(unit, state);
 				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Stash", unit.name() + " = " + state.name(), null);
 			}
+		}
+		else if (command.equals("list"))
+		{
+			if (args.length == 0)
+			{
+				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Stash", "syntax \"::stash list <beginner/easy/medium/hard/elite/master> <not_built/built_maybe_filled/built_not_filled/built_filled>\"", null);
+				return;
+			}
+			List<T2<STASHUnit, RecordState>> units = cache.getCached();
+			STASHUnit[] param1 = Arrays.stream(args).filter(a -> Arrays.stream(StashLevel.values())
+				.map(Enum::name).anyMatch(f->f.equalsIgnoreCase(a)))
+				.map(a -> StashLevel.valueOf(a.toUpperCase()).getUnits())
+				.flatMap(Arrays::stream).distinct().toArray(STASHUnit[]::new);
+
+			RecordState[] param2 = Arrays.stream(args).filter(a -> Arrays.stream(RecordState.values())
+				.map(Enum::name).anyMatch(f->f.equalsIgnoreCase(a)))
+				.map(a -> RecordState.valueOf(a.toUpperCase()))
+				.distinct().toArray(RecordState[]::new);
+			STASHUnit[] filter1 = (param1.length == 0) ? STASHUnit.values() : param1;
+			RecordState[] filter2 = (param2.length == 0) ? (new RecordState[] {RecordState.NOT_BUILT, RecordState.BUILT_MAYBE_FILLED, RecordState.BUILT_NOT_FILLED, RecordState.BUILT_FILLED}) : param2;
+			units.stream().filter(f -> Arrays.stream(filter1).anyMatch(j -> j.equals(f.get_1())) && Arrays.stream(filter2).anyMatch(j -> j.equals(f.get_2())))
+				.sorted((a, b) -> (a.get_2().equals(b.get_2())) ? a.get_1().name().compareTo(b.get_1().name()) : a.get_2().ordinal() - b.get_2().ordinal())
+				.forEach(j ->
+					client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Stash", j.get_1().name() + " -> " + j.get_2().name(), null)
+				);
 		}
 	}
 

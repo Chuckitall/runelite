@@ -37,8 +37,6 @@ import net.runelite.client.plugins.fred.api.wrappers._Item;
 import net.runelite.client.plugins.fred.util.Random;
 import net.runelite.client.plugins.fred.util.Tab;
 import net.runelite.client.plugins.fred.util.TabUtils;
-import net.runelite.client.plugins.fredexperimental.striker.Striker;
-import net.runelite.client.plugins.fredexperimental.striker.StrikerUtils;
 
 import static net.runelite.api.ItemID.COINS_995;
 import static net.runelite.api.MenuOpcode.ITEM_USE;
@@ -119,24 +117,24 @@ public class TradeCharter extends MenuEntryMatcher
 
 	private void doHop()
 	{
-		Striker.typeKey(KeyEvent.VK_ESCAPE);
-		Striker.delayMS(Random.nextInt(120, 200));
-		//WorldHopperPlugin.request_hop(false);
-		int count = 0;
-		while (client.getGameState().equals(GameState.LOGGED_IN) && count++ < 200)
-		{
-			Striker.delayMS(Random.nextInt(20, 50));
-		}
-		log.debug("count {}", count);
-		count = 0;
-		while (!client.getGameState().equals(GameState.LOGGED_IN) && count++ < 200)
-		{
-			Striker.delayMS(Random.nextInt(20, 50));
-		}
-		log.debug("count {}", count);
-		Striker.delayMS(Random.nextInt(100, 150));
-		Striker.typeKey(TabUtils.getTabHotkey(Tab.INVENTORY, client));
-		Striker.delayMS(Random.nextInt(20, 50));
+//		Striker.typeKey(KeyEvent.VK_ESCAPE);
+//		Striker.delayMS(Random.nextInt(120, 200));
+//		//WorldHopperPlugin.request_hop(false);
+//		int count = 0;
+//		while (client.getGameState().equals(GameState.LOGGED_IN) && count++ < 200)
+//		{
+//			Striker.delayMS(Random.nextInt(20, 50));
+//		}
+//		log.debug("count {}", count);
+//		count = 0;
+//		while (!client.getGameState().equals(GameState.LOGGED_IN) && count++ < 200)
+//		{
+//			Striker.delayMS(Random.nextInt(20, 50));
+//		}
+//		log.debug("count {}", count);
+//		Striker.delayMS(Random.nextInt(100, 150));
+//		Striker.typeKey(TabUtils.getTabHotkey(Tab.INVENTORY, client));
+//		Striker.delayMS(Random.nextInt(20, 50));
 	}
 
 	@Override
@@ -271,10 +269,10 @@ public class TradeCharter extends MenuEntryMatcher
 			Rectangle bounds = Perspective.getCanvasTilePoly(client, temp).getBounds();
 			if (client.getCanvas().getBounds().contains(bounds))
 			{
-				Striker.clickMouse(StrikerUtils.getClickPoint(bounds), 1);
-				Striker.delayMS(30, 70);
-				Striker.moveMouse(mPos);
-				Striker.delayMS(20, 40);
+				//Striker.clickMouse(StrikerUtils.getClickPoint(bounds), 1);
+				//Striker.delayMS(30, 70);
+				//Striker.moveMouse(mPos);
+				//Striker.delayMS(20, 40);
 			}
 			else
 			{
@@ -290,11 +288,11 @@ public class TradeCharter extends MenuEntryMatcher
 		{
 			case "WALK":
 				log.debug("walk {}", walkTile);
-				Striker.schedule(() -> walkNextTile(walkTile.toLocalPoint(client), client.getMouseCanvasPosition()), 25);
+				//Striker.schedule(() -> walkNextTile(walkTile.toLocalPoint(client), client.getMouseCanvasPosition()), 25);
 				clicked.consume();
 				break;
 			case "HOP":
-				Striker.schedule(this::doHop, 10);
+				//Striker.schedule(this::doHop, 10);
 				clicked.consume();
 				break;
 			case "TRADE":

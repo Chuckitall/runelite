@@ -17,7 +17,8 @@ import net.runelite.api.ObjectDefinition;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.client.plugins.fred.api.controllers._Banking;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.fred.oneclick.util.ItemSelector;
 import net.runelite.client.plugins.fred.oneclick.util.MenuEntryHijack;
 import net.runelite.client.plugins.fred.oneclick.util.OneclickConstants;
@@ -44,12 +45,9 @@ public class GlassblowingHijack extends MenuEntryHijack
 	private ItemSelector moltenGlass = new ItemSelector(ImmutableSet.of(MOLTEN_GLASS));
 	private ItemSelector glassItems = new ItemSelector(ImmutableSet.of(BEER_GLASS, EMPTY_CANDLE_LANTERN, EMPTY_OIL_LAMP, VIAL, FISHBOWL, UNPOWERED_ORB, LANTERN_LENS, LIGHT_ORB));
 
-	private _Banking bankingController;
-
 	@Override
 	protected void onEnabled()
 	{
-		bankingController = new _Banking(client);
 		glassblowingPipe.clear();
 		moltenGlass.clear();
 		glassItems.clear();
@@ -68,7 +66,12 @@ public class GlassblowingHijack extends MenuEntryHijack
 		glassItems.clear();
 		eventBus.unregister(this);
 	}
-
+	private boolean isBankOpen()
+	{
+		Widget bankContainer = client.getWidget(WidgetInfo.BANK_CONTENT_CONTAINER);
+		Widget bankItemContainer = client.getWidget(WidgetInfo.BANK_ITEM_CONTAINER);
+		return bankContainer != null && !bankContainer.isHidden() && bankItemContainer != null && !bankItemContainer.isHidden();
+	}
 	@Override
 	public void onMenuEntryAdded(MenuEntryAdded event)
 	{
@@ -78,7 +81,7 @@ public class GlassblowingHijack extends MenuEntryHijack
 		}
 		if (glassblowingPipe.found() && event.getMenuOpcode() == ITEM_USE && glassblowingPipe.idxMatches(event.getParam0())) //p0:7, p1:9764864, opCode:38, ident:1785, option:Use, target:Use, mouse:(827, 356), authentic:true
 		{
-			if (bankingController.isBankOpen())
+			if (isBankOpen())
 			{
 
 			}

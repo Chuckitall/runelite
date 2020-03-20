@@ -14,8 +14,11 @@ import net.runelite.client.eventbus.EventBus;
 public class FredManager
 {
 	private final EventBus eventBus;
+	//public stuff
 	@Getter(AccessLevel.PUBLIC)
 	private final ScriptStackTools stackTools;
+
+	//private stuff
 	private final InterfaceChoiceGenerator interfaceChoiceGenerator;
 
 	@Inject

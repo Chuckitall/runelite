@@ -328,9 +328,19 @@ public class Oneclick2 extends Plugin implements ScriptPlugin
 
 	private void onItemContainerChanged(ItemContainerChanged event)
 	{
-		final InventoryID containerId = InventoryID.getValue(event.getContainerId());
-		final ItemContainer itemContainer = event.getItemContainer();
-		final List<Item> items = Arrays.asList(itemContainer.getItems());
+		final InventoryID containerId;
+		final ItemContainer itemContainer;
+		final List<Item> items;
+		try
+		{
+			containerId = InventoryID.getValue(event.getContainerId());
+			itemContainer = event.getItemContainer();
+			items = Arrays.asList(itemContainer.getItems());
+		}
+		catch (Exception ignored)
+		{
+			return;
+		}
 
 		List<_Item> tempList = Lists.newArrayList();
 		for (int idx = 0; idx < items.size(); idx++)

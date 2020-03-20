@@ -1,50 +1,32 @@
 package net.runelite.client.plugins.stash;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Actor;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
-import net.runelite.api.Experience;
 import net.runelite.api.GameState;
-import net.runelite.api.Player;
 import net.runelite.api.ScriptID;
-import net.runelite.api.Skill;
-import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.events.StatChanged;
-import net.runelite.api.events.VarbitChanged;
-import net.runelite.api.kit.KitType;
-import net.runelite.api.util.Text;
+import net.runelite.api.events.ScriptCallbackEvent;
 import net.runelite.client.callback.ClientThread;
-import net.runelite.client.chat.ChatCommandManager;
-import net.runelite.client.chat.ChatMessageBuilder;
-import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.fred.FredManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
-import net.runelite.client.plugins.fred.api.other.Tuples;
 import net.runelite.client.plugins.stash.StashCache.RecordState;
 import net.runelite.client.ui.overlay.OverlayManager;
-import net.runelite.client.util.MiscUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.slf4j.LoggerFactory;
 
-import static java.lang.Math.min;
 
 /**
  * Created by npruff on 9/2/2019.
@@ -85,6 +67,9 @@ public class StashPlugin extends Plugin
 	private ClientThread clientThread;
 
 	@Inject
+	private FredManager fredManager;
+
+	@Inject
 	@Getter(AccessLevel.PUBLIC)
 	private StashCache cache;
 
@@ -94,13 +79,24 @@ public class StashPlugin extends Plugin
 		return configManager.getConfig(StashConfig.class);
 	}
 
+	Object GAME_TICK_LOCK = new Object();
+	private void onGameTick(GameTick tick)
+	{
+		if(cache.isSet())
+		{
+			return;
+		}
+		String name = Optional.of(client.getLocalPlayer()).map(Actor::getName).orElse(null);
+		if (name != null)
+		{
+			log.debug("Gametick {}", name);
+			cache.setCache(name);
+		}
+	}
+
 	private void onGameStateChanged(GameStateChanged event)
 	{
-		if(event.getGameState().equals(GameState.LOGGED_IN))
-		{
-			cache.setCache(client.getLocalPlayer().getName());
-		}
-		else if(event.getGameState().equals(GameState.LOGIN_SCREEN))
+		if(event.getGameState().equals(GameState.LOGIN_SCREEN))
 		{
 			cache.setCache(null);
 		}
@@ -127,7 +123,9 @@ public class StashPlugin extends Plugin
 
 		if (command.equals(""))
 		{
-			Arrays.stream(cache.getCached()).forEach(j -> client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", j.name(), null));
+			cache.getCached().forEach(
+				j -> client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Stash", j.get_1().name() + " -> " + j.get_2().name(), null)
+			);
 		}
 		else if (command.equals("isBuilt") && args.length > 0)
 		{
@@ -137,39 +135,91 @@ public class StashPlugin extends Plugin
 					unit ->
 					{
 						RecordState isBuilt = cache.getRecord(unit);
-						if (isBuilt.equals(RecordState.INVALID))
-						{
-							client.runScript(ScriptID.WATSON_STASH_UNIT_CHECK, unit.getObjectId(), 0, 0, 0);
-							int[] intStack = client.getIntStack();
-							isBuilt = (intStack[0] == 1) ? RecordState.BUILT_MAYBE_FILLED : RecordState.NOT_BUILT;
-						}
+						client.runScript(ScriptID.WATSON_STASH_UNIT_CHECK, unit.getObjectId(), 0, 0, 0);
+						int[] intStack = client.getIntStack();
+						isBuilt = (intStack[0] == 1) ? RecordState.BUILT_MAYBE_FILLED : RecordState.NOT_BUILT;
 						log.debug("unit {} -> state {}", unit.name(), isBuilt.name());
 						cache.updateRecord(unit, isBuilt);
 					});
 			});
+		}
+		else if (command.equals("clear") && args.length > 0)
+		{
+			Arrays.stream(STASHUnit.values()).filter(f -> Arrays.stream(args).anyMatch(a -> a.equals(f.getObjectId()+""))).forEach(
+			unit ->
+			{
+				cache.updateRecord(unit, RecordState.NOT_BUILT);
+				log.debug("cleared state of unit {}", unit.name());
+			});
+		}
+		else if (command.equals("set"))
+		{
+			STASHUnit unit = null;
+			RecordState state = RecordState.INVALID;
+			try
+			{
+				unit = STASHUnit.valueOf(args[0].toUpperCase());
+				state = RecordState.valueOf(args[1].toUpperCase());
+			}
+			catch (Exception ignored)
+			{
 
+			}
+
+			if (args.length != 2 || unit == null || state == null)
+			{
+				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Stash", "syntax \"::stash set <STASHUnit name> <StashRecord name>\"", null);
+			}
+			else
+			{
+				boolean result = cache.updateRecord(unit, state);
+				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Stash", unit.name() + " = " + state.name(), null);
+			}
+		}
+	}
+
+	private void onScriptCallback(ScriptCallbackEvent event)
+	{
+		if (!event.getEventName().contains("1478_callback"))
+		{
+			return;
+		}
+		int[] stack = fredManager.getStackTools().copyIntsFromStack(3);
+		STASHUnit unit = Arrays.stream(STASHUnit.values()).filter(f -> f.getObjectId() == stack[0]).findFirst().orElse(null);
+		boolean filled = stack[1] == 1;
+		boolean built = stack[2] == 1;
+		if (unit != null)
+		{
+			cache.updateRecord(unit, built ? (filled ? RecordState.BUILT_FILLED : RecordState.BUILT_NOT_FILLED) : RecordState.NOT_BUILT);
+		}
+		else
+		{
+			log.error("name: {}, (0: {}, 1: {}, 2: {})", event.getEventName(), stack[0], stack[1], stack[2]);
 		}
 	}
 
 	@Override
 	protected void startUp()
 	{
-		if(client.getGameState().equals(GameState.LOGGED_IN))
-		{
-			cache.setCache(client.getLocalPlayer().getName());
-		}
-		else
-		{
-			cache.setCache(null);
-		}
+		eventBus.subscribe(GameTick.class, GAME_TICK_LOCK, this::onGameTick);
 		eventBus.subscribe(GameStateChanged.class, this, this::onGameStateChanged);
 		eventBus.subscribe(CommandExecuted.class, this, this::onCommandExecuted);
+		eventBus.subscribe(ScriptCallbackEvent.class, this, this::onScriptCallback);
+//		if(client.getLocalPlayer() != null)
+//		{
+//			cache.setCache(client.getLocalPlayer().getName());
+//		}
+//		else
+//		{
+//			cache.setCache(null);
+//		}
 	}
 
 	@Override
 	protected void shutDown()
 	{
-		cache.setCache(null);
 		eventBus.unregister(this);
+		eventBus.unregister(GAME_TICK_LOCK);
+		cache.setCache(null);
 	}
 }

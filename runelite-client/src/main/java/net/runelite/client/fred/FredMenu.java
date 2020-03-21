@@ -17,7 +17,6 @@ import net.runelite.api.Point;
 import net.runelite.api.VarClientInt;
 import net.runelite.api.VarClientStr;
 import net.runelite.api.Varbits;
-import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOptionClicked;
@@ -28,9 +27,8 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.fred.events.BankQtyInput;
-import net.runelite.client.menus.AbstractComparableEntry;
-import net.runelite.client.plugins.fred.api.other.Tuples;
-import net.runelite.client.plugins.fred.api.other.Tuples.T2;
+import net.runelite.client.fred.api.other.Tuples;
+import net.runelite.client.fred.api.other.Tuples.T2;
 
 @Slf4j
 @Singleton

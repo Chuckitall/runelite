@@ -195,8 +195,6 @@ public class TalkerPlugin extends Plugin
 		eventBus.subscribe(InteractingChanged.class, this, this::onInteractingChanged);
 //		overlayManager.add(talkerOverlay);
 
-
-
 		//Initial state
 		loggedIn = client.getGameState() == GameState.LOGGED_IN;
 	}

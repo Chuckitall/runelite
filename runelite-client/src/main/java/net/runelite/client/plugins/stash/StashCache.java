@@ -17,11 +17,10 @@ import net.runelite.api.Client;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.util.Text;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.plugins.fred.api.other.Tuples;
-import net.runelite.client.plugins.fred.api.other.Tuples.T2;
+import net.runelite.client.fred.api.other.Tuples;
+import net.runelite.client.fred.api.other.Tuples.T2;
 
 @SuppressWarnings("FieldCanBeLocal")
 @Singleton

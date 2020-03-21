@@ -8,8 +8,8 @@ import net.runelite.api.Client;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.client.plugins.fred.api.wrappers._Item;
 import net.runelite.client.plugins.fred.oneclick.OneclickPlugin;
+import net.runelite.client.plugins.fred.oneclick.api._Item;
 
 public abstract class MenuEntryMatcher
 {

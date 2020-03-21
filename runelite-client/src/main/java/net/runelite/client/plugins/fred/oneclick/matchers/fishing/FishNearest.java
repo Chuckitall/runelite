@@ -15,8 +15,8 @@ import net.runelite.api.NPC;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.queries.NPCQuery;
-import net.runelite.client.plugins.fred.api.wrappers._Item;
-import net.runelite.client.plugins.fred.api.wrappers._ItemContainer;
+import net.runelite.client.plugins.fred.oneclick.api._Item;
+import net.runelite.client.plugins.fred.oneclick.api._ItemContainer;
 import net.runelite.client.plugins.fred.oneclick.util.MenuEntryMatcher;
 import org.apache.commons.lang3.ArrayUtils;
 

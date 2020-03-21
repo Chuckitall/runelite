@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import lombok.Getter;
-import net.runelite.client.plugins.fred.api.wrappers._Item;
+import net.runelite.client.plugins.fred.oneclick.api._Item;
 
 public class ItemSelector
 {

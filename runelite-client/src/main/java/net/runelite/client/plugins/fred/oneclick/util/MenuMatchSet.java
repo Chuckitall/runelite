@@ -8,7 +8,7 @@ import net.runelite.api.MenuEntry;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.client.plugins.fred.api.wrappers._Item;
+import net.runelite.client.plugins.fred.oneclick.api._Item;
 import net.runelite.client.plugins.fred.oneclick.OneclickConfig;
 import net.runelite.client.plugins.fred.oneclick.OneclickPlugin;
 

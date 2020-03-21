@@ -42,10 +42,9 @@ import net.runelite.client.plugins.fred.oneclick.matchers.FletchingMatches;
 import net.runelite.client.plugins.fred.oneclick.matchers.HunterMatches;
 import net.runelite.client.plugins.fred.oneclick.matchers.SweatyMatches;
 import net.runelite.client.plugins.fred.oneclick.matchers.TwistedMatches;
-import net.runelite.client.plugins.fred.oneclick.matchers.UtilityMatches;
 import net.runelite.client.plugins.fred.oneclick.matchers.WoodcuttingMatches;
 import net.runelite.client.plugins.fred.oneclick.util.MenuMatchSet;
-import net.runelite.client.plugins.fred.api.wrappers._Item;
+import net.runelite.client.plugins.fred.oneclick.api._Item;
 @PluginDescriptor(
 	name = "Fred's Oneclick",
 	description = "1 Click MES Hijacks -DO NOT ABUSE/AUTOCLICK THESE-",
@@ -106,9 +105,6 @@ public class OneclickPlugin extends Plugin
 	private CraftingMatches crafting;
 
 	@Inject
-	private UtilityMatches utility;
-
-	@Inject
 	private SweatyMatches sweaty;
 
 	@Inject
@@ -152,7 +148,7 @@ public class OneclickPlugin extends Plugin
 
 	private List<MenuMatchSet> getMatchSets()
 	{
-		return Lists.newArrayList(woodcutting, hunter, fletching, fishing, crafting, construction, utility, sweaty, twisted);
+		return Lists.newArrayList(woodcutting, hunter, fletching, fishing, crafting, construction, sweaty, twisted);
 	}
 
 	@Provides

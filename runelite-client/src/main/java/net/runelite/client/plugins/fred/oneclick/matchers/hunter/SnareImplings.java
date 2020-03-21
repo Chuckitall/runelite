@@ -11,7 +11,7 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.fred.oneclick.util.MenuEntryMatcher;
-import net.runelite.client.plugins.fred.api.wrappers._Item;
+import net.runelite.client.plugins.fred.oneclick.api._Item;
 
 import static net.runelite.api.ItemID.EARTH_RUNE;
 import static net.runelite.api.ItemID.NATURE_RUNE;

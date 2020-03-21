@@ -17,8 +17,8 @@ import net.runelite.api.MenuOpcode;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.plugins.fred.api.wrappers._Item;
-import net.runelite.client.plugins.fred.api.wrappers._ItemContainer;
+import net.runelite.client.plugins.fred.oneclick.api._Item;
+import net.runelite.client.plugins.fred.oneclick.api._ItemContainer;
 import net.runelite.client.plugins.fred.oneclick.util.MenuEntryMatcher;
 
 import static net.runelite.api.MenuOpcode.GAME_OBJECT_FIRST_OPTION;

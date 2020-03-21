@@ -4,7 +4,6 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
-import net.runelite.client.plugins.fred.oneclick.matchers.utility.CharterArea;
 
 @ConfigGroup("fredsOneclick")
 public interface OneclickConfig extends Config
@@ -309,102 +308,6 @@ public interface OneclickConfig extends Config
 		section = "twisted"
 	)
 	default boolean harvesterDrop()
-	{
-		return false;
-	}
-
-	@ConfigSection(
-		position = 1,
-		name = "Charter Crew Trader",
-		description = "Various swaps for buying stock from charter ship crew members.",
-		keyName = "charterCrewSection"
-	)
-	default boolean charterCrewSection()
-	{
-		return true;
-	}
-
-	@ConfigItem(
-		keyName = "charterCrewEnabled",
-		name = "Enabled",
-		description = "Enable charter enhancements.",
-		position = 0,
-		section = "charterCrewSection"
-	)
-	default boolean charterCrewEnabled()
-	{
-		return true;
-	}
-
-	@ConfigItem(
-		keyName = "charterCrewArea",
-		name = "Trade Charter Area",
-		description = "Area to use one click charter enhancements.",
-		position = 1,
-		section = "charterCrewSection",
-		enumClass = CharterArea.class
-	)
-	default CharterArea charterCrewArea()
-	{
-		return CharterArea.PORT_KHAZARD;
-	}
-
-	@ConfigItem(
-		keyName = "charterCrewSodaAsh",
-		name = "Buy Soda Ash",
-		description = "Buy soda ash from charter ships.",
-		position = 2,
-		section = "charterCrewSection"
-	)
-	default boolean charterCrewSodaAsh()
-	{
-		return false;
-	}
-
-	@ConfigItem(
-		keyName = "charterCrewBucketOfSand",
-		name = "Buy Bucket of Sand",
-		description = "Buy buckets of sand from charter ships.",
-		position = 3,
-		section = "charterCrewSection"
-	)
-	default boolean charterCrewBucketOfSand()
-	{
-		return false;
-	}
-
-	@ConfigItem(
-		keyName = "charterCrewSeaweed",
-		name = "Buy Seaweed",
-		description = "Buy seaweed from charter ships.",
-		position = 4,
-		section = "charterCrewSection"
-	)
-	default boolean charterCrewSeaweed()
-	{
-		return false;
-	}
-
-	@ConfigItem(
-		keyName = "charterCrewBucketOfSlime",
-		name = "Buy Bucket of Slime",
-		description = "Buy buckets of slime from charter ships.",
-		position = 5,
-		section = "charterCrewSection"
-	)
-	default boolean charterCrewBucketOfSlime()
-	{
-		return false;
-	}
-
-	@ConfigItem(
-		keyName = "charterCrewPineapple",
-		name = "Buy Pineapple",
-		description = "Buy pineapples from charter ships.",
-		position = 6,
-		section = "charterCrewSection"
-	)
-	default boolean charterCrewPineapple()
 	{
 		return false;
 	}

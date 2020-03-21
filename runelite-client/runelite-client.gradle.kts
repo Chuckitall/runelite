@@ -77,11 +77,6 @@ dependencies {
     implementation(project(":http-api"))
     implementation(Libraries.naturalMouse)
 
-    implementation(Libraries.groovy)
-    implementation(Libraries.fifesoft_rsyntaxtextarea)
-    implementation(Libraries.fifesoft_rstaui)
-    implementation(Libraries.fifesoft_autocomplete)
-
     runtimeOnly(Libraries.trident)
     runtimeOnly(Libraries.jogampGluegenLinuxAmd64)
     runtimeOnly(Libraries.jogampGluegenLinuxI586)

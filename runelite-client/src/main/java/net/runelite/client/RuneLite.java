@@ -63,9 +63,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.config.OpenOSRSConfig;
 import net.runelite.client.discord.DiscordService;
 import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.fred.FredManager;
 import net.runelite.client.events.ExternalPluginsLoaded;
-import net.runelite.client.fred.FredMenu;
 import net.runelite.client.game.ClanManager;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.LootManager;
@@ -161,12 +159,6 @@ public class RuneLite
 
 	@Inject
 	private Provider<MenuManager> menuManager;
-
-	@Inject
-	private Provider<FredManager> fredManager;
-
-	@Inject
-	private Provider<FredMenu> fredMenu;
 
 	@Inject
 	private Provider<CommandManager> commandManager;
@@ -442,8 +434,6 @@ public class RuneLite
 			clanManager.get();
 			itemManager.get();
 			menuManager.get();
-			fredManager.get();
-			fredMenu.get();
 			chatMessageManager.get();
 			commandManager.get();
 			lootManager.get();

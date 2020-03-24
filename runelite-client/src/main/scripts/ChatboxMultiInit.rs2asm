@@ -368,8 +368,9 @@ LABEL290:
    sload                  4                  ; push 3rd option to the stack
    sload                  5                  ; push 4th option to the stack
    sload                  6                  ; push 5th option to the stack
-   sconst                 "ChatboxMultiInit" r unelite callback
+   sconst                 "ChatboxMultiInit" ; runelite callback
    runelite_callback                         ; make sure to pop off the top int as well as 5 strings to ensure we dont overflow the stack.
+   istore                 0
    pop_int
    pop_string
    pop_string
@@ -377,7 +378,6 @@ LABEL290:
    pop_string
    pop_string
    pop_string
-   istore                 0
    iload                  0
    iconst                 0
    if_icmpeq              RETURN              ;If the stack was not changed during the callback
